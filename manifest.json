@@ -1,0 +1,134 @@
+{
+  "$schema": "https://raw.githubusercontent.com/t8y2/dbx/main/plugins/manifest.schema.json",
+  "manifest_version": 1,
+  "id": "terry.devtools",
+  "name": "Dev Tools",
+  "version": "0.3.2",
+  "publisher": "Terry",
+  "description": "A collection of developer tools: password generator, QR/barcode generator, hash generator, UUID, Base64 and more.",
+  "icon": "assets/plugin.svg",
+  "engines": { "dbx": ">=0.5.68", "host_api": "1" },
+  "permissions": [],
+  "entrypoints": { "ui": { "root": "ui", "entry": "ui/index.html" } },
+  "contributions": [
+    {
+      "type": "workbench",
+      "id": "terry.devtools.home",
+      "label": "Dev Tools",
+      "description": "Developer tools collection home.",
+      "icon": "assets/plugin.svg"
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.password",
+      "label": "Password Generator",
+      "description": "Generate cryptographically secure passwords with custom rules."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.qrcode",
+      "label": "QR Code Generator",
+      "description": "Generate QR codes as SVG or PNG."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.barcode",
+      "label": "Barcode Generator",
+      "description": "Generate CODE-128 barcodes as SVG or PNG."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.hash",
+      "label": "Hash Generator",
+      "description": "Compute MD5 and SHA digests of text."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.uuid",
+      "label": "UUID Generator",
+      "description": "Generate random UUIDs in bulk."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.base64",
+      "label": "Base64 Encoder / Decoder",
+      "description": "Encode and decode Base64 with UTF-8 support."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.jwt",
+      "label": "JWT Parser",
+      "description": "Decode JWT header/payload, inspect claims and verify HS signatures."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.rmb",
+      "label": "RMB Uppercase",
+      "description": "Convert numeric amounts to Chinese RMB uppercase."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.url",
+      "label": "URL Encoder / Decoder",
+      "description": "URL encode/decode with query parameter breakdown."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.imgb64",
+      "label": "Image ⇄ Base64",
+      "description": "Convert images to Base64 and back, with preview and export."
+    }
+  ],
+  "localizations": {
+    "zh-CN": {
+      "name": "Dev Tools",
+      "description": "开发者工具集合：密码生成、二维码/条码生成、哈希计算、UUID、Base64 等。",
+      "contributions": {
+        "terry.devtools.home": {
+          "label": "Dev Tools",
+          "description": "开发者工具集合首页。"
+        },
+        "terry.devtools.password": {
+          "label": "密码生成器",
+          "description": "按规则生成加密安全的随机密码。"
+        },
+        "terry.devtools.qrcode": {
+          "label": "二维码生成器",
+          "description": "生成 SVG / PNG 二维码。"
+        },
+        "terry.devtools.barcode": {
+          "label": "条码生成器",
+          "description": "生成 CODE-128 条码，支持 SVG / PNG 导出。"
+        },
+        "terry.devtools.hash": {
+          "label": "Hash 生成器",
+          "description": "计算文本的 MD5 / SHA 摘要。"
+        },
+        "terry.devtools.uuid": {
+          "label": "UUID 生成器",
+          "description": "批量生成随机 UUID。"
+        },
+        "terry.devtools.base64": {
+          "label": "Base64 编解码",
+          "description": "支持 UTF-8 的 Base64 编码与解码。"
+        },
+        "terry.devtools.jwt": {
+          "label": "JWT 解析",
+          "description": "解码 JWT header/payload，检查声明并校验 HS 签名。"
+        },
+        "terry.devtools.rmb": {
+          "label": "人民币大写",
+          "description": "数字金额转人民币大写。"
+        },
+        "terry.devtools.url": {
+          "label": "URL 编解码",
+          "description": "URL 编码/解码，含查询参数拆解。"
+        },
+        "terry.devtools.imgb64": {
+          "label": "图片 ⇄ Base64",
+          "description": "图片与 Base64 互转，支持预览与导出。"
+        }
+      }
+    }
+  }
+}

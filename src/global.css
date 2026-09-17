@@ -1,0 +1,99 @@
+/* Token fallbacks for hosts that don't inject DBX design tokens (dev host).
+   In production the host sets these as inline styles on <html>, which always
+   win over these stylesheet defaults. */
+:root {
+  color-scheme: light dark;
+  --color-background: #ffffff;
+  --color-foreground: #18181b;
+  --color-card: #ffffff;
+  --color-border: #e4e4e7;
+  --color-input: #d4d4d8;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-destructive: #dc2626;
+  --color-ring: #93c5fd;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+}
+:root[data-dbx-theme="dark"] {
+  --color-background: #141416;
+  --color-foreground: #f4f4f5;
+  --color-card: #1c1c1f;
+  --color-border: #2e2e33;
+  --color-input: #3f3f46;
+  --color-muted: #26262a;
+  --color-muted-foreground: #a1a1aa;
+  --color-ring: #2563eb;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-foreground);
+  background: var(--color-background);
+}
+
+/* Mirror of the host's lightweight component kit so dev and production look
+   the same; the host-injected copy loads earlier, ours wins ties harmlessly. */
+.dbx-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  padding: 14px 16px;
+}
+.dbx-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  margin: 0 0 10px;
+}
+.dbx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 13px;
+  cursor: pointer;
+}
+.dbx-btn:hover { background: var(--color-muted); }
+.dbx-btn--primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-primary-foreground); }
+.dbx-btn--primary:hover { background: var(--color-primary); opacity: 0.9; }
+.dbx-btn--ghost { border-color: transparent; background: transparent; }
+.dbx-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.dbx-label { display: inline-flex; font-size: 12px; font-weight: 500; color: var(--color-foreground); }
+.dbx-input, .dbx-select, .dbx-textarea {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-input);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 13px;
+  font-family: inherit;
+}
+.dbx-textarea { height: auto; min-height: 64px; padding: 6px 10px; resize: vertical; }
+.dbx-input:focus, .dbx-select:focus, .dbx-textarea:focus {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 1px;
+  border-color: var(--color-ring);
+}
+.dbx-hint { font-size: 12px; color: var(--color-muted-foreground); }
+.dbx-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.dbx-table th { text-align: left; font-weight: 600; color: var(--color-muted-foreground); border-bottom: 1px solid var(--color-border); padding: 6px 8px; }
+.dbx-table td { border-bottom: 1px solid var(--color-border); padding: 6px 8px; }
+.dbx-link { color: var(--color-primary); text-decoration: none; cursor: pointer; }
+.dbx-link:hover { text-decoration: underline; }
