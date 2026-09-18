@@ -4,7 +4,7 @@
 
 日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——纯前端实现、universal 包、无原生 Sidecar。
 
-![DBX >=0.5.68](https://img.shields.io/badge/DBX-%3E%3D0.5.68-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
 
 ## 工具列表
 
