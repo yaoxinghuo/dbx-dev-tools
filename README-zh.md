@@ -6,6 +6,8 @@
 
 ![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
 
+<img width="2236" height="1220" alt="image" src="https://github.com/user-attachments/assets/839f7421-3744-4274-af3b-e5c0bc9d1972" />
+
 ## 工具列表
 
 - **密码生成器**：`crypto.getRandomValues` + 拒绝采样（无取模偏差），支持长度/字符集/易混淆字符规则、批量生成、熵强度估算
