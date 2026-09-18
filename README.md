@@ -4,7 +4,7 @@
 
 A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — pure frontend, universal package, no native sidecar.
 
-![DBX >=0.5.68](https://img.shields.io/badge/DBX-%3E%3D0.5.68-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
 
 ## Tools
 
