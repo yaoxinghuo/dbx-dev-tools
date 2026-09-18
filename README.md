@@ -21,6 +21,12 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 
 ## Install
 
+### From the plugin store (recommended)
+
+**Plugin Center → Store** — find **Dev Tools** and click install. Store packages are officially signed, no extra setup needed.
+
+### From a release package
+
 1. Download the latest `terry.devtools-*-universal.dbxp` from [Releases](https://github.com/yaoxinghuo/dbx-dev-tools/releases).
 2. In DBX: **Plugin Center → Settings → allow unsigned development packages**.
 3. Choose the local `.dbxp` to install.
@@ -38,6 +44,10 @@ Each tool is a manifest `workbench` contribution (independent entry/tab), all sh
 3. Fallback — Home tool grid
 
 Copy goes through `dbxPlugin.copy()` (host clipboard bridge) and export through `dbxPlugin.saveFile()` (native save dialog); both degrade to browser implementations under the dev host.
+
+## Contributing
+
+Have a small tool you reach for every day? This collection is meant to grow — open an issue with your idea, or send a PR following the four steps below.
 
 ## Add a new tool
 

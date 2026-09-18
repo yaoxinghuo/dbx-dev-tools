@@ -21,6 +21,12 @@
 
 ## 安装
 
+### 插件商店安装（推荐）
+
+**插件中心 → 插件商店**，搜索 **Dev Tools** 点击安装。商店包经官方签名，无需额外设置。
+
+### 本地包安装
+
 1. 从 [Releases](https://github.com/yaoxinghuo/dbx-dev-tools/releases) 下载最新的 `terry.devtools-*-universal.dbxp`。
 2. 在 DBX 中打开 **插件中心 → 设置 → 允许安装未签名开发包**。
 3. 选择本地 `.dbxp` 安装。
@@ -38,6 +44,10 @@
 3. 兜底 —— Home 工具列表页
 
 复制走 `dbxPlugin.copy()`（宿主剪贴板桥），导出走 `dbxPlugin.saveFile()`（宿主原生保存对话框），两者在 dev host 下自动降级为浏览器实现。
+
+## 参与贡献
+
+有你常用的小工具想加进来？这个集合就是为持续扩充设计的——欢迎开 issue 提想法，或者按下面四步直接提 PR。
 
 ## 添加新工具
 
