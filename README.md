@@ -13,10 +13,10 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Password Generator** — `crypto.getRandomValues` + rejection sampling (no modulo bias), charset rules, batch generation, entropy meter
 - **QR Code Generator** — `qrcode-generator`, adjustable EC level / module size / quiet zone, SVG & PNG export
 - **Barcode Generator** — hand-rolled CODE-128 B encoder, adjustable bar width / height / caption, SVG & PNG export
-- **Hash Generator** — MD5 + SHA-1/256/384/512 via Web Crypto
-- **UUID Generator** — v4 in bulk, uppercase / hyphen options
+- **Hash Generator** — MD5 + SHA-1/256/384/512 digests for text **and files**; optional key switches to HMAC-SHA digests
+- **ID Generator** — UUID v4, NanoID and ULID in bulk; uppercase / hyphen options for UUID
 - **Base64** — UTF-8 safe encode/decode, URL-safe variant
-- **JWT Parser** — decodes header/payload, claims table with exp/nbf validity badges, HS256/384/512 signature verification
+- **JWT Parser / Generator** — decodes header/payload, claims table with exp/nbf validity badges, HS256/384/512 signature verification, plus JWT signing (payload JSON + secret → token)
 - **RMB Uppercase** — numeric amount to Chinese RMB uppercase (correct 零 folding, negatives, up to 兆)
 - **URL Encoder / Decoder** — `encodeURIComponent`/`encodeURI` modes, form `+` toggle, query parameter breakdown
 - **Image ⇄ Base64** — image to Base64 (drop / paste / pick, optional data-URI prefix, size inflation shown); Base64 to image with magic-byte sniffing, preview & export
@@ -27,6 +27,16 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Lorem Ipsum** — dummy text at an exact length for input-boundary testing: characters or UTF-8 bytes, lorem / repeating pattern / random alphanumeric / random Chinese modes, common length presets
 - **JSON Formatter** — validate with precise error line/column/snippet (own parser, since JSC reports no position), pretty-print at 2/4/tab or minify, key sorting, depth/key/item stats, .json export
 - **URL breakdown** — the URL tool also splits a parseable URL into protocol / credentials / host / port / origin / path / query / fragment, each field individually copyable
+- **Text Diff** — LCS-based diff between two texts, line or character granularity, +/- stats, unified patch copy
+- **Case Converter** — camelCase / PascalCase / snake_case / kebab-case / CONSTANT_CASE / Title Case / dot.case and more, all at once
+- **Number Base** — BigInt-powered binary/octal/decimal/hex conversion (`0x`/`0o`/`0b` auto-detected), ASCII interpretation of the value
+- **Mojibake Fixer** — repairs text garbled by the wrong charset (UTF-8 mistaken as Windows-1252/GBK/Big5/Shift_JIS), ranked candidates
+- **Invisible Characters** — visualizes zero-width chars, BOM, NBSP, bidi controls and friends, with a code-point/count summary and one-click cleanup
+- **Date Calculator** — difference between two dates (days/weeks/months/years, working days, h/m/s) and date ± N days/weeks/months
+- **Color Converter** — HEX/RGB/HSL/HSV conversion with swatch + color picker, WCAG contrast ratio vs white and black (AA/AAA badges)
+- **Line Operations** — trim, remove empty, dedupe, sort A→Z/Z→A, add line numbers, reverse — combined in a fixed pipeline
+- **AES Encrypt / Decrypt** — PBKDF2 (100k, SHA-256) → AES-256-GCM; output is `base64(salt|iv|ciphertext)`, GCM tag rejects wrong passwords
+- **Chmod Calculator** — owner/group/other rwx checkboxes ⇄ octal, live symbolic (`rwxr-xr-x`), common presets
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 

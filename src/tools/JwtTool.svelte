@@ -11,6 +11,7 @@
   const TIME_CLAIMS = new Set(["exp", "iat", "nbf", "auth_time"]);
   const ALG_HASH = { HS256: "SHA-256", HS384: "SHA-384", HS512: "SHA-512" };
 
+  let mode = $state("parse"); // "parse" | "generate"
   let input = $state("");
   let secret = $state("");
   let error = $state("");
@@ -22,11 +23,53 @@
   let claims = $state([]);
   let verifyState = $state(""); // "" | "valid" | "invalid" | "unsupported"
 
+  let genPayload = $state('{\n  "sub": "1234567890",\n  "name": "Terry",\n  "iat": 1700000000\n}');
+  let genAlg = $state("HS256");
+  let genSecret = $state("");
+  let genToken = $state("");
+  let genError = $state("");
+
   function b64urlBytes(segment) {
     let normalized = segment.replaceAll("-", "+").replaceAll("_", "/");
     const rem = normalized.length % 4;
     if (rem) normalized += "=".repeat(4 - rem);
     return Uint8Array.from(atob(normalized), (c) => c.charCodeAt(0));
+  }
+
+  function b64urlEncode(bytes) {
+    let s = "";
+    for (const b of bytes) s += String.fromCharCode(b);
+    return btoa(s).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+  }
+
+  async function generate() {
+    genError = "";
+    genToken = "";
+    let payload;
+    try {
+      payload = JSON.parse(genPayload);
+    } catch {
+      genError = j.badJson;
+      return;
+    }
+    if (!genSecret) return;
+    try {
+      const te = new TextEncoder();
+      const head = b64urlEncode(te.encode(JSON.stringify({ alg: genAlg, typ: "JWT" })));
+      const body = b64urlEncode(te.encode(JSON.stringify(payload)));
+      const si = `${head}.${body}`;
+      const key = await crypto.subtle.importKey(
+        "raw",
+        te.encode(genSecret),
+        { name: "HMAC", hash: { name: ALG_HASH[genAlg] } },
+        false,
+        ["sign"],
+      );
+      const sig = await crypto.subtle.sign("HMAC", key, te.encode(si));
+      genToken = `${si}.${b64urlEncode(new Uint8Array(sig))}`;
+    } catch {
+      genError = j.genFailed;
+    }
   }
 
   $effect(() => {
@@ -91,12 +134,37 @@
 
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card">
-    <label class="dbx-label" for="jwt-in">JWT</label>
-    <textarea id="jwt-in" class="dbx-textarea mono" rows="4" bind:value={input} placeholder={j.placeholder}></textarea>
-    {#if error}<p class="err">{error}</p>{/if}
+    <div class="seg">
+      <button type="button" class="seg-btn" class:active={mode === "parse"} onclick={() => (mode = "parse")}>{j.parse}</button>
+      <button type="button" class="seg-btn" class:active={mode === "generate"} onclick={() => (mode = "generate")}>{j.generate}</button>
+    </div>
+
+    {#if mode === "parse"}
+      <label class="dbx-label" for="jwt-in">JWT</label>
+      <textarea id="jwt-in" class="dbx-textarea mono" rows="4" bind:value={input} placeholder={j.placeholder}></textarea>
+      {#if error}<p class="err">{error}</p>{/if}
+    {:else}
+      <label class="dbx-label" for="jwt-payload">{j.payload}</label>
+      <textarea id="jwt-payload" class="dbx-textarea mono" rows="6" bind:value={genPayload}></textarea>
+      <div class="gen-row">
+        <select class="dbx-input narrow" bind:value={genAlg}>
+          {#each Object.keys(ALG_HASH) as a}<option value={a}>{a}</option>{/each}
+        </select>
+        <input class="dbx-input" bind:value={genSecret} placeholder={j.secret} />
+        <button type="button" class="dbx-btn dbx-btn--primary" onclick={generate} disabled={!genSecret}>{j.generate}</button>
+      </div>
+      {#if genError}<p class="err">{genError}</p>{/if}
+      {#if genToken}
+        <div class="card-head">
+          <h2 class="dbx-section-title">JWT</h2>
+          <CopyButton text={genToken} small />
+        </div>
+        <code class="mono sig">{genToken}</code>
+      {/if}
+    {/if}
   </div>
 
-  {#if headerJson}
+  {#if mode === "parse" && headerJson}
     <div class="dbx-card">
       <div class="card-head">
         <h2 class="dbx-section-title">{j.header}</h2>
@@ -159,4 +227,10 @@
   .sig { overflow-wrap: anywhere; }
   .verify { display: flex; gap: 8px; align-items: center; }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }
+  .seg { display: flex; border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; overflow: hidden; width: fit-content; }
+  .seg-btn { padding: 6px 16px; font-size: 13px; background: transparent; border: none; color: var(--color-text-secondary, #64748b); cursor: pointer; }
+  .seg-btn.active { background: var(--color-primary, #3b82f6); color: #fff; }
+  .gen-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .gen-row .dbx-input:not(.narrow) { flex: 1; min-width: 160px; }
+  .narrow { width: 110px; flex: none; }
 </style>

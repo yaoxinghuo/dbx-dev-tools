@@ -38,3 +38,31 @@ export async function hashText(text) {
   }
   return results;
 }
+
+// Same set, on a binary buffer (file hashing).
+export async function hashBuffer(buffer) {
+  const results = [{ name: "MD5", hex: md5(new Uint8Array(buffer)) }];
+  for (const algo of SHA_ALGOS) {
+    const digest = await crypto.subtle.digest(algo, buffer);
+    results.push({ name: algo, hex: toHex(digest) });
+  }
+  return results;
+}
+
+// HMAC needs WebCrypto keys — MD5 is not in the spec, so SHA family only.
+export async function hmacBuffer(buffer, keyText) {
+  const keyBytes = new TextEncoder().encode(keyText);
+  const results = [];
+  for (const algo of SHA_ALGOS) {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyBytes,
+      { name: "HMAC", hash: { name: algo } },
+      false,
+      ["sign"],
+    );
+    const sig = await crypto.subtle.sign("HMAC", key, buffer);
+    results.push({ name: `HMAC-${algo}`, hex: toHex(sig) });
+  }
+  return results;
+}

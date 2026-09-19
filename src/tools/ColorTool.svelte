@@ -1,0 +1,100 @@
+<script>
+  import ToolShell from "../components/ToolShell.svelte";
+  import CopyButton from "../components/CopyButton.svelte";
+  import { parseColor, describe, contrast } from "../lib/color.js";
+  import { t, onLangChange } from "../lib/i18n.js";
+
+  let s = $state(t());
+  onLangChange(() => (s = t()));
+  const tool = $derived(s.tools.color);
+  const c = $derived(s.color);
+
+  let input = $state("#3b82f6");
+
+  const color = $derived(parseColor(input));
+  const invalid = $derived(input.trim() !== "" && color === null);
+  const info = $derived(color ? describe(color) : null);
+
+  const WHITE = { r: 255, g: 255, b: 255 };
+  const BLACK = { r: 0, g: 0, b: 0 };
+
+  const contrasts = $derived(
+    color
+      ? [
+          { label: c.onWhite, ratio: contrast(color, WHITE), bg: "#ffffff", fg: "#111111" },
+          { label: c.onBlack, ratio: contrast(color, BLACK), bg: "#111111", fg: "#ffffff" },
+        ]
+      : [],
+  );
+
+  function badge(ratio) {
+    if (ratio >= 7) return { cls: "ok", label: "AAA" };
+    if (ratio >= 4.5) return { cls: "ok", label: "AA" };
+    if (ratio >= 3) return { cls: "warn", label: "AA-L" };
+    return { cls: "bad", label: "✕" };
+  }
+
+  const hex6 = $derived(color ? describe({ ...color, a: 1 }).hex : "#000000");
+</script>
+
+<ToolShell title={tool.name} desc={tool.desc}>
+  <div class="dbx-card">
+    <label class="dbx-label" for="col-in">{s.input}</label>
+    <div class="row">
+      <input id="col-in" class="dbx-input mono" bind:value={input} placeholder={c.placeholder} />
+      <input type="color" class="picker" value={hex6}
+        oninput={(e) => (input = e.target.value)} />
+      {#if color}
+        <span class="swatch" style="background:{info.rgb}"></span>
+      {/if}
+    </div>
+    {#if invalid}<p class="err">{c.invalid}</p>{/if}
+  </div>
+
+  {#if info}
+    <div class="dbx-card table-card">
+      <table class="dbx-table">
+        <tbody>
+          <tr><td class="k">HEX</td><td class="v"><code>{info.hex}</code></td><td class="act"><CopyButton text={info.hex} small /></td></tr>
+          <tr><td class="k">RGB</td><td class="v"><code>{info.rgb}</code></td><td class="act"><CopyButton text={info.rgb} small /></td></tr>
+          <tr><td class="k">HSL</td><td class="v"><code>{info.hsl}</code></td><td class="act"><CopyButton text={info.hsl} small /></td></tr>
+          <tr><td class="k">HSV</td><td class="v"><code>{info.hsv}</code></td><td class="act"><CopyButton text={info.hsv} small /></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dbx-card table-card">
+      <h2 class="dbx-section-title">{c.contrast}</h2>
+      <table class="dbx-table">
+        <tbody>
+          {#each contrasts as ct}
+            <tr>
+              <td class="k">{ct.label}</td>
+              <td><span class="chip" style="background:{ct.bg};color:{ct.fg};border:1px solid var(--color-border,#e2e8f0)">Aa</span> {ct.ratio.toFixed(2)}:1</td>
+              <td class="act"><span class="badge {badge(ct.ratio).cls}">{badge(ct.ratio).label}</span></td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+</ToolShell>
+
+<style>
+  .dbx-card { display: flex; flex-direction: column; gap: 10px; }
+  .table-card { margin-top: 16px; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .row .dbx-input { flex: 1; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .picker { width: 40px; height: 32px; padding: 0; border: 1px solid var(--color-border, #e2e8f0); border-radius: 6px; background: transparent; cursor: pointer; }
+  .swatch { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--color-border, #e2e8f0); flex: none; }
+  .k { white-space: nowrap; font-weight: 600; width: 90px; }
+  .v code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+  .act { width: 70px; text-align: right; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; margin-right: 8px; }
+  .badge { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .badge.ok { background: rgba(22, 163, 74, .15); color: #16a34a; }
+  .badge.warn { background: rgba(217, 119, 6, .15); color: #d97706; }
+  .badge.bad { background: rgba(220, 38, 38, .15); color: var(--color-destructive, #dc2626); }
+  .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }
+</style>

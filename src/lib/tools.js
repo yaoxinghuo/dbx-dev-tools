@@ -15,6 +15,16 @@ import CounterTool from "../tools/CounterTool.svelte";
 import EscapeTool from "../tools/EscapeTool.svelte";
 import LoremTool from "../tools/LoremTool.svelte";
 import JsonTool from "../tools/JsonTool.svelte";
+import DiffTool from "../tools/DiffTool.svelte";
+import CaseTool from "../tools/CaseTool.svelte";
+import NumBaseTool from "../tools/NumBaseTool.svelte";
+import MojibakeTool from "../tools/MojibakeTool.svelte";
+import InvisTool from "../tools/InvisTool.svelte";
+import DateCalcTool from "../tools/DateCalcTool.svelte";
+import ColorTool from "../tools/ColorTool.svelte";
+import LinesTool from "../tools/LinesTool.svelte";
+import AesTool from "../tools/AesTool.svelte";
+import ChmodTool from "../tools/ChmodTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -23,8 +33,18 @@ export const TOOLS = [
   { key: "password", contributionId: "terry.devtools.password", component: PasswordTool, tags: ["security", "generator", "random", "password"] },
   { key: "qrcode", contributionId: "terry.devtools.qrcode", component: QrTool, tags: ["generator", "image", "qrcode"] },
   { key: "barcode", contributionId: "terry.devtools.barcode", component: BarcodeTool, tags: ["generator", "barcode"] },
-  { key: "hash", contributionId: "terry.devtools.hash", component: HashTool, tags: ["hash", "security", "digest"] },
+  { key: "hash", contributionId: "terry.devtools.hash", component: HashTool, tags: ["hash", "security", "digest", "crypto"] },
   { key: "uuid", contributionId: "terry.devtools.uuid", component: UuidTool, tags: ["generator", "random", "identifier"] },
+  { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff"] },
+  { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter"] },
+  { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
+  { key: "mojibake", contributionId: "terry.devtools.mojibake", component: MojibakeTool, tags: ["codec", "chinese", "text"] },
+  { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
+  { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
+  { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter"] },
+  { key: "lines", contributionId: "terry.devtools.lines", component: LinesTool, tags: ["text"] },
+  { key: "aes", contributionId: "terry.devtools.aes", component: AesTool, tags: ["security", "crypto"] },
+  { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
   { key: "base64", contributionId: "terry.devtools.base64", component: Base64Tool, tags: ["codec", "converter", "base64"] },
   { key: "jwt", contributionId: "terry.devtools.jwt", component: JwtTool, tags: ["security", "parser", "token"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
