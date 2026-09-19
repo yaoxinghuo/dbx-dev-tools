@@ -55,10 +55,14 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="grid">
     <div class="options dbx-card">
-      <label class="row">
-        <span class="dbx-label">{p.length}: {length}</span>
-        <input type="range" min="4" max="128" bind:value={length} />
-      </label>
+      <div class="row">
+        <span class="dbx-label">{p.length}</span>
+        <div class="len-row">
+          <input type="range" min="4" max="128" bind:value={length} />
+          <input class="dbx-input narrow" type="number" min="4" max="128" bind:value={length}
+            onchange={() => (length = Math.min(128, Math.max(4, Math.round(length) || 4)))} />
+        </div>
+      </div>
       <label class="row">
         <span class="dbx-label">{p.count}</span>
         <input name="count" class="dbx-input narrow" type="number" min="1" max="100" bind:value={count} />
@@ -98,6 +102,8 @@
   @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
   .options { display: flex; flex-direction: column; gap: 10px; }
   .row { display: flex; flex-direction: column; gap: 6px; }
+  .len-row { display: flex; align-items: center; gap: 10px; }
+  .len-row input[type="range"] { flex: 1; }
   .narrow { width: 90px; }
   .check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
   .strength { display: flex; flex-direction: column; gap: 6px; }
