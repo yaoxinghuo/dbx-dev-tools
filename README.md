@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — pure frontend, universal package, no native sidecar. **26 tools in a package under 100KB**, zero permissions requested.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs fully offline inside DBX's sandbox, zero permissions requested**. 26 tools in a package under 100KB; pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 tools](https://img.shields.io/badge/tools-26-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 tools](https://img.shields.io/badge/tools-26-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
 
 <img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 

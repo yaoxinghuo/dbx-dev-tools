@@ -1,6 +1,6 @@
 {
   "name": "Dev Tools",
-  "description": "26 everyday developer utilities in a package under 100KB — generators (password/QR/barcode/ID/lorem), codecs (Base64/URL/escape/image), crypto (hash/HMAC/JWT/AES), text tools (JSON/diff/case/lines/mojibake) and more. Pure frontend, zero permissions.",
+  "description": "Runs fully offline inside DBX's sandbox — zero permissions requested. 26 everyday developer utilities in a package under 100KB: generators (password/QR/barcode/ID/lorem), codecs (Base64/URL/escape/image), crypto (hash/HMAC/JWT/AES), text tools (JSON/diff/case/lines/mojibake) and more.",
   "icon": "assets/plugin.svg",
   "tags": [
     "devtools",
@@ -22,7 +22,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "26 个日常开发工具，安装包不到 100KB——生成器（密码/二维码/条码/ID/占位文本）、编解码（Base64/URL/转义/图片）、安全（哈希/HMAC/JWT/AES）、文本工具（JSON/对比/大小写/行处理/乱码修复）等。纯前端、零权限。"
+      "description": "完全在 DBX 沙箱内离线运行，零权限申请。26 个日常开发工具，安装包不到 100KB：生成器（密码/二维码/条码/ID/占位文本）、编解码（Base64/URL/转义/图片）、安全（哈希/HMAC/JWT/AES）、文本工具（JSON/对比/大小写/行处理/乱码修复）等。"
     }
   }
 }
