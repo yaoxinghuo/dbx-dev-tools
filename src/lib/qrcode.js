@@ -29,10 +29,11 @@ export function qrSvg(text, { ecLevel = "M", scale = 6, margin = 4, logoUri = ""
   }
   let overlay = "";
   // Centered logo over a white rounded backdrop — needs EC H (30%) to stay
-  // scannable; UI steers the level when a logo is picked.
+  // scannable; UI steers the level when a logo is picked. Size is relative
+  // to the code area (quiet zone excluded) so the plate stays modest.
   if (logoUri.startsWith("data:image/")) {
-    const box = Math.round(size * 0.22);
-    const pad = Math.round(scale * 1.5);
+    const box = Math.round(count * scale * 0.16);
+    const pad = scale;
     const x = (size - box) / 2 - pad;
     const w = box + pad * 2;
     overlay = `<rect x="${x}" y="${x}" width="${w}" height="${w}" rx="${Math.round(w / 6)}" fill="#ffffff"/>` +
