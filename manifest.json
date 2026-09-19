@@ -5,7 +5,7 @@
   "name": "Dev Tools",
  "version": "0.5.1",
   "publisher": "terry",
-  "description": "Fully sandboxed and offline, zero permissions — 26 developer tools under 100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
+  "description": "Sandboxed, offline, zero permissions — 26 tools under 100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
   "icon": "assets/plugin.svg",
   "engines": {
     "dbx": ">=0.5.68",
@@ -186,7 +186,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "完全沙箱离线运行、零权限——26 个开发工具，包体不到 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
+      "description": "沙箱离线运行，零权限——26 个工具，不到 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
       "contributions": {
         "terry.devtools.home": {
           "label": "Dev Tools",

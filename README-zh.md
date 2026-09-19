@@ -2,7 +2,7 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**完全在 DBX 沙箱内离线运行，零权限申请**。26 个工具、安装包不到 100KB；纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零权限申请**。26 个工具、安装包不到 100KB；纯前端实现、universal 包、无原生 Sidecar。
 
 ![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 个工具](https://img.shields.io/badge/工具-26-orange) ![安装包 <100KB](https://img.shields.io/badge/安装包-%3C100KB-brightgreen) ![权限 0](https://img.shields.io/badge/权限-0-blueviolet)
 
