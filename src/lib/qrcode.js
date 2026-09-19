@@ -32,7 +32,7 @@ export function qrSvg(text, { ecLevel = "M", scale = 6, margin = 4, logoUri = ""
   // scannable; UI steers the level when a logo is picked. Size is relative
   // to the code area (quiet zone excluded) so the plate stays modest.
   if (logoUri.startsWith("data:image/")) {
-    const box = Math.round(count * scale * 0.16);
+    const box = Math.round(count * scale * 0.14);
     const pad = scale;
     const x = (size - box) / 2 - pad;
     const w = box + pad * 2;
