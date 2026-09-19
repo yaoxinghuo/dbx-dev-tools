@@ -107,6 +107,12 @@
       "id": "terry.devtools.lorem",
       "label": "Lorem Ipsum",
       "description": "Generate dummy text at an exact length — by characters or UTF-8 bytes."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.json",
+      "label": "JSON Formatter",
+      "description": "Validate, pretty-print or minify JSON, with precise error location."
     }
   ],
   "localizations": {
@@ -177,6 +183,10 @@
         "terry.devtools.lorem": {
           "label": "占位文本生成",
           "description": "按精确长度生成测试文本，支持字符数或 UTF-8 字节数。"
+        },
+        "terry.devtools.json": {
+          "label": "JSON 格式化",
+          "description": "校验、美化或压缩 JSON，精确定位错误位置。"
         }
       }
     }

@@ -14,7 +14,7 @@
   let plusSpace = $state(false);
   let output = $state("");
   let error = $state("");
-  let params = $state([]);
+  let urlInfo = $state(null);
 
   function encode(text) {
     const encoded = scope === "component" ? encodeURIComponent(text) : encodeURI(text);
@@ -26,19 +26,31 @@
     return scope === "component" ? decodeURIComponent(normalized) : decodeURI(normalized);
   }
 
-  function parseParams(text) {
+  function parseUrl(text) {
     try {
       const url = new URL(text.trim());
-      return [...url.searchParams.entries()];
+      const parts = [
+        ["protocol", url.protocol],
+        ["username", url.username],
+        ["password", url.password],
+        ["host", url.host],
+        ["hostname", url.hostname],
+        ["port", url.port],
+        ["origin", url.origin],
+        ["pathname", url.pathname],
+        ["search", url.search],
+        ["hash", url.hash],
+      ].filter(([, v]) => v);
+      return { parts, params: [...url.searchParams.entries()] };
     } catch {
-      return [];
+      return null;
     }
   }
 
   $effect(() => {
     error = "";
     output = "";
-    params = [];
+    urlInfo = null;
     const text = input;
     if (!text.trim()) return;
     try {
@@ -46,7 +58,7 @@
     } catch {
       error = u.invalid;
     }
-    params = parseParams(mode === "encode" ? text : output || text);
+    urlInfo = parseUrl(mode === "encode" ? text : output || text);
   });
 </script>
 
@@ -80,15 +92,33 @@
     </div>
   {/if}
 
-  {#if params.length}
+  {#if urlInfo}
+    <div class="dbx-card">
+      <h2 class="dbx-section-title">{u.breakdown}</h2>
+      <table class="dbx-table">
+        <tbody>
+          {#each urlInfo.parts as [name, value]}
+            <tr>
+              <td class="k"><code>{u.parts[name] || name}</code></td>
+              <td class="v"><code>{value}</code></td>
+              <td class="c"><CopyButton text={value} small /></td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+
+  {#if urlInfo?.params.length}
     <div class="dbx-card">
       <h2 class="dbx-section-title">{u.params}</h2>
       <table class="dbx-table">
         <tbody>
-          {#each params as [name, value]}
+          {#each urlInfo.params as [name, value]}
             <tr>
               <td class="k"><code>{name}</code></td>
               <td class="v"><code>{value}</code></td>
+              <td class="c"><CopyButton text={value} small /></td>
             </tr>
           {/each}
         </tbody>
@@ -108,5 +138,6 @@
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
   .k { white-space: nowrap; font-weight: 600; width: 120px; }
   .v code { overflow-wrap: anywhere; }
+  .c { width: 60px; text-align: right; }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }
 </style>

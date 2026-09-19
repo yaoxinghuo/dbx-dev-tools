@@ -25,6 +25,8 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Word Counter** — words (Latin tokens + per-CJK-char), characters (with/without spaces), letters, digits, punctuation, whitespace, lines, paragraphs, sentences, UTF-8 byte size, reading time
 - **Escape / Unescape** — HTML/XML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
 - **Lorem Ipsum** — dummy text at an exact length for input-boundary testing: characters or UTF-8 bytes, lorem / repeating pattern / random alphanumeric / random Chinese modes, common length presets
+- **JSON Formatter** — validate with precise error line/column/snippet (own parser, since JSC reports no position), pretty-print at 2/4/tab or minify, key sorting, depth/key/item stats, .json export
+- **URL breakdown** — the URL tool also splits a parseable URL into protocol / credentials / host / port / origin / path / query / fragment, each field individually copyable
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 

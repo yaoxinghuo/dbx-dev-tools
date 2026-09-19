@@ -14,6 +14,7 @@ import FileSizeTool from "../tools/FileSizeTool.svelte";
 import CounterTool from "../tools/CounterTool.svelte";
 import EscapeTool from "../tools/EscapeTool.svelte";
 import LoremTool from "../tools/LoremTool.svelte";
+import JsonTool from "../tools/JsonTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -34,6 +35,7 @@ export const TOOLS = [
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
   { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
   { key: "lorem", contributionId: "terry.devtools.lorem", component: LoremTool, tags: ["generator", "text", "test"] },
+  { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
 ];
 
 export const HOME_ID = "terry.devtools.home";
