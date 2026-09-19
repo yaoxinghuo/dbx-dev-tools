@@ -3,7 +3,7 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "terry",
   "description": "A collection of developer tools: password generator, QR/barcode generator, hash generator, UUID, Base64, timestamp/date conversion, file size converter, word counter, escape/unescape and more.",
   "icon": "assets/plugin.svg",
