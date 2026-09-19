@@ -6,7 +6,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 
 ![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 tools](https://img.shields.io/badge/tools-26-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen)
 
-<img width="2244" height="1526" alt="image" src="https://github.com/user-attachments/assets/ae75bab9-48b7-4583-931f-7a3a3f740027" />
+<img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 
 ## Tools
 
