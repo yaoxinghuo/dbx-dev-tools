@@ -210,6 +210,8 @@ const messages = {
     datecalc: {
       diffTitle: "Difference between dates",
       addTitle: "Add / subtract from a date",
+      placeholder: "yyyy-MM-dd HH:mm",
+      now: "Now",
       days: "Days",
       weeks: "Weeks",
       months: "Months (≈30.44 d)",
@@ -621,6 +623,8 @@ const messages = {
     datecalc: {
       diffTitle: "两日期之差",
       addTitle: "日期加减",
+      placeholder: "yyyy-MM-dd HH:mm",
+      now: "现在",
       days: "天",
       weeks: "周",
       months: "月（≈30.44 天）",

@@ -14,11 +14,21 @@
   let amount = $state(7);
   let unit = $state("days"); // days | weeks | months
 
+  // WKWebView's datetime-local picker is clumsy for the time part, so inputs
+  // are plain text: yyyy-MM-dd[ HH:mm[:ss]] (-, /, . or T separators accepted).
   function parse(v) {
     if (!v) return null;
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
+    const m = v.trim().match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[T ](\d{1,2})(?::(\d{1,2}))?(?::(\d{1,2}))?)?$/);
+    if (!m) return null;
+    const [, y, mo, d, h = "0", mi = "0", sec = "0"] = m;
+    const dt = new Date(+y, +mo - 1, +d, +h, +mi, +sec);
+    return dt.getFullYear() === +y && dt.getMonth() === +mo - 1 && dt.getDate() === +d && +h < 24 && +mi < 60 && +sec < 60 ? dt : null;
   }
+
+  const p2 = (n) => String(n).padStart(2, "0");
+  const fmtLocal = (d) =>
+    `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+  const now = () => fmtLocal(new Date());
 
   function workingDays(d1, d2) {
     let [from, to] = d1 <= d2 ? [d1, d2] : [d2, d1];
@@ -72,8 +82,12 @@
   <div class="dbx-card">
     <h2 class="dbx-section-title">{dc.diffTitle}</h2>
     <div class="row">
-      <input type="datetime-local" class="dbx-input" bind:value={a} />
-      <input type="datetime-local" class="dbx-input" bind:value={b} />
+      <input type="text" class="dbx-input mono" bind:value={a} placeholder={dc.placeholder} />
+      <button type="button" class="dbx-btn now-btn" onclick={() => (a = now())}>{dc.now}</button>
+    </div>
+    <div class="row">
+      <input type="text" class="dbx-input mono" bind:value={b} placeholder={dc.placeholder} />
+      <button type="button" class="dbx-btn now-btn" onclick={() => (b = now())}>{dc.now}</button>
     </div>
     {#if diff}
       <table class="dbx-table">
@@ -94,7 +108,8 @@
   <div class="dbx-card">
     <h2 class="dbx-section-title">{dc.addTitle}</h2>
     <div class="row">
-      <input type="datetime-local" class="dbx-input" bind:value={base} />
+      <input type="text" class="dbx-input mono" bind:value={base} placeholder={dc.placeholder} />
+      <button type="button" class="dbx-btn now-btn" onclick={() => (base = now())}>{dc.now}</button>
       <input type="number" class="dbx-input narrow" bind:value={amount} />
       <select class="dbx-input narrow" bind:value={unit}>
         <option value="days">{dc.days}</option>
@@ -104,9 +119,9 @@
     </div>
     {#if added}
       <div class="result">
-        <code class="mono">{added.toLocaleString()}</code>
+        <code class="mono">{fmtLocal(added)}</code>
         <code class="mono iso">{added.toISOString()}</code>
-        <CopyButton text={added.toISOString()} small />
+        <CopyButton text={fmtLocal(added)} small />
       </div>
     {/if}
   </div>
@@ -117,6 +132,7 @@
   .row { display: flex; gap: 10px; flex-wrap: wrap; }
   .row .dbx-input { flex: 1; min-width: 140px; }
   .row .narrow { flex: none; width: 110px; }
+  .now-btn { flex: none; }
   .k { white-space: nowrap; font-weight: 600; width: 140px; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
   .result { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
