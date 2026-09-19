@@ -55,7 +55,7 @@ export const TOOLS = [
   { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
   { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
-  { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter"] },
+  { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter", "hex", "rgb", "hsl", "hsv", "contrast", "wcag", "picker"] },
   { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
 ];

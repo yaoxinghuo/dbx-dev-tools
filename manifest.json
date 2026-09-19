@@ -161,8 +161,8 @@
     {
       "type": "workbench",
       "id": "terry.devtools.color",
-      "label": "Color Converter",
-      "description": "Convert between HEX, RGB, HSL and HSV, with WCAG contrast checks."
+      "label": "Color Converter & Contrast",
+      "description": "Convert between HEX, RGB, HSL and HSV, with WCAG contrast checks vs any background."
     },
     {
       "type": "workbench",
@@ -281,8 +281,8 @@
           "description": "两日期之差、工作日统计、日期加减 N 天 / 周 / 月。"
         },
         "terry.devtools.color": {
-          "label": "颜色转换",
-          "description": "HEX / RGB / HSL / HSV 互转与 WCAG 对比度检查。"
+          "label": "颜色转换与对比度",
+          "description": "HEX / RGB / HSL / HSV 互转与 WCAG 对比度检查，支持自定义背景色。"
         },
         "terry.devtools.lines": {
           "label": "文本行处理",

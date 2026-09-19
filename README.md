@@ -33,7 +33,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Mojibake Fixer** — repairs text garbled by the wrong charset (UTF-8 mistaken as Windows-1252/GBK/Big5/Shift_JIS), ranked candidates
 - **Invisible Characters** — visualizes zero-width chars, BOM, NBSP, bidi controls and friends, with a code-point/count summary and one-click cleanup
 - **Date Calculator** — difference between two dates (days/weeks/months/years, working days, h/m/s) and date ± N days/weeks/months
-- **Color Converter** — HEX/RGB/HSL/HSV conversion with swatch + color picker, WCAG contrast ratio vs white and black (AA/AAA badges)
+- **Color Converter & Contrast** — HEX/RGB/HSL/HSV conversion with swatch + color picker, WCAG contrast ratio vs white, black or a custom background (AA/AAA badges)
 - **Line Operations** — trim, remove empty, dedupe, sort A→Z/Z→A, add line numbers, reverse — combined in a fixed pipeline
 - **AES Encrypt / Decrypt** — PBKDF2 (100k, SHA-256) → AES-256-GCM; output is `base64(salt|iv|ciphertext)`, GCM tag rejects wrong passwords
 - **Chmod Calculator** — owner/group/other rwx checkboxes ⇄ octal, live symbolic (`rwxr-xr-x`), common presets

@@ -10,6 +10,7 @@
   const c = $derived(s.color);
 
   let input = $state("#3b82f6");
+  let bgInput = $state("#ffffff");
 
   const color = $derived(parseColor(input));
   const invalid = $derived(input.trim() !== "" && color === null);
@@ -17,12 +18,15 @@
 
   const WHITE = { r: 255, g: 255, b: 255 };
   const BLACK = { r: 0, g: 0, b: 0 };
+  const bgCustom = $derived(parseColor(bgInput) ?? WHITE);
+  const bgCustomHex = $derived(describe({ ...bgCustom, a: 1 }).hex);
 
   const contrasts = $derived(
     color
       ? [
-          { label: c.onWhite, ratio: contrast(color, WHITE), bg: "#ffffff", fg: "#111111" },
-          { label: c.onBlack, ratio: contrast(color, BLACK), bg: "#111111", fg: "#ffffff" },
+          { label: c.onWhite, ratio: contrast(color, WHITE), bg: "#ffffff" },
+          { label: c.onBlack, ratio: contrast(color, BLACK), bg: "#111111" },
+          { label: `${c.onCustom} (${bgCustomHex})`, ratio: contrast(color, bgCustom), bg: bgCustomHex },
         ]
       : [],
   );
@@ -65,12 +69,18 @@
 
     <div class="dbx-card table-card">
       <h2 class="dbx-section-title">{c.contrast}</h2>
+      <div class="row">
+        <label class="dbx-label" for="col-bg" style="margin:0">{c.background}</label>
+        <input id="col-bg" class="dbx-input mono" bind:value={bgInput} placeholder="#ffffff" />
+        <input type="color" class="picker" value={bgCustomHex}
+          oninput={(e) => (bgInput = e.target.value)} />
+      </div>
       <table class="dbx-table">
         <tbody>
           {#each contrasts as ct}
             <tr>
               <td class="k">{ct.label}</td>
-              <td><span class="chip" style="background:{ct.bg};color:{ct.fg};border:1px solid var(--color-border,#e2e8f0)">Aa</span> {ct.ratio.toFixed(2)}:1</td>
+              <td><span class="chip" style="background:{ct.bg};color:{hex6};border:1px solid var(--color-border,#e2e8f0)">Aa</span> {ct.ratio.toFixed(2)}:1</td>
               <td class="act"><span class="badge {badge(ct.ratio).cls}">{badge(ct.ratio).label}</span></td>
             </tr>
           {/each}
