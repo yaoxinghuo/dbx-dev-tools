@@ -3,9 +3,9 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "publisher": "terry",
-  "description": "A collection of developer tools: password generator, QR/barcode generator, hash generator, UUID, Base64 and more.",
+  "description": "A collection of developer tools: password generator, QR/barcode generator, hash generator, UUID, Base64, timestamp/date conversion, file size converter, word counter, escape/unescape and more.",
   "icon": "assets/plugin.svg",
   "engines": { "dbx": ">=0.5.68", "host_api": "1" },
   "permissions": [],
@@ -77,12 +77,36 @@
       "id": "terry.devtools.imgb64",
       "label": "Image ⇄ Base64",
       "description": "Convert images to Base64 and back, with preview and export."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.time",
+      "label": "Timestamp ⇄ Date",
+      "description": "Convert Unix timestamps (s/ms/µs/ns auto-detected) and date strings both ways, with full time details."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.filesize",
+      "label": "File Size Converter",
+      "description": "Convert bytes to human-readable sizes and back, with SI and IEC tables."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.counter",
+      "label": "Word Counter",
+      "description": "Count words, characters, letters, digits, punctuation, byte size and more."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.escape",
+      "label": "Escape / Unescape",
+      "description": "Escape and unescape HTML entities, JavaScript strings, regex, CSV fields and shell quoting."
     }
   ],
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "开发者工具集合：密码生成、二维码/条码生成、哈希计算、UUID、Base64 等。",
+      "description": "开发者工具集合：密码生成、二维码/条码生成、哈希计算、UUID、Base64、时间戳转换、文件大小转换、字数统计、转义工具等。",
       "contributions": {
         "terry.devtools.home": {
           "label": "Dev Tools",
@@ -127,6 +151,22 @@
         "terry.devtools.imgb64": {
           "label": "图片 ⇄ Base64",
           "description": "图片与 Base64 互转，支持预览与导出。"
+        },
+        "terry.devtools.time": {
+          "label": "时间戳 ⇄ 日期",
+          "description": "Unix 时间戳（秒/毫秒/微秒/纳秒自动识别）与日期互转，含详细时间信息。"
+        },
+        "terry.devtools.filesize": {
+          "label": "文件大小转换",
+          "description": "字节与可读大小互转，含 SI / IEC 双表。"
+        },
+        "terry.devtools.counter": {
+          "label": "字数统计",
+          "description": "统计词数、字符、字母、数字、标点、字节大小等。"
+        },
+        "terry.devtools.escape": {
+          "label": "转义 / 反转义",
+          "description": "HTML 实体、JavaScript 字符串、正则、CSV 字段、Shell 引用的转义与反转义。"
         }
       }
     }

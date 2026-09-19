@@ -20,6 +20,12 @@
 - **人民币大写**：数字金额转中文大写（零规则折叠、负值、兆级上限）
 - **URL 编解码**：encodeURIComponent/encodeURI 两档、表单 `+` 空格切换、URL 查询参数拆解
 - **图片 ⇄ Base64**：图片转 Base64（拖拽/粘贴/选文件，可选 data URI 前缀，显示体积膨胀率）；Base64 转图片（魔数嗅探 PNG/JPEG/GIF/WebP/BMP/ICO/SVG，预览 + 导出）
+- **时间戳 ⇄ 日期**：秒/毫秒/微秒/纳秒自动识别（小数按秒处理），日期字符串双向解析；展示 Unix 秒/毫秒、本地与 UTC、ISO 8601、星期、年内第几天、ISO 周、闰年、时区偏移、相对时间
+- **文件大小转换**：裸字节数或 `"1.5 GB"`/`"2 GiB"`/`"10M"` 形式输入解析为字节；最佳单位 + SI（1000 进制）与 IEC（1024 进制）双表
+- **字数统计**：词数（拉丁词元 + 逐中文字）、字符（含/不含空白）、字母、数字、标点、空白、行数、段落、句子、UTF-8 字节大小、预计阅读时长
+- **转义 / 反转义**：HTML 实体、JavaScript 字符串转义、正则元字符、CSV 字段引用、POSIX shell 单引号
+
+首页提供多语言搜索（查询匹配所有语言的名称/描述/标签，不限于当前界面语言）和按当前语言本地化的标签筛选。
 
 ## 安装
 
@@ -54,7 +60,7 @@
 ## 添加新工具
 
 1. `src/tools/` 下新建 `XxxTool.svelte`（用 `ToolShell` 包裹内容，复用 `dbx-*` 样式类与 `CopyButton`）
-2. `src/lib/tools.js` 的 `TOOLS` 数组注册 `{ key, contributionId, component }`
+2. `src/lib/tools.js` 的 `TOOLS` 数组注册 `{ key, contributionId, component, tags }`（tags 为语言无关的 canonical key，并在 `t().tags` 补中英文显示名）
 3. `manifest.json` 增加对应 `workbench` contribution（id 形如 `terry.devtools.xxx`）及 `zh-CN` 本地化
 4. `src/lib/i18n.js` 补充 `tools.xxx` 的中英文案
 

@@ -20,6 +20,12 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **RMB Uppercase** — numeric amount to Chinese RMB uppercase (correct 零 folding, negatives, up to 兆)
 - **URL Encoder / Decoder** — `encodeURIComponent`/`encodeURI` modes, form `+` toggle, query parameter breakdown
 - **Image ⇄ Base64** — image to Base64 (drop / paste / pick, optional data-URI prefix, size inflation shown); Base64 to image with magic-byte sniffing, preview & export
+- **Timestamp ⇄ Date** — Unix timestamps auto-detected across s/ms/µs/ns (decimals treated as seconds), date strings parsed both ways; shows Unix s/ms, local & UTC, ISO 8601, day of week, day of year, ISO week, leap year, timezone offset, relative time
+- **File Size Converter** — bare bytes or `"1.5 GB"`/`"2 GiB"`/`"10M"` style input parsed to bytes; best-fit unit plus full SI (1000) and IEC (1024) tables
+- **Word Counter** — words (Latin tokens + per-CJK-char), characters (with/without spaces), letters, digits, punctuation, whitespace, lines, paragraphs, sentences, UTF-8 byte size, reading time
+- **Escape / Unescape** — HTML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
+
+The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 
 ## Install
 
@@ -54,7 +60,7 @@ Have a small tool you reach for every day? This collection is meant to grow — 
 ## Add a new tool
 
 1. Create `src/tools/XxxTool.svelte` (wrap content in `ToolShell`, reuse `dbx-*` classes and `CopyButton`)
-2. Register `{ key, contributionId, component }` in `src/lib/tools.js`
+2. Register `{ key, contributionId, component, tags }` in `src/lib/tools.js` (tags are canonical keys; add their en+zh display names to `t().tags`)
 3. Add a `workbench` contribution (`terry.devtools.xxx`) and `zh-CN` localization in `manifest.json`
 4. Add `tools.xxx` strings (en + zh) in `src/lib/i18n.js`
 
