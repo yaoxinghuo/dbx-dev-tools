@@ -12,7 +12,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 
 - **Password Generator** — `crypto.getRandomValues` + rejection sampling (no modulo bias), charset rules, batch generation, entropy meter
 - **QR Code Generator** — `qrcode-generator`, adjustable EC level / module size / quiet zone, optional center logo (auto-suggests EC H), SVG & PNG export
-- **Barcode Generator** — hand-rolled CODE-128 B encoder, adjustable bar width / height / caption, SVG & PNG export
+- **Barcode Generator** — hand-rolled encoders for CODE-128 (auto A/B/C set switching), CODE-39, EAN-13/8, UPC-A, ITF/ITF-14, Codabar; auto check digits, adjustable bar width / height / caption, SVG & PNG export
 - **Hash Generator** — MD5 + SHA-1/256/384/512 digests for text **and files**; optional key switches to HMAC-SHA digests
 - **ID Generator** — UUID v4, NanoID and ULID in bulk; uppercase / hyphen options for UUID
 - **Base64** — UTF-8 safe encode/decode, URL-safe variant

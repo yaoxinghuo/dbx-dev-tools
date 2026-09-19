@@ -1,6 +1,6 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
-  import { barcodeSvg, svgToPngBytes } from "../lib/barcode.js";
+  import { barcodeSvg, svgToPngBytes, SYMBOLOGIES } from "../lib/barcode.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
@@ -9,7 +9,13 @@
   const tool = $derived(s.tools.barcode);
   const b = $derived(s.barcode);
 
+  const SYM_LABELS = {
+    code128: "CODE-128", code39: "CODE-39", ean13: "EAN-13", ean8: "EAN-8",
+    upca: "UPC-A", itf: "ITF", itf14: "ITF-14", codabar: "Codabar",
+  };
+
   let content = $state("");
+  let sym = $state("code128");
   let barWidth = $state(2);
   let height = $state(80);
   let showText = $state(true);
@@ -20,11 +26,9 @@
     error = "";
     svg = "";
     if (!content) return;
-    try {
-      svg = barcodeSvg(content, { barWidth, height, showText });
-    } catch {
-      error = b.invalid;
-    }
+    const r = barcodeSvg(content, { sym, barWidth, height, showText });
+    if (r.error) error = b.errors[r.error] || b.invalid;
+    else svg = r.svg;
   });
 
   function exportSvg() {
@@ -45,8 +49,14 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card controls">
     <label class="dbx-label" for="bc-content">{b.content}</label>
-    <input id="bc-content" class="dbx-input" bind:value={content} placeholder={b.placeholder} />
+    <input id="bc-content" class="dbx-input" bind:value={content} placeholder={b.hints[sym]} />
     <div class="fields">
+      <label>
+        <span class="dbx-label">{b.symbology}</span>
+        <select class="dbx-select" bind:value={sym}>
+          {#each SYMBOLOGIES as sy}<option value={sy}>{SYM_LABELS[sy]}</option>{/each}
+        </select>
+      </label>
       <label>
         <span class="dbx-label">{b.barWidth}: {barWidth}px</span>
         <input type="range" min="1" max="5" bind:value={barWidth} />

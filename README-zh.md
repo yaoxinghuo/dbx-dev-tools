@@ -12,7 +12,7 @@
 
 - **密码生成器**：`crypto.getRandomValues` + 拒绝采样（无取模偏差），支持长度/字符集/易混淆字符规则、批量生成、熵强度估算
 - **二维码生成器**：基于 `qrcode-generator`，容错级别/模块大小/静区可调，支持中心 Logo（自动建议 H 级容错），导出 SVG / PNG
-- **条码生成器**：手写 CODE-128 B 编码器，条宽/高度/文字可调，导出 SVG / PNG
+- **条码生成器**：手写 CODE-128（自动 A/B/C 字符集切换）、CODE-39、EAN-13/8、UPC-A、ITF/ITF-14、Codabar 编码器；自动补/校验校验位，条宽/高度/文字可调，导出 SVG / PNG
 - **Hash 生成器**：文本**与文件**的 MD5 + SHA-1/256/384/512 摘要（Web Crypto）；填写密钥后切换为 HMAC-SHA 摘要
 - **ID 生成器**：UUID v4、NanoID、ULID 批量生成；UUID 支持大写/连字符选项
 - **Base64 编解码**：UTF-8 安全，支持 URL-safe 变体

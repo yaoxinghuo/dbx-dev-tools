@@ -42,7 +42,7 @@
       "type": "workbench",
       "id": "terry.devtools.barcode",
       "label": "Barcode Generator",
-      "description": "Generate CODE-128 barcodes as SVG or PNG."
+      "description": "Generate CODE-128/39, EAN-13/8, UPC-A, ITF and Codabar barcodes as SVG or PNG."
     },
     {
       "type": "workbench",
@@ -202,7 +202,7 @@
         },
         "terry.devtools.barcode": {
           "label": "条码生成器",
-          "description": "生成 CODE-128 条码，支持 SVG / PNG 导出。"
+          "description": "生成 CODE-128/39、EAN-13/8、UPC-A、ITF、Codabar 条码，支持 SVG / PNG 导出。"
         },
         "terry.devtools.hash": {
           "label": "Hash 生成器",
