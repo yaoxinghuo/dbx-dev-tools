@@ -31,7 +31,7 @@ export const TOOLS = [
   { key: "time", contributionId: "terry.devtools.time", component: TimeTool, tags: ["converter", "time", "date"] },
   { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
-  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape"] },
+  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
 ];
 
 export const HOME_ID = "terry.devtools.home";

@@ -23,7 +23,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Timestamp ⇄ Date** — Unix timestamps auto-detected across s/ms/µs/ns (decimals treated as seconds), date strings parsed both ways; shows Unix s/ms, local & UTC, ISO 8601, day of week, day of year, ISO week, leap year, timezone offset, relative time
 - **File Size Converter** — bare bytes or `"1.5 GB"`/`"2 GiB"`/`"10M"` style input parsed to bytes; best-fit unit plus full SI (1000) and IEC (1024) tables
 - **Word Counter** — words (Latin tokens + per-CJK-char), characters (with/without spaces), letters, digits, punctuation, whitespace, lines, paragraphs, sentences, UTF-8 byte size, reading time
-- **Escape / Unescape** — HTML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
+- **Escape / Unescape** — HTML/XML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 

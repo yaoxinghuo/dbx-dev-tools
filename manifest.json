@@ -100,7 +100,7 @@
       "type": "workbench",
       "id": "terry.devtools.escape",
       "label": "Escape / Unescape",
-      "description": "Escape and unescape HTML entities, JavaScript strings, regex, CSV fields and shell quoting."
+      "description": "Escape and unescape HTML/XML entities, JavaScript strings, regex, CSV fields and shell quoting."
     }
   ],
   "localizations": {
@@ -166,7 +166,7 @@
         },
         "terry.devtools.escape": {
           "label": "转义 / 反转义",
-          "description": "HTML 实体、JavaScript 字符串、正则、CSV 字段、Shell 引用的转义与反转义。"
+          "description": "HTML/XML 实体、JavaScript 字符串、正则、CSV 字段、Shell 引用的转义与反转义。"
         }
       }
     }

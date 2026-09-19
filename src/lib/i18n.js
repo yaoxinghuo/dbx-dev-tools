@@ -28,7 +28,7 @@ const messages = {
       time: { name: "Timestamp ⇄ Date", desc: "Unix timestamps (s/ms/µs/ns auto-detected) to full date details and back." },
       filesize: { name: "File Size Converter", desc: "Bytes ⇄ human-readable sizes, with SI and IEC tables." },
       counter: { name: "Word Counter", desc: "Words, characters, letters, digits, punctuation, byte size and more." },
-      escape: { name: "Escape / Unescape", desc: "Escape and unescape HTML, JavaScript strings, regex, CSV and shell." },
+      escape: { name: "Escape / Unescape", desc: "Escape and unescape HTML/XML entities, JavaScript strings, regex, CSV and shell." },
     },
     tags: {
       security: "Security",
@@ -56,6 +56,7 @@ const messages = {
       text: "Text",
       counter: "Counter",
       escape: "Escape",
+      xml: "XML",
     },
     home: {
       searchPlaceholder: "Search tools (any language)…",
@@ -220,6 +221,7 @@ const messages = {
       invalid: "Conversion failed for this input",
       formats: {
         html: "HTML entities",
+        xml: "XML entities",
         js: "JavaScript string",
         regex: "Regular expression",
         csv: "CSV field",
@@ -227,6 +229,7 @@ const messages = {
       },
       hints: {
         html: "Escapes & < > \" ' as named entities; decodes named and numeric entities.",
+        xml: "XML has only five predefined entities (&amp; &lt; &gt; &quot; &apos;); other named entities are left untouched.",
         js: "Escapes quotes, backslashes and control characters as JS string escapes (\\n, \\xNN, \\uNNNN, \\u{…}); decodes them back.",
         regex: "Escapes regex metacharacters with backslashes; unescape strips them.",
         csv: "Wraps a field containing quotes, commas or newlines in double quotes (\"\" doubling); unwraps it.",
@@ -261,7 +264,7 @@ const messages = {
       time: { name: "时间戳 ⇄ 日期", desc: "Unix 时间戳（秒/毫秒/微秒/纳秒自动识别）与日期互转，含详细信息。" },
       filesize: { name: "文件大小转换", desc: "字节与可读大小互转，含 SI / IEC 双表。" },
       counter: { name: "字数统计", desc: "词数、字符、字母、数字、标点、字节大小等统计。" },
-      escape: { name: "转义 / 反转义", desc: "HTML、JS 字符串、正则、CSV、Shell 的转义与反转义。" },
+      escape: { name: "转义 / 反转义", desc: "HTML/XML 实体、JS 字符串、正则、CSV、Shell 的转义与反转义。" },
     },
     tags: {
       security: "安全",
@@ -289,6 +292,7 @@ const messages = {
       text: "文本",
       counter: "统计",
       escape: "转义",
+      xml: "XML",
     },
     home: {
       searchPlaceholder: "搜索工具（中英文均可）…",
@@ -453,6 +457,7 @@ const messages = {
       invalid: "该输入转换失败",
       formats: {
         html: "HTML 实体",
+        xml: "XML 实体",
         js: "JavaScript 字符串",
         regex: "正则表达式",
         csv: "CSV 字段",
@@ -460,6 +465,7 @@ const messages = {
       },
       hints: {
         html: "将 & < > \" ' 转为命名实体；可解码命名与数字实体。",
+        xml: "XML 仅有五个预定义实体（&amp; &lt; &gt; &quot; &apos;）；其他命名实体保持原样。",
         js: "将引号、反斜杠与控制字符转为 JS 字符串转义（\\n、\\xNN、\\uNNNN、\\u{…}）；可还原。",
         regex: "用反斜杠转义正则元字符；反转义则去除反斜杠。",
         csv: "含引号、逗号或换行的字段用双引号包裹（\"\" 双写）；可还原。",

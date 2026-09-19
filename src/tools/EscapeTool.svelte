@@ -15,7 +15,7 @@
   let output = $state("");
   let error = $state("");
 
-  const FORMAT_KEYS = ["html", "js", "regex", "csv", "shell"];
+  const FORMAT_KEYS = ["html", "xml", "js", "regex", "csv", "shell"];
 
   $effect(() => {
     error = "";

@@ -1,21 +1,31 @@
 // Escape / unescape for common formats. Pure functions for testability.
 
 const HTML_NAMED = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-const HTML_REVERSE = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+const HTML_REVERSE = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: "\u00a0" };
+// XML predefines only five entities; the apostrophe is &apos;, and named
+// entities like &nbsp; are undefined (invalid) in XML.
+const XML_NAMED = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" };
+const XML_REVERSE = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
 
-function htmlEscape(text) {
-  return text.replace(/[&<>"']/g, (c) => HTML_NAMED[c]);
+function entityEscape(map) {
+  return (text) => text.replace(/[&<>"']/g, (c) => map[c]);
 }
 
-function htmlUnescape(text) {
-  return text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (whole, body) => {
-    if (body[0] === "#") {
-      const code = body[1] === "x" || body[1] === "X" ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
-      return Number.isFinite(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
-    }
-    return HTML_REVERSE[body.toLowerCase()] ?? whole;
-  });
+function entityUnescape(reverseMap) {
+  return (text) =>
+    text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (whole, body) => {
+      if (body[0] === "#") {
+        const code = body[1] === "x" || body[1] === "X" ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
+        return Number.isFinite(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
+      }
+      return reverseMap[body.toLowerCase()] ?? whole;
+    });
 }
+
+const htmlEscape = entityEscape(HTML_NAMED);
+const htmlUnescape = entityUnescape(HTML_REVERSE);
+const xmlEscape = entityEscape(XML_NAMED);
+const xmlUnescape = entityUnescape(XML_REVERSE);
 
 const JS_ESCAPES = { "\\": "\\\\", '"': '\\"', "'": "\\'", "\n": "\\n", "\r": "\\r", "\t": "\\t", "\b": "\\b", "\f": "\\f", "\v": "\\v", "\0": "\\0" };
 
@@ -64,6 +74,7 @@ function shellUnescape(text) {
 }
 
 export const ESCAPE_FORMATS = {
+  xml: { escape: xmlEscape, unescape: xmlUnescape },
   html: { escape: htmlEscape, unescape: htmlUnescape },
   js: { escape: jsEscape, unescape: jsUnescape },
   regex: { escape: regexEscape, unescape: regexUnescape },
