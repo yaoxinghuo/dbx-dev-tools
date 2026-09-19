@@ -1,22 +1,28 @@
 {
   "name": "Dev Tools",
-  "description": "A collection of everyday developer utilities: password/QR/barcode/UUID generators, hash, Base64, JWT parser, RMB uppercase, URL codec and image ⇄ Base64.",
+  "description": "26 everyday developer utilities in a package under 100KB — generators (password/QR/barcode/ID/lorem), codecs (Base64/URL/escape/image), crypto (hash/HMAC/JWT/AES), text tools (JSON/diff/case/lines/mojibake) and more. Pure frontend, zero permissions.",
   "icon": "assets/plugin.svg",
   "tags": [
     "devtools",
     "utilities",
     "encoding",
-    "generator"
+    "generator",
+    "qrcode",
+    "barcode",
+    "jwt",
+    "json",
+    "diff",
+    "color"
   ],
   "permissions": [],
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "Initial release with 10 tools: password, QR code, barcode, hash, UUID, Base64, JWT parser, RMB uppercase, URL codec and image ⇄ Base64.",
+  "releaseNotes": "26 tools: password/ID/lorem/QR/barcode generators, Base64/URL/escape/image codecs, hash & HMAC, JWT decode & sign, AES, RMB uppercase, JSON formatter, text diff, case/line/invisible-char/mojibake tools, timestamp & date calc, file size, number base, color & contrast, chmod.",
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "日常开发工具集合：密码/二维码/条码/UUID 生成、哈希计算、Base64、JWT 解析、人民币大写、URL 编解码、图片 ⇄ Base64。"
+      "description": "26 个日常开发工具，安装包不到 100KB——生成器（密码/二维码/条码/ID/占位文本）、编解码（Base64/URL/转义/图片）、安全（哈希/HMAC/JWT/AES）、文本工具（JSON/对比/大小写/行处理/乱码修复）等。纯前端、零权限。"
     }
   }
 }
