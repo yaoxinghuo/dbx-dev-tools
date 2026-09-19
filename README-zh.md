@@ -6,7 +6,7 @@
 
 ![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
 
-<img width="2236" height="1220" alt="image" src="https://github.com/user-attachments/assets/839f7421-3744-4274-af3b-e5c0bc9d1972" />
+<img width="2230" height="1512" alt="image" src="https://github.com/user-attachments/assets/44348d71-f5c3-4340-be66-e2630de70761" />
 
 ## 工具列表
 
