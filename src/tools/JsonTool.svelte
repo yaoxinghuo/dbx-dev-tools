@@ -3,7 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
-  import { formatJson } from "../lib/json.js";
+  import { formatJson, tokenizeJson } from "../lib/json.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -21,6 +21,8 @@
     { value: "tab", label: "Tab" },
     { value: "min", label: "Minify" },
   ];
+
+  const tokens = $derived(result?.ok ? tokenizeJson(result.output) : []);
 
   // Multi-KB pastes re-run parse+stringify per keystroke; debounce a bit.
   $effect(() => {
@@ -64,7 +66,7 @@
             <CopyButton text={result.output} small />
           </div>
         </div>
-        <textarea class="dbx-textarea mono" rows="12" readonly value={result.output}></textarea>
+        <pre class="hl mono">{#each tokens as tok}<span class={tok.t}>{tok.v}</span>{/each}</pre>
       </div>
     {:else}
       <div class="dbx-card">
@@ -93,4 +95,32 @@
   .snip { white-space: pre-wrap; }
   .ok { color: var(--color-primary); }
   .err { color: var(--color-destructive, #dc2626); }
+  .hl {
+    --tok-key: #0550ae;
+    --tok-str: #0a6b33;
+    --tok-num: #8250df;
+    --tok-lit: #cf222e;
+    --tok-punct: #57606a;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--color-input);
+    border-radius: var(--radius-md);
+    background: var(--color-background);
+    max-height: 420px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  :global([data-dbx-theme="dark"]) .hl {
+    --tok-key: #79b8ff;
+    --tok-str: #7ee787;
+    --tok-num: #d2a8ff;
+    --tok-lit: #ff7b72;
+    --tok-punct: #8b949e;
+  }
+  .hl .key { color: var(--tok-key); }
+  .hl .str { color: var(--tok-str); }
+  .hl .num { color: var(--tok-num); }
+  .hl .lit { color: var(--tok-lit); }
+  .hl .punct { color: var(--tok-punct); }
 </style>

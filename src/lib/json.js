@@ -153,3 +153,60 @@ export function formatJson(text, { indent = 2, sortKeys = false } = {}) {
   const stats = countStats(data);
   return { ok: true, output: out, stats };
 }
+
+// Splits JSON text into { t, v } tokens for syntax highlighting. Runs on
+// already-validated output, so no error path is needed. Whitespace rides
+// along in "plain" tokens to preserve indentation.
+export function tokenizeJson(text) {
+  const tokens = [];
+  let i = 0;
+  let buf = "";
+  const flush = () => {
+    if (buf) tokens.push({ t: "plain", v: buf });
+    buf = "";
+  };
+  while (i < text.length) {
+    const c = text[i];
+    if (c === '"') {
+      flush();
+      let j = i + 1;
+      while (j < text.length && text[j] !== '"') {
+        if (text[j] === "\\") j++;
+        j++;
+      }
+      const raw = text.slice(i, j + 1);
+      // A string followed by ':' (after horizontal whitespace) is an object key.
+      let k = j + 1;
+      while (k < text.length && (text[k] === " " || text[k] === "\t")) k++;
+      tokens.push({ t: text[k] === ":" ? "key" : "str", v: raw });
+      i = j + 1;
+    } else if (c === "-" || (c >= "0" && c <= "9")) {
+      flush();
+      const m = /^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/.exec(text.slice(i));
+      const raw = m ? m[0] : c;
+      tokens.push({ t: "num", v: raw });
+      i += raw.length;
+    } else if (text.startsWith("true", i)) {
+      flush();
+      tokens.push({ t: "lit", v: "true" });
+      i += 4;
+    } else if (text.startsWith("false", i)) {
+      flush();
+      tokens.push({ t: "lit", v: "false" });
+      i += 5;
+    } else if (text.startsWith("null", i)) {
+      flush();
+      tokens.push({ t: "lit", v: "null" });
+      i += 4;
+    } else if ("{}[]:,".includes(c)) {
+      flush();
+      tokens.push({ t: "punct", v: c });
+      i++;
+    } else {
+      buf += c;
+      i++;
+    }
+  }
+  flush();
+  return tokens;
+}
