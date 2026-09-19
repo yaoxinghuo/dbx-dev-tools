@@ -3,13 +3,21 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "publisher": "terry",
   "description": "A collection of developer tools: password generator, QR/barcode generator, hash generator, UUID, Base64, timestamp/date conversion, file size converter, word counter, escape/unescape and more.",
   "icon": "assets/plugin.svg",
-  "engines": { "dbx": ">=0.5.68", "host_api": "1" },
+  "engines": {
+    "dbx": ">=0.5.68",
+    "host_api": "1"
+  },
   "permissions": [],
-  "entrypoints": { "ui": { "root": "ui", "entry": "ui/index.html" } },
+  "entrypoints": {
+    "ui": {
+      "root": "ui",
+      "entry": "ui/index.html"
+    }
+  },
   "contributions": [
     {
       "type": "workbench",

@@ -22,6 +22,12 @@
 </button>
 
 <style>
+  button {
+    /* Long values next to the button (passwords, UUIDs) would squeeze it
+       out of shape in flex rows; a copy button should never shrink. */
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
   .small {
     height: 24px;
     padding: 0 8px;
