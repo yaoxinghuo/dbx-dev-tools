@@ -29,6 +29,7 @@ const messages = {
       filesize: { name: "File Size Converter", desc: "Bytes ⇄ human-readable sizes, with SI and IEC tables." },
       counter: { name: "Word Counter", desc: "Words, characters, letters, digits, punctuation, byte size and more." },
       escape: { name: "Escape / Unescape", desc: "Escape and unescape HTML/XML entities, JavaScript strings, regex, CSV and shell." },
+      lorem: { name: "Lorem Ipsum", desc: "Generate dummy text at an exact length — by characters or UTF-8 bytes." },
     },
     tags: {
       security: "Security",
@@ -57,6 +58,7 @@ const messages = {
       counter: "Counter",
       escape: "Escape",
       xml: "XML",
+      test: "Testing",
     },
     home: {
       searchPlaceholder: "Search tools (any language)…",
@@ -236,6 +238,22 @@ const messages = {
         shell: "Wraps text in single quotes, '\\'' for embedded quotes (POSIX sh style).",
       },
     },
+    lorem: {
+      length: "Length",
+      unitChars: "characters",
+      unitBytes: "UTF-8 bytes",
+      modes: {
+        lorem: "Lorem ipsum",
+        pattern: "Repeat pattern",
+        alpha: "Random A-Z 0-9",
+        cjk: "Random Chinese",
+      },
+      patternPlaceholder: "e.g. 0123456789",
+      result: "Generated",
+      charsLabel: "chars",
+      bytesLabel: "bytes",
+      padHint: "Trailing \"x\" padding tops up the last 1–3 bytes to hit the exact byte count.",
+    },
   },
   zh: {
     homeTitle: "Dev Tools",
@@ -265,6 +283,7 @@ const messages = {
       filesize: { name: "文件大小转换", desc: "字节与可读大小互转，含 SI / IEC 双表。" },
       counter: { name: "字数统计", desc: "词数、字符、字母、数字、标点、字节大小等统计。" },
       escape: { name: "转义 / 反转义", desc: "HTML/XML 实体、JS 字符串、正则、CSV、Shell 的转义与反转义。" },
+      lorem: { name: "占位文本生成", desc: "按精确长度生成测试文本，支持字符数或 UTF-8 字节数。" },
     },
     tags: {
       security: "安全",
@@ -293,6 +312,7 @@ const messages = {
       counter: "统计",
       escape: "转义",
       xml: "XML",
+      test: "测试",
     },
     home: {
       searchPlaceholder: "搜索工具（中英文均可）…",
@@ -471,6 +491,22 @@ const messages = {
         csv: "含引号、逗号或换行的字段用双引号包裹（\"\" 双写）；可还原。",
         shell: "用单引号包裹文本，内嵌单引号写作 '\\''（POSIX sh 风格）。",
       },
+    },
+    lorem: {
+      length: "长度",
+      unitChars: "字符",
+      unitBytes: "UTF-8 字节",
+      modes: {
+        lorem: "Lorem ipsum",
+        pattern: "循环模式",
+        alpha: "随机字母数字",
+        cjk: "随机中文",
+      },
+      patternPlaceholder: "如 0123456789",
+      result: "生成结果",
+      charsLabel: "字符",
+      bytesLabel: "字节",
+      padHint: "末尾的 \"x\" 用于补齐最后 1–3 个字节，使总字节数精确达标。",
     },
   },
 };

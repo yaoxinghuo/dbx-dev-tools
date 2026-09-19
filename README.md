@@ -24,6 +24,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **File Size Converter** — bare bytes or `"1.5 GB"`/`"2 GiB"`/`"10M"` style input parsed to bytes; best-fit unit plus full SI (1000) and IEC (1024) tables
 - **Word Counter** — words (Latin tokens + per-CJK-char), characters (with/without spaces), letters, digits, punctuation, whitespace, lines, paragraphs, sentences, UTF-8 byte size, reading time
 - **Escape / Unescape** — HTML/XML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
+- **Lorem Ipsum** — dummy text at an exact length for input-boundary testing: characters or UTF-8 bytes, lorem / repeating pattern / random alphanumeric / random Chinese modes, common length presets
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 
