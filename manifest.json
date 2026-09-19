@@ -3,7 +3,7 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
- "version": "0.5.0",
+ "version": "0.5.1",
   "publisher": "terry",
   "description": "A collection of developer tools: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color, mojibake fixer and more.",
   "icon": "assets/plugin.svg",
@@ -36,7 +36,7 @@
       "type": "workbench",
       "id": "terry.devtools.qrcode",
       "label": "QR Code Generator",
-      "description": "Generate QR codes as SVG or PNG."
+      "description": "Generate QR codes as SVG or PNG, with optional center logo."
     },
     {
       "type": "workbench",
@@ -198,7 +198,7 @@
         },
         "terry.devtools.qrcode": {
           "label": "二维码生成器",
-          "description": "生成 SVG / PNG 二维码。"
+          "description": "生成 SVG / PNG 二维码，支持中心 Logo。"
         },
         "terry.devtools.barcode": {
           "label": "条码生成器",

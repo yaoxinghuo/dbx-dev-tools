@@ -2,16 +2,16 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — pure frontend, universal package, no native sidecar. **26 tools in a package under 100KB**, zero permissions requested.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 tools](https://img.shields.io/badge/tools-26-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen)
 
 <img width="2244" height="1526" alt="image" src="https://github.com/user-attachments/assets/ae75bab9-48b7-4583-931f-7a3a3f740027" />
 
 ## Tools
 
 - **Password Generator** — `crypto.getRandomValues` + rejection sampling (no modulo bias), charset rules, batch generation, entropy meter
-- **QR Code Generator** — `qrcode-generator`, adjustable EC level / module size / quiet zone, SVG & PNG export
+- **QR Code Generator** — `qrcode-generator`, adjustable EC level / module size / quiet zone, optional center logo (auto-suggests EC H), SVG & PNG export
 - **Barcode Generator** — hand-rolled CODE-128 B encoder, adjustable bar width / height / caption, SVG & PNG export
 - **Hash Generator** — MD5 + SHA-1/256/384/512 digests for text **and files**; optional key switches to HMAC-SHA digests
 - **ID Generator** — UUID v4, NanoID and ULID in bulk; uppercase / hyphen options for UUID

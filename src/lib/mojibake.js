@@ -57,14 +57,22 @@ function encoderFor(label) {
   return map;
 }
 
-// Encode text as `label` bytes; returns Uint8Array or null if a char is unrepresentable.
+// Encode text as `label` bytes. Unmappable chars degrade to "?" instead of
+// failing outright — pasted mojibake often contains chars outside the charset
+// (truncated samples, stray punctuation). Returns null only when over half of
+// the text is unrepresentable (i.e. this charset is clearly the wrong guess).
 function encodeAs(text, map) {
   const out = [];
+  let missed = 0;
   for (const ch of text) {
     const bytes = map.get(ch.codePointAt(0));
-    if (!bytes) return null;
-    out.push(...bytes);
+    if (bytes) out.push(...bytes);
+    else {
+      out.push(0x3f);
+      missed++;
+    }
   }
+  if (missed * 2 > text.length) return null;
   return Uint8Array.from(out);
 }
 
@@ -84,17 +92,15 @@ function score(text) {
 }
 
 // Returns candidate fixes sorted by likelihood: [{from, result, score}].
+// Decoding is non-fatal: real-world mojibake is often truncated, leaving a
+// dangling byte that strict UTF-8 rejects wholesale — partial fixes are still
+// useful, so U+FFFD stays in the output and drags the score down.
 export function fixMojibake(text) {
   const cands = [];
   for (const label of Object.keys(CHARSETS)) {
     const bytes = encodeAs(text, encoderFor(label));
     if (!bytes) continue;
-    let out;
-    try {
-      out = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    } catch {
-      continue;
-    }
+    const out = new TextDecoder("utf-8").decode(bytes);
     if (out === text) continue;
     cands.push({ from: label, result: out, score: score(out) });
   }

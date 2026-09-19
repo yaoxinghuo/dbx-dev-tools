@@ -16,7 +16,7 @@ const messages = {
     output: "Output",
     tools: {
       password: { name: "Password Generator", desc: "Cryptographically secure passwords with custom rules." },
-      qrcode: { name: "QR Code Generator", desc: "Turn text or URLs into QR codes." },
+      qrcode: { name: "QR Code Generator", desc: "Turn text or URLs into QR codes, optional center logo." },
       barcode: { name: "Barcode Generator", desc: "CODE-128 barcodes as SVG or PNG." },
       hash: { name: "Hash Generator", desc: "MD5/SHA digests for text and files, plus optional HMAC." },
       uuid: { name: "ID Generator", desc: "UUID v4, NanoID and ULID in bulk." },
@@ -104,6 +104,8 @@ const messages = {
       placeholder: "Text or URL to encode…",
       tooLong: "Content too long for a QR code (max ~700 bytes at this level)",
       invalid: "Unable to encode content",
+      logo: "Center logo (optional)",
+      logoClear: "Clear",
     },
     barcode: {
       content: "Content",
@@ -222,6 +224,8 @@ const messages = {
       cipherHint: "Base64 payload to decrypt…",
       password: "Password",
       failed: "Operation failed — check the input and password",
+      keyLen: "Key",
+      iterations: "PBKDF2 iterations",
     },
     chmod: {
       owner: "Owner",
@@ -400,7 +404,7 @@ const messages = {
     output: "输出",
     tools: {
       password: { name: "密码生成器", desc: "按规则生成加密安全的随机密码。" },
-      qrcode: { name: "二维码生成器", desc: "将文本或链接生成二维码。" },
+      qrcode: { name: "二维码生成器", desc: "将文本或链接生成二维码，支持中心 Logo。" },
       barcode: { name: "条码生成器", desc: "生成 CODE-128 条码，支持导出。" },
       hash: { name: "Hash 生成器", desc: "文本与文件的 MD5/SHA 摘要，支持 HMAC。" },
       uuid: { name: "ID 生成器", desc: "批量生成 UUID v4、NanoID、ULID。" },
@@ -488,6 +492,8 @@ const messages = {
       placeholder: "要编码的文本或链接…",
       tooLong: "内容过长，当前容错级别下超出二维码容量（约 700 字节）",
       invalid: "无法编码该内容",
+      logo: "中心 Logo（可选）",
+      logoClear: "清除",
     },
     barcode: {
       content: "内容",
@@ -606,6 +612,8 @@ const messages = {
       cipherHint: "要解密的 Base64 密文…",
       password: "密码",
       failed: "操作失败——请检查输入与密码",
+      keyLen: "密钥长度",
+      iterations: "PBKDF2 迭代次数",
     },
     chmod: {
       owner: "所有者",

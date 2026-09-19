@@ -29,33 +29,35 @@ import ChmodTool from "../tools/ChmodTool.svelte";
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
 // t().tags so filtering stays stable when the UI language changes.
+// Order defines the Home listing: generators → codecs → security → text
+// processing → numbers/time → misc.
 export const TOOLS = [
   { key: "password", contributionId: "terry.devtools.password", component: PasswordTool, tags: ["security", "generator", "random", "password"] },
+  { key: "uuid", contributionId: "terry.devtools.uuid", component: UuidTool, tags: ["generator", "random", "identifier"] },
+  { key: "lorem", contributionId: "terry.devtools.lorem", component: LoremTool, tags: ["generator", "text", "test"] },
   { key: "qrcode", contributionId: "terry.devtools.qrcode", component: QrTool, tags: ["generator", "image", "qrcode"] },
   { key: "barcode", contributionId: "terry.devtools.barcode", component: BarcodeTool, tags: ["generator", "barcode"] },
+  { key: "base64", contributionId: "terry.devtools.base64", component: Base64Tool, tags: ["codec", "converter", "base64"] },
+  { key: "url", contributionId: "terry.devtools.url", component: UrlTool, tags: ["codec", "converter", "url"] },
+  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
+  { key: "imgb64", contributionId: "terry.devtools.imgb64", component: ImageBase64Tool, tags: ["converter", "image", "base64"] },
   { key: "hash", contributionId: "terry.devtools.hash", component: HashTool, tags: ["hash", "security", "digest", "crypto"] },
-  { key: "uuid", contributionId: "terry.devtools.uuid", component: UuidTool, tags: ["generator", "random", "identifier"] },
+  { key: "jwt", contributionId: "terry.devtools.jwt", component: JwtTool, tags: ["security", "parser", "token"] },
+  { key: "aes", contributionId: "terry.devtools.aes", component: AesTool, tags: ["security", "crypto"] },
+  { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff"] },
   { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter"] },
-  { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
-  { key: "mojibake", contributionId: "terry.devtools.mojibake", component: MojibakeTool, tags: ["codec", "chinese", "text"] },
-  { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
-  { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
-  { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter"] },
   { key: "lines", contributionId: "terry.devtools.lines", component: LinesTool, tags: ["text"] },
-  { key: "aes", contributionId: "terry.devtools.aes", component: AesTool, tags: ["security", "crypto"] },
-  { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
-  { key: "base64", contributionId: "terry.devtools.base64", component: Base64Tool, tags: ["codec", "converter", "base64"] },
-  { key: "jwt", contributionId: "terry.devtools.jwt", component: JwtTool, tags: ["security", "parser", "token"] },
-  { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
-  { key: "url", contributionId: "terry.devtools.url", component: UrlTool, tags: ["codec", "converter", "url"] },
-  { key: "imgb64", contributionId: "terry.devtools.imgb64", component: ImageBase64Tool, tags: ["converter", "image", "base64"] },
-  { key: "time", contributionId: "terry.devtools.time", component: TimeTool, tags: ["converter", "time", "date"] },
-  { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
-  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
-  { key: "lorem", contributionId: "terry.devtools.lorem", component: LoremTool, tags: ["generator", "text", "test"] },
-  { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
+  { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
+  { key: "mojibake", contributionId: "terry.devtools.mojibake", component: MojibakeTool, tags: ["codec", "chinese", "text"] },
+  { key: "time", contributionId: "terry.devtools.time", component: TimeTool, tags: ["converter", "time", "date"] },
+  { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
+  { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
+  { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
+  { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter"] },
+  { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
+  { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
 ];
 
 export const HOME_ID = "terry.devtools.home";

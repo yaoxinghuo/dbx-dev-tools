@@ -2,16 +2,16 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——纯前端实现、universal 包、无原生 Sidecar。**26 个工具，安装包不到 100KB**，零权限申请。
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 个工具](https://img.shields.io/badge/工具-26-orange) ![安装包 <100KB](https://img.shields.io/badge/安装包-%3C100KB-brightgreen)
 
 <img width="2230" height="1512" alt="image" src="https://github.com/user-attachments/assets/44348d71-f5c3-4340-be66-e2630de70761" />
 
 ## 工具列表
 
 - **密码生成器**：`crypto.getRandomValues` + 拒绝采样（无取模偏差），支持长度/字符集/易混淆字符规则、批量生成、熵强度估算
-- **二维码生成器**：基于 `qrcode-generator`，容错级别/模块大小/静区可调，导出 SVG / PNG
+- **二维码生成器**：基于 `qrcode-generator`，容错级别/模块大小/静区可调，支持中心 Logo（自动建议 H 级容错），导出 SVG / PNG
 - **条码生成器**：手写 CODE-128 B 编码器，条宽/高度/文字可调，导出 SVG / PNG
 - **Hash 生成器**：文本**与文件**的 MD5 + SHA-1/256/384/512 摘要（Web Crypto）；填写密钥后切换为 HMAC-SHA 摘要
 - **ID 生成器**：UUID v4、NanoID、ULID 批量生成；UUID 支持大写/连字符选项

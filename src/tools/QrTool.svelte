@@ -13,15 +13,27 @@
   let ecLevel = $state("M");
   let scale = $state(6);
   let margin = $state(4);
+  let logo = $state(""); // data URI
   let svg = $state("");
   let error = $state("");
+
+  function pickLogo(e) {
+    const f = e.target.files?.[0];
+    if (!f || !f.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      logo = reader.result;
+      if (ecLevel !== "H" && ecLevel !== "Q") ecLevel = "H"; // logo needs high EC to stay scannable
+    };
+    reader.readAsDataURL(f);
+  }
 
   $effect(() => {
     error = "";
     svg = "";
     if (!content) return;
     try {
-      svg = qrSvg(content, { ecLevel, scale, margin });
+      svg = qrSvg(content, { ecLevel, scale, margin, logoUri: logo });
     } catch (e) {
       error = /too long|code length overflow/i.test(String(e)) ? q.tooLong : q.invalid;
     }
@@ -66,6 +78,16 @@
           <span class="dbx-label">{q.margin}: {margin}</span>
           <input type="range" min="0" max="8" bind:value={margin} />
         </label>
+        <label>
+          <span class="dbx-label">{q.logo}</span>
+          <div class="logo-row">
+            <input type="file" accept="image/*" onchange={pickLogo} class="dbx-input logo-input" />
+            {#if logo}
+              <img src={logo} alt="logo" class="logo-thumb" />
+              <button type="button" class="dbx-btn" onclick={() => (logo = "")}>{q.logoClear}</button>
+            {/if}
+          </div>
+        </label>
       </div>
       {#if svg}
         <div class="actions">
@@ -95,5 +117,8 @@
   .actions { display: flex; gap: 8px; }
   .preview { display: flex; justify-content: center; align-items: center; min-height: 240px; }
   .qr-box { color: #000; background: #fff; padding: 16px; border-radius: 8px; line-height: 0; }
+  .logo-row { display: flex; align-items: center; gap: 10px; }
+  .logo-input { flex: 1; }
+  .logo-thumb { width: 32px; height: 32px; object-fit: contain; border: 1px solid var(--color-border, #e2e8f0); border-radius: 6px; background: #fff; }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; }
 </style>
