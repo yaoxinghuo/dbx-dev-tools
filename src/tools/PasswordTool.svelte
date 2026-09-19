@@ -59,7 +59,7 @@
         <span class="dbx-label">{p.length}</span>
         <div class="len-row">
           <input type="range" min="4" max="128" bind:value={length} />
-          <input class="dbx-input narrow" type="number" min="4" max="128" bind:value={length}
+          <input class="dbx-input len-num" type="number" min="4" max="128" bind:value={length}
             onchange={() => (length = Math.min(128, Math.max(4, Math.round(length) || 4)))} />
         </div>
       </div>
@@ -104,6 +104,7 @@
   .row { display: flex; flex-direction: column; gap: 6px; }
   .len-row { display: flex; align-items: center; gap: 10px; }
   .len-row input[type="range"] { flex: 1; }
+  .len-num { width: 64px; flex: none; }
   .narrow { width: 90px; }
   .check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
   .strength { display: flex; flex-direction: column; gap: 6px; }
