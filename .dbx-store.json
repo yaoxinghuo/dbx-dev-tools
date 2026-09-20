@@ -1,6 +1,6 @@
 {
   "name": "Dev Tools",
-  "description": "Sandboxed, offline, zero permissions — 26 tools under 100KB: generators (password/QR/barcode/ID/lorem), codecs (Base64/URL/escape/image), crypto (hash/HMAC/JWT/AES), text tools (JSON/diff/case/lines/mojibake) and more.",
+  "description": "Sandboxed, offline, zero permissions — 31 tools under 100KB: generators (password/QR/barcode/ID/lorem), codecs (Base64/URL/escape/image), crypto (hash/HMAC/JWT/AES), text tools (JSON/diff/case/lines/mojibake) and more.",
   "icon": "assets/plugin.svg",
   "tags": [
     "devtools",
@@ -18,11 +18,11 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "26 tools: password/ID/lorem/QR/barcode generators, Base64/URL/escape/image codecs, hash & HMAC, JWT decode & sign, AES, RMB uppercase, JSON formatter, text diff, case/line/invisible-char/mojibake tools, timestamp & date calc, file size, number base, color & contrast, chmod.",
+  "releaseNotes": "31 tools: password/ID/lorem/QR/barcode/RSA generators, Base64/URL/escape/image codecs, image compressor, hash & HMAC, JWT decode & sign, AES, certificate decoder, RMB uppercase, JSON formatter, text diff, regex tester, case/line/invisible-char/mojibake tools, timestamp & date calc, file size, number base, semver, color & contrast, chmod.",
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "沙箱离线运行，零权限——26 个开发工具，不到 100KB：生成器（密码/二维码/条码/ID/占位文本）、编解码（Base64/URL/转义/图片）、安全（哈希/HMAC/JWT/AES）、文本工具（JSON/对比/大小写/行处理/乱码修复）等。"
+      "description": "沙箱离线运行，零权限——31 个开发工具，不到 100KB：生成器（密码/二维码/条码/ID/RSA 密钥）、编解码（Base64/URL/转义/图片）、安全（哈希/HMAC/JWT/AES/证书解析）、文本工具（JSON/对比/正则/大小写/行处理/乱码修复）等。"
     }
   }
 }

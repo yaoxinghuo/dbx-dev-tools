@@ -5,7 +5,7 @@
   "name": "Dev Tools",
  "version": "0.5.1",
   "publisher": "terry",
-  "description": "Sandboxed, offline, zero permissions — 26 tools under 100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
+  "description": "Sandboxed, offline, zero permissions — 31 tools under 100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
   "icon": "assets/plugin.svg",
   "engines": {
     "dbx": ">=0.5.68",
@@ -88,6 +88,12 @@
     },
     {
       "type": "workbench",
+      "id": "terry.devtools.imgcomp",
+      "label": "Image Compressor",
+      "description": "Re-encode images to WebP/JPEG/PNG with adjustable quality."
+    },
+    {
+      "type": "workbench",
       "id": "terry.devtools.time",
       "label": "Timestamp ⇄ Date",
       "description": "Convert Unix timestamps (s/ms/µs/ns auto-detected) and date strings both ways, with full time details."
@@ -130,6 +136,12 @@
     },
     {
       "type": "workbench",
+      "id": "terry.devtools.regex",
+      "label": "Regex Tester",
+      "description": "Test regexes with match highlighting, capture groups and replace preview."
+    },
+    {
+      "type": "workbench",
       "id": "terry.devtools.case",
       "label": "Case Converter",
       "description": "Convert between camelCase, snake_case, kebab-case, CONSTANT_CASE and more."
@@ -139,6 +151,12 @@
       "id": "terry.devtools.numbase",
       "label": "Number Base",
       "description": "Convert between binary, octal, decimal and hexadecimal, with ASCII view."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.semver",
+      "label": "Semver Compare",
+      "description": "Compare two versions and sort version lists per semver.org rules."
     },
     {
       "type": "workbench",
@@ -178,6 +196,18 @@
     },
     {
       "type": "workbench",
+      "id": "terry.devtools.rsa",
+      "label": "RSA Key Generator",
+      "description": "Generate RSA key pairs as PEM (PKCS#8) for signing or encryption."
+    },
+    {
+      "type": "workbench",
+      "id": "terry.devtools.cert",
+      "label": "Certificate Decoder",
+      "description": "Inspect X.509 certificates: subject, validity, SAN, fingerprints."
+    },
+    {
+      "type": "workbench",
       "id": "terry.devtools.chmod",
       "label": "Chmod Calculator",
       "description": "Convert rwx checkboxes to octal and symbolic permissions."
@@ -186,7 +216,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "沙箱离线运行，零权限——26 个工具，不到 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
+      "description": "沙箱离线运行，零权限——31 个工具，不到 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
       "contributions": {
         "terry.devtools.home": {
           "label": "Dev Tools",
@@ -232,6 +262,10 @@
           "label": "图片 ⇄ Base64",
           "description": "图片与 Base64 互转，支持预览与导出。"
         },
+        "terry.devtools.imgcomp": {
+          "label": "图片压缩转换",
+          "description": "图片重编码为 WebP/JPEG/PNG，质量可调。"
+        },
         "terry.devtools.time": {
           "label": "时间戳 ⇄ 日期",
           "description": "Unix 时间戳（秒/毫秒/微秒/纳秒自动识别）与日期互转，含详细时间信息。"
@@ -260,6 +294,10 @@
           "label": "文本对比",
           "description": "两段文本的行级 / 字符级差异高亮。"
         },
+        "terry.devtools.regex": {
+          "label": "正则测试器",
+          "description": "正则匹配测试：高亮预览、捕获组与替换。"
+        },
         "terry.devtools.case": {
           "label": "大小写转换",
           "description": "camelCase、snake_case、kebab-case、CONSTANT_CASE 等互转。"
@@ -267,6 +305,10 @@
         "terry.devtools.numbase": {
           "label": "进制转换",
           "description": "二 / 八 / 十 / 十六进制互转，附 ASCII 视图。"
+        },
+        "terry.devtools.semver": {
+          "label": "Semver 版本比较",
+          "description": "按 semver.org 规则比较版本号、排序版本列表。"
         },
         "terry.devtools.mojibake": {
           "label": "乱码修复",
@@ -291,6 +333,14 @@
         "terry.devtools.aes": {
           "label": "AES 加解密",
           "description": "密码加密文本：PBKDF2 派生密钥 + AES-GCM。"
+        },
+        "terry.devtools.rsa": {
+          "label": "RSA 密钥生成器",
+          "description": "生成 RSA 密钥对并导出 PEM（PKCS#8），支持签名与加密算法。"
+        },
+        "terry.devtools.cert": {
+          "label": "证书解析器",
+          "description": "解析 X.509 证书：主体、签发者、有效期、SAN、指纹等。"
         },
         "terry.devtools.chmod": {
           "label": "chmod 计算器",

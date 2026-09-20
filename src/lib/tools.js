@@ -25,6 +25,11 @@ import ColorTool from "../tools/ColorTool.svelte";
 import LinesTool from "../tools/LinesTool.svelte";
 import AesTool from "../tools/AesTool.svelte";
 import ChmodTool from "../tools/ChmodTool.svelte";
+import RegexTool from "../tools/RegexTool.svelte";
+import SemverTool from "../tools/SemverTool.svelte";
+import ImageCompTool from "../tools/ImageCompTool.svelte";
+import RsaTool from "../tools/RsaTool.svelte";
+import CertTool from "../tools/CertTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -41,11 +46,15 @@ export const TOOLS = [
   { key: "url", contributionId: "terry.devtools.url", component: UrlTool, tags: ["codec", "converter", "url"] },
   { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
   { key: "imgb64", contributionId: "terry.devtools.imgb64", component: ImageBase64Tool, tags: ["converter", "image", "base64"] },
+  { key: "imgcomp", contributionId: "terry.devtools.imgcomp", component: ImageCompTool, tags: ["converter", "image", "compress"] },
   { key: "hash", contributionId: "terry.devtools.hash", component: HashTool, tags: ["hash", "security", "digest", "crypto"] },
   { key: "jwt", contributionId: "terry.devtools.jwt", component: JwtTool, tags: ["security", "parser", "token"] },
   { key: "aes", contributionId: "terry.devtools.aes", component: AesTool, tags: ["security", "crypto"] },
+  { key: "rsa", contributionId: "terry.devtools.rsa", component: RsaTool, tags: ["generator", "security", "crypto", "key"] },
+  { key: "cert", contributionId: "terry.devtools.cert", component: CertTool, tags: ["security", "parser", "certificate", "x509", "pem"] },
   { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff"] },
+  { key: "regex", contributionId: "terry.devtools.regex", component: RegexTool, tags: ["text", "regex", "test"] },
   { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter"] },
   { key: "lines", contributionId: "terry.devtools.lines", component: LinesTool, tags: ["text"] },
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
@@ -55,6 +64,7 @@ export const TOOLS = [
   { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
   { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
+  { key: "semver", contributionId: "terry.devtools.semver", component: SemverTool, tags: ["version", "semver", "compare", "sort"] },
   { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter", "hex", "rgb", "hsl", "hsv", "contrast", "wcag", "picker"] },
   { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },

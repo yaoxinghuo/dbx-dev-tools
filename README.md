@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline, zero permissions**. 26 tools in a package under 100KB; pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline, zero permissions**. 31 tools in a package under 100KB; pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![26 tools](https://img.shields.io/badge/tools-26-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![31 tools](https://img.shields.io/badge/tools-31-orange) ![package <100KB](https://img.shields.io/badge/package-%3C100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
 
 <img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 
@@ -37,6 +37,11 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Line Operations** — trim, remove empty, dedupe, sort A→Z/Z→A, add line numbers, reverse — combined in a fixed pipeline
 - **AES Encrypt / Decrypt** — PBKDF2 (100k, SHA-256) → AES-256-GCM; output is `base64(salt|iv|ciphertext)`, GCM tag rejects wrong passwords
 - **Chmod Calculator** — owner/group/other rwx checkboxes ⇄ octal, live symbolic (`rwxr-xr-x`), common presets
+- **Regex Tester** — pattern + flags, highlighted match preview, capture-group table, replace preview
+- **Semver Compare** — compare two versions and sort version lists per semver.org rules (prerelease-aware)
+- **Image Compressor** — re-encode to WebP/JPEG/PNG with quality slider, before/after size preview
+- **RSA Key Generator** — RSA key pairs (RSASSA / RSA-PSS / RSA-OAEP, 2048–4096 bits) exported as PEM/PKCS#8
+- **Certificate Decoder** — parse X.509 PEM/DER: subject/issuer, validity, SAN, key usage, SHA-1/256 fingerprints
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 
