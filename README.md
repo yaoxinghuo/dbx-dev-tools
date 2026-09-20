@@ -1,4 +1,4 @@
-# Dev Tools
+# Dev Tools — DBX Plugin
 
 [English](./README.md) | [中文](./README-zh.md)
 
