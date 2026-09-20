@@ -5,7 +5,7 @@
   "name": "Dev Tools",
  "version": "0.5.1",
   "publisher": "terry",
-  "description": "Sandboxed, offline, zero permissions — 31 tools under 100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
+  "description": "Sandboxed, offline, zero permissions — 32 tools at ~100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, Base64, timestamp/date, diff, color & contrast, mojibake fixer and more.",
   "icon": "assets/plugin.svg",
   "engines": {
     "dbx": ">=0.5.68",
@@ -160,6 +160,12 @@
     },
     {
       "type": "workbench",
+      "id": "terry.devtools.ipcalc",
+      "label": "IP Calculator",
+      "description": "IPv4 subnet math and splitting, IPv6 normalization, type and PTR."
+    },
+    {
+      "type": "workbench",
       "id": "terry.devtools.mojibake",
       "label": "Mojibake Fixer",
       "description": "Repair text garbled by the wrong charset (UTF-8 vs GBK, Big5, Shift_JIS, Windows-1252)."
@@ -216,7 +222,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "沙箱离线运行，零权限——31 个工具，不到 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
+      "description": "沙箱离线运行，零权限——32 个工具，约 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
       "contributions": {
         "terry.devtools.home": {
           "label": "Dev Tools",
@@ -309,6 +315,10 @@
         "terry.devtools.semver": {
           "label": "Semver 版本比较",
           "description": "按 semver.org 规则比较版本号、排序版本列表。"
+        },
+        "terry.devtools.ipcalc": {
+          "label": "IP 计算器",
+          "description": "IPv4 子网计算与划分，IPv6 规范化、类型识别与反解。"
         },
         "terry.devtools.mojibake": {
           "label": "乱码修复",

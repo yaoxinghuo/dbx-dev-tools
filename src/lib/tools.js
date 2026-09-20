@@ -30,6 +30,7 @@ import SemverTool from "../tools/SemverTool.svelte";
 import ImageCompTool from "../tools/ImageCompTool.svelte";
 import RsaTool from "../tools/RsaTool.svelte";
 import CertTool from "../tools/CertTool.svelte";
+import IpTool from "../tools/IpTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -65,6 +66,7 @@ export const TOOLS = [
   { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
   { key: "semver", contributionId: "terry.devtools.semver", component: SemverTool, tags: ["version", "semver", "compare", "sort"] },
+  { key: "ipcalc", contributionId: "terry.devtools.ipcalc", component: IpTool, tags: ["network", "ip", "ipv4", "ipv6", "subnet", "cidr"] },
   { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter", "hex", "rgb", "hsl", "hsv", "contrast", "wcag", "picker"] },
   { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },

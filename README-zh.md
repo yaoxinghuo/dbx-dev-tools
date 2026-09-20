@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零权限申请**。31 个工具、安装包不到 100KB；纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零权限申请**。32 个工具、安装包约 100KB；纯前端实现、universal 包、无原生 Sidecar。
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![31 个工具](https://img.shields.io/badge/工具-31-orange) ![安装包 <100KB](https://img.shields.io/badge/安装包-%3C100KB-brightgreen) ![权限 0](https://img.shields.io/badge/权限-0-blueviolet)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![32 个工具](https://img.shields.io/badge/工具-32-orange) ![安装包 约100KB](https://img.shields.io/badge/安装包-约100KB-brightgreen) ![权限 0](https://img.shields.io/badge/权限-0-blueviolet)
 
 <img width="2232" height="1516" alt="image" src="https://github.com/user-attachments/assets/c260afbf-559d-4f82-8262-0132cda81db2" />
 
@@ -42,6 +42,7 @@
 - **图片压缩转换**：重编码为 WebP/JPEG/PNG，质量滑杆可调，前后体积对比
 - **RSA 密钥生成器**：RSA 密钥对（RSASSA / RSA-PSS / RSA-OAEP，2048–4096 位）导出 PEM/PKCS#8
 - **证书解析器**：解析 X.509 PEM/DER 证书：主体/签发者、有效期、SAN、密钥用途、SHA-1/256 指纹
+- **IP 计算器**：IPv4 子网计算（网络/广播/可用主机/掩码/反掩码/范围属性/PTR）与子网划分；IPv6 压缩/展开、前缀、类型识别、ip6.arpa 反解
 
 首页提供多语言搜索（查询匹配所有语言的名称/描述/标签，不限于当前界面语言）和按当前语言本地化的标签筛选。
 
