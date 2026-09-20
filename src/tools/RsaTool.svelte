@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { generateRsaPair, RSA_ALGS } from "../lib/rsa.js";
+  import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let s = $state(t());
@@ -31,11 +32,7 @@
   }
 
   function download(name, text) {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], { type: "application/x-pem-file" }));
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveFile({ fileName: name, contentType: "application/x-pem-file" }, text);
   }
 </script>
 

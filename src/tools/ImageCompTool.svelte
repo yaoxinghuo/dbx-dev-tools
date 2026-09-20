@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
+  import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let s = $state(t());
@@ -72,12 +73,10 @@
 
   const ratio = $derived(file && out ? (1 - out.size / file.size) * 100 : null);
 
-  function download() {
+  async function download() {
     if (!out || !file) return;
-    const a = document.createElement("a");
-    a.href = out.url;
-    a.download = file.name.replace(/\.[^.]+$/, "") + "." + out.ext;
-    a.click();
+    const name = file.name.replace(/\.[^.]+$/, "") + "." + out.ext;
+    await saveFile({ fileName: name, contentType: out.type }, new Uint8Array(await out.blob.arrayBuffer()));
   }
 </script>
 
