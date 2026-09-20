@@ -106,14 +106,17 @@
 
   {#if file && out}
     <div class="dbx-card">
+      <div class="result-row">
+        <span class="meta">
+          {out.type.split("/")[1].toUpperCase()} · {formatSize(out.size, IEC_UNITS)}
+          {#if ratio > 0}· {ic.saved} <b>{ratio.toFixed(1)}%</b>{:else}· {ic.grew} <b>{(-ratio).toFixed(1)}%</b>{/if}
+        </span>
+        <button type="button" class="dbx-btn primary" onclick={download} disabled={busy}>{ic.download}</button>
+      </div>
       <div class="imgs">
         <figure><img src={file.url} alt="src" /><figcaption>{ic.before} · {formatSize(file.size, IEC_UNITS)}</figcaption></figure>
         <figure><img src={out.url} alt="out" /><figcaption>{ic.after} · {out.type.split("/")[1].toUpperCase()} · {formatSize(out.size, IEC_UNITS)}</figcaption></figure>
       </div>
-      <p class="meta">
-        {#if ratio > 0}{ic.saved}: <b>{ratio.toFixed(1)}%</b>{:else}{ic.grew}: <b>{(-ratio).toFixed(1)}%</b>{/if}
-      </p>
-      <div><button type="button" class="dbx-btn primary" onclick={download} disabled={busy}>{ic.download}</button></div>
     </div>
   {/if}
 </ToolShell>
@@ -125,6 +128,7 @@
   .narrow { width: 140px; flex: none; }
   .meta { margin: 0; font-size: 13px; color: var(--color-text-secondary, #64748b); }
   .meta b { color: var(--color-text, #0f172a); }
+  .result-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .imgs { display: flex; gap: 14px; flex-wrap: wrap; }
   figure { margin: 0; flex: 1; min-width: 160px; }
   figure img { width: 100%; border: 1px solid var(--color-border, #e2e8f0); border-radius: 8px; background: repeating-conic-gradient(#e2e8f0 0 25%, #fff 0 50%) 0 0/16px 16px; }
