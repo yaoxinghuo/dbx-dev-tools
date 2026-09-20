@@ -49,7 +49,7 @@
 
   <div class="dbx-card">
     <h2 class="dbx-section-title">{v.sortTitle}</h2>
-    <textarea class="dbx-input mono" rows="6" bind:value={list} placeholder={"1.2.3\n2.0.0-rc.1\n1.10.0"} spellcheck="false"></textarea>
+    <textarea class="dbx-textarea mono" rows="6" bind:value={list} placeholder={"1.2.3\n2.0.0-rc.1\n1.10.0"} spellcheck="false"></textarea>
     <div class="opts">
       <label class="check"><input type="checkbox" bind:checked={desc} /> {v.descOrder}</label>
       <label class="check"><input type="checkbox" bind:checked={unique} /> {v.unique}</label>

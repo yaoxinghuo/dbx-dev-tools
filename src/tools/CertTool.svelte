@@ -51,7 +51,7 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card">
     <label class="dbx-label" for="cert-in">{c.input}</label>
-    <textarea id="cert-in" class="dbx-input mono" rows="6" bind:value={pem}
+    <textarea id="cert-in" class="dbx-textarea mono" rows="8" bind:value={pem}
       placeholder="-----BEGIN CERTIFICATE-----&#10;…" spellcheck="false"></textarea>
     <div class="row">
       <input type="file" accept=".pem,.crt,.cer,.der" onchange={pick} class="dbx-input" />

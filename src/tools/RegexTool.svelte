@@ -69,7 +69,7 @@
 
   <div class="dbx-card">
     <label class="dbx-label" for="rx-text">{r.text}</label>
-    <textarea id="rx-text" class="dbx-input mono" rows="5" bind:value={text} spellcheck="false"></textarea>
+    <textarea id="rx-text" class="dbx-textarea mono" rows="5" bind:value={text} spellcheck="false"></textarea>
   </div>
 
   {#if compiled.re && text}

@@ -75,7 +75,7 @@
           <button type="button" class="dbx-btn" onclick={() => download("public.pem", keys.publicPem)}>{r.download}</button>
         </div>
       </div>
-      <textarea class="dbx-input mono" rows="9" readonly value={keys.publicPem}></textarea>
+      <textarea class="dbx-textarea mono" rows="9" readonly value={keys.publicPem}></textarea>
     </div>
     <div class="dbx-card">
       <div class="head">
@@ -85,7 +85,7 @@
           <button type="button" class="dbx-btn" onclick={() => download("private.pem", keys.privatePem)}>{r.download}</button>
         </div>
       </div>
-      <textarea class="dbx-input mono" rows="14" readonly value={keys.privatePem}></textarea>
+      <textarea class="dbx-textarea mono" rows="16" readonly value={keys.privatePem}></textarea>
       <p class="hint">{r.pkcs8Note} · {keys.ms} ms</p>
     </div>
   {/if}
