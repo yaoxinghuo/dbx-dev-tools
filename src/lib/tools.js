@@ -53,7 +53,7 @@ export const TOOLS = [
   { key: "barcode", contributionId: "terry.devtools.barcode", component: BarcodeTool, tags: ["generator", "barcode"] },
   { key: "base64", contributionId: "terry.devtools.base64", component: Base64Tool, tags: ["codec", "converter", "base64"] },
   { key: "url", contributionId: "terry.devtools.url", component: UrlTool, tags: ["codec", "converter", "url"] },
-  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
+  { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml", "json"] },
   { key: "punycode", contributionId: "terry.devtools.punycode", component: PunycodeTool, tags: ["codec", "converter", "domain", "idn"] },
   { key: "qp", contributionId: "terry.devtools.qp", component: QpTool, tags: ["codec", "converter", "email", "mime"] },
   { key: "datauri", contributionId: "terry.devtools.datauri", component: DataUriTool, tags: ["codec", "converter", "base64", "image"] },

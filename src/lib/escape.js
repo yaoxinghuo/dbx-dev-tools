@@ -43,6 +43,27 @@ function jsUnescape(text) {
   });
 }
 
+// JSON string escaping via JSON.stringify — strips the surrounding quotes so
+// escaping is content-level: {"a":1} → {\"a\":1}.
+function jsonEscape(text) {
+  return JSON.stringify(text).slice(1, -1);
+}
+
+// Unescape accepts both a quoted JSON string literal ("{\"a\":1}") and bare
+// escaped content ({\"a\":1}); bare input is wrapped in quotes for JSON.parse.
+function jsonUnescape(text) {
+  const t = text.trim();
+  const candidate = t.startsWith('"') && t.endsWith('"') && t.length >= 2 ? t : `"${t}"`;
+  try {
+    return JSON.parse(candidate);
+  } catch {
+    // Raw control chars (e.g. a real newline) break strict JSON.parse — escape
+    // them inside the literal and retry once.
+    const inner = candidate.slice(1, -1).replace(/[\n\r\t]/g, (c) => ({ "\n": "\\n", "\r": "\\r", "\t": "\\t" })[c]);
+    return JSON.parse(`"${inner}"`);
+  }
+}
+
 const REGEX_SPECIAL = /[.*+?^${}()|[\]\\]/g;
 
 function regexEscape(text) {
@@ -77,6 +98,7 @@ export const ESCAPE_FORMATS = {
   xml: { escape: xmlEscape, unescape: xmlUnescape },
   html: { escape: htmlEscape, unescape: htmlUnescape },
   js: { escape: jsEscape, unescape: jsUnescape },
+  json: { escape: jsonEscape, unescape: jsonUnescape },
   regex: { escape: regexEscape, unescape: regexUnescape },
   csv: { escape: csvEscape, unescape: csvUnescape },
   shell: { escape: shellEscape, unescape: shellUnescape },
