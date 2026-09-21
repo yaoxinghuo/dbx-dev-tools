@@ -1,8 +1,8 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
-  import { TOOLS, VISIBLE_TAGS } from "../lib/tools.js";
+  import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys } from "../lib/prefs.svelte.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let { onPick } = $props();
@@ -22,11 +22,9 @@
     return buildSearchIndex();
   });
 
-  // Chips only list category-level tags (shared by 3+ tools); the long tail
-  // of niche tags stays reachable through search, keeping the row to one line.
-  const allTags = $derived.by(() =>
-    [...VISIBLE_TAGS].sort((a, b) => tagName(a).localeCompare(tagName(b)))
-  );
+  // Category cards list only category-level tags (shared by 3+ tools), sorted
+  // by tool count; the long tail of niche tags stays reachable through search.
+  const categories = CATEGORY_TAGS;
 
   const visible = $derived.by(() => {
     const q = query.trim().toLowerCase();
@@ -37,11 +35,13 @@
     });
   });
 
-  // Favorites float to the top of the grid, declaration order preserved.
+  // Favorites float to the top of the grid in the user's drag-sorted order.
   const ordered = $derived.by(() => {
+    const order = new Map(favoriteKeys().map((key, i) => [key, i]));
     const fav = [];
     const rest = [];
     for (const tool of visible) (isFavorite(tool.key) ? fav : rest).push(tool);
+    fav.sort((a, b) => order.get(a.key) - order.get(b.key));
     return [...fav, ...rest];
   });
 
@@ -56,22 +56,6 @@
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
   <div class="controls">
     <input class="dbx-input search" bind:value={query} placeholder={s.home.searchPlaceholder} />
-    <div class="chips">
-      <button
-        type="button"
-        class="chip dbx-btn"
-        class:dbx-btn--primary={activeTag === null}
-        onclick={() => (activeTag = null)}
-      >{s.home.filterAll}</button>
-      {#each allTags as tag}
-        <button
-          type="button"
-          class="chip dbx-btn"
-          class:dbx-btn--primary={activeTag === tag}
-          onclick={() => (activeTag = activeTag === tag ? null : tag)}
-        >{tagName(tag)}</button>
-      {/each}
-    </div>
   </div>
 
   {#if !query.trim() && !activeTag && recentTools.length}
@@ -82,6 +66,24 @@
       {/each}
     </div>
   {/if}
+
+  <div class="section dbx-hint">{s.home.browseCats}</div>
+  <div class="cats">
+    <button
+      type="button"
+      class="cat"
+      class:on={activeTag === null}
+      onclick={() => (activeTag = null)}
+    ><span>{s.home.filterAll}</span><span class="cnt">{TOOLS.length}</span></button>
+    {#each categories as cat}
+      <button
+        type="button"
+        class="cat"
+        class:on={activeTag === cat.key}
+        onclick={() => (activeTag = activeTag === cat.key ? null : cat.key)}
+      ><span>{tagName(cat.key)}</span><span class="cnt">{cat.count}</span></button>
+    {/each}
+  </div>
 
   {#if visible.length}
     <div class="grid">
@@ -114,8 +116,26 @@
 <style>
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
   .search { max-width: 420px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chip { height: 24px; padding: 0 10px; font-size: 12px; border-radius: 12px; }
+  .section { font-size: 12px; margin: 0 0 8px; }
+  .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .cat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    color: inherit;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .cat:hover { border-color: var(--color-primary); }
+  .cat.on { border-color: var(--color-primary); background: var(--color-muted); }
+  .cnt { font-size: 12px; color: var(--color-muted-foreground); }
   .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
   .recent-label { font-size: 12px; margin-right: 2px; }
   .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; }

@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, isFavorite, recentKeys } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, moveFavorite } from "./lib/prefs.svelte.js";
   import { t, onLangChange } from "./lib/i18n.js";
 
   let s = $state(t());
@@ -17,16 +17,21 @@
   setContext("currentTool", () => active);
 
   let navQuery = $state("");
-  let navOpen = $state(false);
-  let panel = $state(null); // "recent" | "fav" | null
+  let dragKey = $state(null); // favorites drag-to-reorder payload
+  let dropKey = $state(null); // item currently hovered as a drop target
+
+  const toolByKey = new Map(TOOLS.map((tool) => [tool.key, tool]));
 
   const recentTools = $derived.by(() =>
     recentKeys()
-      .map((key) => TOOLS.find((tool) => tool.key === key))
+      .map((key) => toolByKey.get(key))
       .filter(Boolean)
-      .slice(0, 8)
   );
-  const favTools = $derived.by(() => TOOLS.filter((tool) => isFavorite(tool.key)));
+  const favTools = $derived.by(() =>
+    favoriteKeys()
+      .map((key) => toolByKey.get(key))
+      .filter(Boolean)
+  );
 
   // `s` is tracked so the index re-localizes when the UI language changes.
   const navIndex = $derived.by(() => {
@@ -35,43 +40,44 @@
   });
   const navResults = $derived.by(() => {
     const q = navQuery.trim().toLowerCase();
-    if (!q) return [];
-    return TOOLS.filter((tool) => (navIndex.get(tool.key) || "").includes(q)).slice(0, 8);
+    if (!q) return null; // null => browsing mode, show grouped lists
+    return TOOLS.filter((tool) => (navIndex.get(tool.key) || "").includes(q));
   });
 
-  // Any tool switch (sidebar, dropdown or host context) clears the search and
+  // Any tool switch (sidebar, search or host context) clears the search and
   // counts as usage for the home page's recent list.
   $effect(() => {
     if (active) recordRecent(active.key);
     navQuery = "";
-    panel = null;
   });
 
   function pick(tool) {
     active = tool;
-    navOpen = false;
-    panel = null;
-  }
-
-  function togglePanel(which) {
-    panel = panel === which ? null : which;
-  }
-
-  // Blur only closes this button's own panel, so switching between the two
-  // quick-open buttons doesn't race the 150ms close timeout.
-  function blurClose(which) {
-    setTimeout(() => {
-      if (panel === which) panel = null;
-    }, 150);
   }
 
   function onNavKey(e) {
     if (e.key === "Escape") {
       navQuery = "";
       e.currentTarget.blur();
-    } else if (e.key === "Enter" && navResults.length) {
+    } else if (e.key === "Enter" && navResults?.length) {
       pick(navResults[0]);
     }
+  }
+
+  // HTML5 DnD: favorites reorder. Dragging over an item marks it as the
+  // insertion point; dropping reorders via moveFavorite.
+  function favDragOver(e, tool) {
+    if (!dragKey || dragKey === tool.key) return;
+    e.preventDefault();
+    dropKey = tool.key;
+  }
+
+  function favDrop(e, tool) {
+    e.preventDefault();
+    e.stopPropagation(); // item drop must not bubble to the list's own handler
+    if (dragKey) moveFavorite(dragKey, tool?.key ?? null);
+    dragKey = null;
+    dropKey = null;
   }
 
   function initialTool() {
@@ -100,84 +106,62 @@
   <div class="layout">
     <nav>
       <button type="button" class="brand" class:active={!active} onclick={() => (active = null)}>
-        {s.homeTitle}
+        🏠 {s.homeTitle}
       </button>
-      <div class="sep"></div>
-      {#each TOOLS as tool}
-        <button type="button" class="item" class:active={active === tool} onclick={() => (active = tool)}>
-          {s.tools[tool.key].name}
-        </button>
-      {/each}
+      <input
+        class="navsearch dbx-input"
+        bind:value={navQuery}
+        placeholder={s.home.searchPlaceholder}
+        onkeydown={onNavKey}
+      />
+      {#if navResults}
+        {#each navResults as tool}
+          <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+            {s.tools[tool.key].name}
+          </button>
+        {:else}
+          <div class="empty dbx-hint">{s.home.noResults}</div>
+        {/each}
+      {:else}
+        {#if favTools.length}
+          <div class="group dbx-hint">★ {s.home.favs}</div>
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div class="droplist" ondragover={(e) => e.preventDefault()} ondrop={(e) => favDrop(e, null)}>
+            {#each favTools as tool (tool.key)}
+              <button
+                type="button"
+                class="item fav-item"
+                class:active={active === tool}
+                class:drop={dropKey === tool.key}
+                draggable="true"
+                title={s.home.dragReorder}
+                ondragstart={() => (dragKey = tool.key)}
+                ondragend={() => { dragKey = null; dropKey = null; }}
+                ondragover={(e) => favDragOver(e, tool)}
+                ondrop={(e) => favDrop(e, tool)}
+                onclick={() => pick(tool)}
+              >{s.tools[tool.key].name}</button>
+            {/each}
+          </div>
+        {/if}
+        {#if recentTools.length}
+          <div class="group dbx-hint">🕘 {s.home.recent}</div>
+          {#each recentTools as tool}
+            <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+              {s.tools[tool.key].name}
+            </button>
+          {/each}
+        {/if}
+        <div class="group dbx-hint">{s.home.allTools}</div>
+        {#each TOOLS as tool}
+          <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+            {s.tools[tool.key].name}
+          </button>
+        {/each}
+      {/if}
     </nav>
     <main>
       {#if active}
-        <div class="topbar">
-          <button type="button" class="back" onclick={() => (active = null)}>‹ 🏠 {s.home.back}</button>
-          <div class="quick">
-            <button
-              type="button"
-              class="back qbtn"
-              class:open={panel === "recent"}
-              onclick={() => togglePanel("recent")}
-              onblur={() => blurClose("recent")}
-            >🕘 {s.home.recent}</button>
-            {#if panel === "recent"}
-              <div class="navdrop qdrop">
-                {#each recentTools as tool}
-                  <button type="button" class="navitem" onmousedown={() => pick(tool)}>
-                    <span class="nname">{s.tools[tool.key].name}</span>
-                    <span class="ndesc">{s.tools[tool.key].desc}</span>
-                  </button>
-                {:else}
-                  <div class="navitem empty">{s.home.recentEmpty}</div>
-                {/each}
-              </div>
-            {/if}
-          </div>
-          <div class="quick">
-            <button
-              type="button"
-              class="back qbtn"
-              class:open={panel === "fav"}
-              onclick={() => togglePanel("fav")}
-              onblur={() => blurClose("fav")}
-            >★ {s.home.fav}</button>
-            {#if panel === "fav"}
-              <div class="navdrop qdrop">
-                {#each favTools as tool}
-                  <button type="button" class="navitem" onmousedown={() => pick(tool)}>
-                    <span class="nname">{s.tools[tool.key].name}</span>
-                    <span class="ndesc">{s.tools[tool.key].desc}</span>
-                  </button>
-                {:else}
-                  <div class="navitem empty">{s.home.favEmpty}</div>
-                {/each}
-              </div>
-            {/if}
-          </div>
-          <div class="navsearch">
-            <input
-              class="dbx-input"
-              bind:value={navQuery}
-              placeholder={s.home.searchPlaceholder}
-              onfocus={() => (navOpen = true)}
-              onblur={() => setTimeout(() => (navOpen = false), 150)}
-              onkeydown={onNavKey}
-            />
-            {#if navOpen && navQuery.trim()}
-              <div class="navdrop">
-                {#each navResults as tool}
-                  <button type="button" class="navitem" onmousedown={() => pick(tool)}>
-                    <span class="nname">{s.tools[tool.key].name}</span>
-                    <span class="ndesc">{s.tools[tool.key].desc}</span>
-                  </button>
-                {:else}
-                  <div class="navitem empty">{s.home.noResults}</div>
-                {/each}
-              </div>
-            {/if}
-          </div>
-        </div>
         <active.component />
       {:else}
         <Home onPick={(tool) => (active = tool)} />
@@ -213,7 +197,24 @@
     cursor: pointer;
     color: var(--color-foreground);
   }
-  .sep { height: 1px; background: var(--color-border); margin: 8px 4px; }
+  .brand:hover { background: var(--color-muted); }
+  .navsearch {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0 10px;
+    height: 30px;
+    font-size: 12px;
+  }
+  .group {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    color: var(--color-muted-foreground);
+    margin-top: 12px;
+    padding: 10px 10px 4px;
+    border-top: 1px solid var(--color-border);
+  }
+  .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }
   .item {
     border: 0;
     background: none;
@@ -227,72 +228,8 @@
   }
   .item:hover { background: var(--color-muted); }
   .item.active, .brand.active { background: var(--color-primary); color: var(--color-primary-foreground); }
+  .fav-item { cursor: grab; }
+  .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
+  .empty { font-size: 12px; padding: 8px 10px; }
   main { flex: 1; min-width: 0; }
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 24px;
-    background: var(--color-background);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .back {
-    border: 0;
-    background: none;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-muted-foreground);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: var(--radius-md);
-    white-space: nowrap;
-  }
-  .back:hover { color: var(--color-foreground); background: var(--color-muted); }
-  .back.open { color: var(--color-foreground); background: var(--color-muted); }
-  .quick { position: relative; }
-  .navdrop.qdrop { left: 0; right: auto; width: 280px; }
-  .navsearch { position: relative; margin-left: auto; width: 320px; max-width: 55%; }
-  .navsearch .dbx-input { width: 100%; }
-  .navdrop {
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0;
-    width: 100%;
-    max-height: 320px;
-    overflow-y: auto;
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
-    padding: 4px;
-  }
-  .navitem {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    width: 100%;
-    border: 0;
-    background: none;
-    font: inherit;
-    text-align: left;
-    padding: 7px 10px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    color: var(--color-foreground);
-  }
-  .navitem:hover { background: var(--color-muted); }
-  .navitem.empty { cursor: default; color: var(--color-muted-foreground); font-size: 12px; }
-  .navitem.empty:hover { background: none; }
-  .nname { font-size: 13px; font-weight: 600; }
-  .ndesc {
-    font-size: 12px;
-    color: var(--color-muted-foreground);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 </style>

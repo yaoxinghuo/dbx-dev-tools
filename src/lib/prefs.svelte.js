@@ -1,31 +1,48 @@
 import { untrack } from "svelte";
-import { SvelteSet } from "svelte/reactivity";
 import { storageGet, storageSet } from "./storage.js";
 
 const RECENT_MAX = 10;
 
-// $state only proxies plain objects/arrays — a Set passed through it stays a
-// raw, non-reactive Set. SvelteSet is the reactive implementation.
-const favorites = new SvelteSet();
+// Favorites are an ordered array (not a Set) so users can drag-reorder them
+// in the sidebar; the order is also how they sort on the home grid.
+const favorites = $state([]);
 const recent = $state([]);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
-  if (Array.isArray(fav)) for (const key of fav) if (typeof key === "string") favorites.add(key);
+  if (Array.isArray(fav)) favorites.push(...fav.filter((key) => typeof key === "string"));
   const rec = await storageGet("recent");
   if (Array.isArray(rec)) recent.push(...rec.filter((key) => typeof key === "string").slice(0, RECENT_MAX));
 })();
 
 export function isFavorite(key) {
-  return favorites.has(key);
+  return favorites.includes(key);
+}
+
+export function favoriteKeys() {
+  return favorites;
 }
 
 export function toggleFavorite(key) {
   // Reads+writes favorites; untracked so callers inside $effect don't end up
   // depending on the very signal this mutates (self-invalidation loop).
   untrack(() => {
-    if (favorites.has(key)) favorites.delete(key);
-    else favorites.add(key);
+    const index = favorites.indexOf(key);
+    if (index >= 0) favorites.splice(index, 1);
+    else favorites.push(key); // new favorites take the tail slot
+    storageSet("favorites", [...favorites]);
+  });
+}
+
+// Drag-to-reorder: `key` is inserted at `overKey`'s position (before it);
+// null overKey means dropped past the end.
+export function moveFavorite(key, overKey) {
+  untrack(() => {
+    const from = favorites.indexOf(key);
+    if (from < 0 || key === overKey) return;
+    favorites.splice(from, 1);
+    if (overKey == null) favorites.push(key);
+    else favorites.splice(favorites.indexOf(overKey), 0, key);
     storageSet("favorites", [...favorites]);
   });
 }
