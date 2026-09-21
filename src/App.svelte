@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent } from "./lib/prefs.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
@@ -199,7 +199,12 @@
           </div>
         {/if}
         {#if recentTools.length}
-          <div class="group dbx-hint"><Icon name="clock" size={11} />{s.home.recent}</div>
+          <div class="group dbx-hint">
+            <Icon name="clock" size={11} />{s.home.recent}
+            <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
+              <Icon name="trash" size={11} />
+            </button>
+          </div>
           {#each recentTools as tool}
             <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
               {s.tools[tool.key].name}
@@ -268,6 +273,17 @@
   .railbtn:hover { background: var(--color-muted); }
   .railbtn.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .collapser { color: var(--color-muted-foreground); }
+  .miniact {
+    margin-left: auto;
+    border: 0;
+    background: none;
+    padding: 1px 2px;
+    cursor: pointer;
+    color: inherit;
+    display: inline-flex;
+    border-radius: 3px;
+  }
+  .miniact:hover { color: var(--color-foreground); }
   .searchwrap { position: relative; margin: 10px 0 4px; }
   /* the magnifier sits inside the input; padding keeps text clear of it */
   .searchwrap > :global(.ic) {

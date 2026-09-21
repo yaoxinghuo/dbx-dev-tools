@@ -70,6 +70,13 @@ export function recordRecent(key) {
   });
 }
 
+export function clearRecent() {
+  untrack(() => {
+    recent.length = 0;
+    storageSet("recent", []);
+  });
+}
+
 export function isAllCollapsed() {
   return allCollapsed;
 }

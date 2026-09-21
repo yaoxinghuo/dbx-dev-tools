@@ -4,7 +4,7 @@
   import Icon from "../components/Icon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite, clearRecent } from "../lib/prefs.svelte.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let { onPick } = $props();
@@ -93,7 +93,12 @@
 
   {#if recentTools.length}
     <div class="recent">
-      <span class="recent-label dbx-hint"><Icon name="clock" size={12} />{s.home.recent}</span>
+      <span class="recent-label dbx-hint">
+        <Icon name="clock" size={12} />{s.home.recent}
+        <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
+          <Icon name="trash" size={12} />
+        </button>
+      </span>
       {#each recentTools as tool}
         <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>{s.tools[tool.key].name}</button>
       {/each}
@@ -210,6 +215,16 @@
   .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
   .recent-label { font-size: 12px; margin-right: 2px; display: inline-flex; align-items: center; gap: 5px; }
   .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; }
+  .miniact {
+    border: 0;
+    background: none;
+    padding: 1px 2px;
+    cursor: pointer;
+    color: inherit;
+    display: inline-flex;
+    border-radius: 3px;
+  }
+  .miniact:hover { color: var(--color-foreground); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
   .cell { position: relative; display: flex; }
   .cell .card { flex: 1; }
