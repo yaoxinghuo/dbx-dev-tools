@@ -145,6 +145,7 @@
         </button>
       {:else}
       <div class="navtop">
+        <span class="brand">Dev Tools</span>
         <button type="button" class="railbtn collapser" title={s.home.collapseNav} onclick={() => setNavCollapsed(true)}>
           <Icon name="chevrons-left" size={14} />
         </button>
@@ -248,7 +249,8 @@
      heights when the nav overflows; disable it so the nav scrolls */
   nav > * { flex-shrink: 0; }
   nav.collapsed { width: 46px; padding: 14px 8px; align-items: center; }
-  .navtop { display: flex; justify-content: flex-end; }
+  .navtop { display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 14px; font-weight: 650; padding-left: 8px; }
   .navitem { display: flex; align-items: center; gap: 6px; }
   .railbtn {
     border: 0;

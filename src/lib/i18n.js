@@ -126,7 +126,7 @@ const messages = {
       calc: "Calc",
     },
     home: {
-      searchPlaceholder: "Name/tag, any language",
+      searchPlaceholder: "Search by name/tag, EN or 中文",
       back: "Home",
       recent: "Recently used",
       fav: "Favorite",
@@ -829,7 +829,7 @@ const messages = {
       calc: "计算",
     },
     home: {
-      searchPlaceholder: "中英文、Tag均可",
+      searchPlaceholder: "中英文、Tag均可搜",
       back: "首页",
       recent: "最近使用",
       fav: "收藏",
