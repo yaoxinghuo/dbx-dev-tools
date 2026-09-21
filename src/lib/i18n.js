@@ -3,7 +3,7 @@ import { locale, onEnvChange, onInit } from "./bridge.js";
 const messages = {
   en: {
     homeTitle: "Dev Tools",
-    homeSubtitle: "A collection of small tools for everyday development.",
+    homeSubtitle: "40 everyday dev tools · sandboxed & offline · only 1 local permission.",
     copy: "Copy",
     copied: "Copied",
     copyAll: "Copy all",
@@ -703,7 +703,7 @@ const messages = {
   },
   zh: {
     homeTitle: "Dev Tools",
-    homeSubtitle: "日常开发工具集合。",
+    homeSubtitle: "40 个日常开发工具 · 沙箱离线运行 · 仅 1 项本地权限。",
     copy: "复制",
     copied: "已复制",
     copyAll: "全部复制",

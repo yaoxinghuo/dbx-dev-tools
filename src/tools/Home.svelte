@@ -37,14 +37,14 @@
   });
 
   // Favorites float to the top of the grid in the user's drag-sorted order.
-  const ordered = $derived.by(() => {
+  const favOrdered = $derived.by(() => {
     const order = new Map(favoriteKeys().map((key, i) => [key, i]));
-    const fav = [];
-    const rest = [];
-    for (const tool of visible) (isFavorite(tool.key) ? fav : rest).push(tool);
-    fav.sort((a, b) => order.get(a.key) - order.get(b.key));
-    return [...fav, ...rest];
+    return visible
+      .filter((tool) => order.has(tool.key))
+      .sort((a, b) => order.get(a.key) - order.get(b.key));
   });
+  const restOrdered = $derived(visible.filter((tool) => !isFavorite(tool.key)));
+  const ordered = $derived([...favOrdered, ...restOrdered]);
 
   const recentTools = $derived.by(() =>
     recentKeys()
@@ -58,6 +58,19 @@
   const canSort = $derived(!query.trim() && !activeTag);
   let dragKey = $state(null);
   let dropKey = $state(null);
+
+  function favDragStart(e, tool) {
+    dragKey = tool.key;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", tool.key);
+    // The grip is tiny; use the whole card as the drag image so the dragged
+    // card visually follows the cursor.
+    const card = e.currentTarget.closest(".cell")?.querySelector(".card");
+    if (card) {
+      const r = card.getBoundingClientRect();
+      e.dataTransfer.setDragImage(card, e.clientX - r.left, e.clientY - r.top);
+    }
+  }
 
   function favDragOver(e, tool) {
     if (!dragKey || dragKey === tool.key) return;
@@ -105,45 +118,58 @@
     {/each}
   </div>
 
-  {#if visible.length}
-    <div class="grid">
-      {#each ordered as tool}
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div
-          class="cell"
-          class:faved={canSort && isFavorite(tool.key)}
-          class:drop={dropKey === tool.key}
-          ondragover={(e) => canSort && isFavorite(tool.key) && favDragOver(e, tool)}
-          ondrop={(e) => canSort && isFavorite(tool.key) && favDrop(e, tool)}
-        >
-          <button type="button" class="card dbx-card" onclick={() => onPick?.(tool)}>
-            <span class="name">{s.tools[tool.key].name}</span>
-            <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
-            <span class="tagrow">
-              {#each tool.tags.filter((tag) => VISIBLE_TAGS.has(tag)) as tag}
-                <span class="mini-tag">{tagName(tag)}</span>
-              {/each}
-            </span>
-          </button>
-          {#if canSort && isFavorite(tool.key)}
-            <span
-              class="gripbox"
-              title={s.home.dragReorder}
-              draggable="true"
-              ondragstart={() => (dragKey = tool.key)}
-              ondragend={() => { dragKey = null; dropKey = null; }}
-            ><GripIcon /></span>
-          {/if}
-          <button
-            type="button"
-            class="star"
-            class:faved={isFavorite(tool.key)}
-            title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
-            onclick={() => toggleFavorite(tool.key)}
-          >{isFavorite(tool.key) ? "★" : "☆"}</button>
-        </div>
-      {/each}
+  {#snippet cell(tool)}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="cell"
+      class:faved={canSort && isFavorite(tool.key)}
+      class:drop={dropKey === tool.key}
+      ondragover={(e) => canSort && isFavorite(tool.key) && favDragOver(e, tool)}
+      ondrop={(e) => canSort && isFavorite(tool.key) && favDrop(e, tool)}
+    >
+      <button type="button" class="card dbx-card" onclick={() => onPick?.(tool)}>
+        <span class="name">{s.tools[tool.key].name}</span>
+        <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
+        <span class="tagrow">
+          {#each tool.tags.filter((tag) => VISIBLE_TAGS.has(tag)) as tag}
+            <span class="mini-tag">{tagName(tag)}</span>
+          {/each}
+        </span>
+      </button>
+      {#if canSort && isFavorite(tool.key)}
+        <span
+          class="gripbox"
+          title={s.home.dragReorder}
+          draggable="true"
+          ondragstart={(e) => favDragStart(e, tool)}
+          ondragend={() => { dragKey = null; dropKey = null; }}
+        ><GripIcon /></span>
+      {/if}
+      <button
+        type="button"
+        class="star"
+        class:faved={isFavorite(tool.key)}
+        title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
+        onclick={() => toggleFavorite(tool.key)}
+      >{isFavorite(tool.key) ? "★" : "☆"}</button>
     </div>
+  {/snippet}
+
+  {#if visible.length}
+    {#if canSort && favOrdered.length}
+      <div class="section dbx-hint">★ {s.home.favs}</div>
+      <div class="grid">
+        {#each favOrdered as tool}{@render cell(tool)}{/each}
+      </div>
+      <div class="section dbx-hint mid">{s.home.allTools}</div>
+      <div class="grid">
+        {#each restOrdered as tool}{@render cell(tool)}{/each}
+      </div>
+    {:else}
+      <div class="grid">
+        {#each ordered as tool}{@render cell(tool)}{/each}
+      </div>
+    {/if}
   {:else}
     <p class="dbx-hint empty">{s.home.noResults}</p>
   {/if}
@@ -151,8 +177,9 @@
 
 <style>
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .search { max-width: 420px; }
+  .search { max-width: 480px; height: 40px; font-size: 14px; padding: 0 14px; }
   .section { font-size: 12px; margin: 0 0 8px; }
+  .section.mid { margin-top: 16px; }
   .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
   .cat {
     display: flex;

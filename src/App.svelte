@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, moveFavorite } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed } from "./lib/prefs.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
 
@@ -136,7 +136,12 @@
                 class:drop={dropKey === tool.key}
                 draggable="true"
                 title={s.home.dragReorder}
-                ondragstart={() => (dragKey = tool.key)}
+                ondragstart={(e) => {
+                  dragKey = tool.key;
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", tool.key);
+                  e.dataTransfer.setDragImage(e.currentTarget, e.offsetX, e.offsetY);
+                }}
                 ondragend={() => { dragKey = null; dropKey = null; }}
                 ondragover={(e) => favDragOver(e, tool)}
                 ondrop={(e) => favDrop(e, tool)}
@@ -153,12 +158,16 @@
             </button>
           {/each}
         {/if}
-        <div class="group dbx-hint">{s.home.allTools}</div>
-        {#each TOOLS as tool}
-          <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
-            {s.tools[tool.key].name}
-          </button>
-        {/each}
+        <button type="button" class="group grouptoggle dbx-hint" onclick={toggleAllCollapsed}>
+          <span class="chev" class:open={!isAllCollapsed()}>▸</span>{s.home.allTools}
+        </button>
+        {#if !isAllCollapsed()}
+          {#each TOOLS as tool}
+            <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+              {s.tools[tool.key].name}
+            </button>
+          {/each}
+        {/if}
       {/if}
     </nav>
     <main>
@@ -201,6 +210,21 @@
     padding: 10px 10px 4px;
     border-top: 1px solid var(--color-border);
   }
+  .grouptoggle {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .grouptoggle:hover { color: var(--color-foreground); }
+  .chev { display: inline-block; transition: transform .15s; font-size: 9px; }
+  .chev.open { transform: rotate(90deg); }
   .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }
   .item {
     border: 0;

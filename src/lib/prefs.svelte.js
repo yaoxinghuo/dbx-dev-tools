@@ -7,12 +7,15 @@ const RECENT_MAX = 10;
 // in the sidebar; the order is also how they sort on the home grid.
 const favorites = $state([]);
 const recent = $state([]);
+// Sidebar "全部工具" group collapsed state, persisted so it survives reloads.
+let allCollapsed = $state(false);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
   if (Array.isArray(fav)) favorites.push(...fav.filter((key) => typeof key === "string"));
   const rec = await storageGet("recent");
   if (Array.isArray(rec)) recent.push(...rec.filter((key) => typeof key === "string").slice(0, RECENT_MAX));
+  allCollapsed = (await storageGet("navAllCollapsed")) === true;
 })();
 
 export function isFavorite(key) {
@@ -59,6 +62,15 @@ export function recordRecent(key) {
     if (recent.length > RECENT_MAX) recent.length = RECENT_MAX;
     storageSet("recent", [...recent]);
   });
+}
+
+export function isAllCollapsed() {
+  return allCollapsed;
+}
+
+export function toggleAllCollapsed() {
+  allCollapsed = !allCollapsed;
+  storageSet("navAllCollapsed", allCollapsed);
 }
 
 // Tests and callers that must observe the restored snapshot await this.
