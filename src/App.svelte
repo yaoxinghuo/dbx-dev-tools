@@ -157,6 +157,7 @@
         <Icon name="search" size={13} />
         <input
           class="navsearch dbx-input"
+          class:has-clear={navQuery}
           bind:this={navSearchEl}
           bind:value={navQuery}
           placeholder={s.home.searchPlaceholder}
@@ -309,7 +310,8 @@
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .searchwrap .navsearch { width: 100%; padding-left: 27px; padding-right: 24px; }
+  .searchwrap .navsearch { width: 100%; padding-left: 27px; }
+  .searchwrap .navsearch.has-clear { padding-right: 24px; }
   .clearbtn {
     position: absolute;
     right: 5px;

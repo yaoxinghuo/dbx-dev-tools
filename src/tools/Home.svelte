@@ -87,7 +87,7 @@
   <div class="controls">
     <div class="searchwrap">
       <Icon name="search" size={15} />
-      <input class="dbx-input search" bind:value={query} placeholder={s.home.searchPlaceholder} />
+      <input class="dbx-input search" class:has-clear={query} bind:value={query} placeholder={s.home.searchPlaceholder} />
       {#if query}
         <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
           <Icon name="x" size={13} />
@@ -195,7 +195,8 @@
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 30px 0 34px; }
+  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; }
+  .search.has-clear { padding-right: 30px; }
   .clearbtn {
     position: absolute;
     right: 8px;
