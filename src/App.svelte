@@ -5,6 +5,7 @@
   import { buildSearchIndex } from "./lib/toolsearch.js";
   import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed } from "./lib/prefs.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
+  import Icon from "./components/Icon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
 
   let s = $state(t());
@@ -106,15 +107,18 @@
 {#if booted}
   <div class="layout">
     <nav>
-      <button type="button" class="item" class:active={!active} onclick={() => (active = null)}>
-        🏠 {s.home.back}
+      <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
+        <Icon name="home" size={14} />{s.home.back}
       </button>
-      <input
-        class="navsearch dbx-input"
-        bind:value={navQuery}
-        placeholder={s.home.searchPlaceholder}
-        onkeydown={onNavKey}
-      />
+      <div class="searchwrap">
+        <Icon name="search" size={13} />
+        <input
+          class="navsearch dbx-input"
+          bind:value={navQuery}
+          placeholder={s.home.searchPlaceholder}
+          onkeydown={onNavKey}
+        />
+      </div>
       {#if navResults}
         {#each navResults as tool}
           <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
@@ -125,7 +129,7 @@
         {/each}
       {:else}
         {#if favTools.length}
-          <div class="group dbx-hint">★ {s.home.favs}</div>
+          <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}</div>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="droplist" ondragover={(e) => e.preventDefault()} ondrop={(e) => favDrop(e, null)}>
             {#each favTools as tool (tool.key)}
@@ -151,7 +155,7 @@
           </div>
         {/if}
         {#if recentTools.length}
-          <div class="group dbx-hint">🕘 {s.home.recent}</div>
+          <div class="group dbx-hint"><Icon name="clock" size={11} />{s.home.recent}</div>
           {#each recentTools as tool}
             <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
               {s.tools[tool.key].name}
@@ -159,7 +163,7 @@
           {/each}
         {/if}
         <button type="button" class="group grouptoggle dbx-hint" onclick={toggleAllCollapsed}>
-          <span class="chev" class:open={!isAllCollapsed()}>▸</span>{s.home.allTools}
+          <span class="chev" class:open={!isAllCollapsed()}><Icon name="chevron" size={10} /></span><Icon name="grid" size={11} />{s.home.allTools}
         </button>
         {#if !isAllCollapsed()}
           {#each TOOLS as tool}
@@ -198,9 +202,18 @@
   /* column flex children shrink by default and squish below their set
      heights when the nav overflows; disable it so the nav scrolls */
   nav > * { flex-shrink: 0; }
-  .navsearch {
-    margin: 8px 0 10px;
+  .navitem { display: flex; align-items: center; gap: 6px; }
+  .searchwrap { position: relative; margin: 8px 0 10px; }
+  /* the magnifier sits inside the input; padding keeps text clear of it */
+  .searchwrap > :global(.ic) {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-muted-foreground);
+    pointer-events: none;
   }
+  .searchwrap .navsearch { width: 100%; padding-left: 27px; }
   .group {
     font-size: 11px;
     font-weight: 600;
@@ -209,6 +222,9 @@
     margin-top: 12px;
     padding: 10px 10px 4px;
     border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
   .grouptoggle {
     width: 100%;
@@ -223,7 +239,7 @@
     gap: 4px;
   }
   .grouptoggle:hover { color: var(--color-foreground); }
-  .chev { display: inline-block; transition: transform .15s; font-size: 12px; line-height: 1; }
+  .chev { display: inline-flex; transition: transform .15s; }
   .chev.open { transform: rotate(90deg); }
   .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }
   .item {

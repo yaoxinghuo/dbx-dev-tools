@@ -3,6 +3,7 @@
   import { isFavorite, toggleFavorite } from "../lib/prefs.svelte.js";
   import { VISIBLE_TAGS } from "../lib/tools.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import Icon from "./Icon.svelte";
 
   let { title = "", desc = "", children } = $props();
   // App provides the current tool entry; null on the home page means no star.
@@ -23,7 +24,7 @@
           class:faved={isFavorite(key)}
           title={isFavorite(key) ? s.home.unfav : s.home.fav}
           onclick={() => toggleFavorite(key)}
-        >{isFavorite(key) ? "★" : "☆"}</button>
+        ><Icon name="star" size={16} filled={isFavorite(key)} /></button>
       {/if}
     </h1>
     {#if desc}<p class="dbx-hint">{desc}</p>{/if}
@@ -60,12 +61,11 @@
   .fav {
     border: 0;
     background: none;
-    font-size: 16px;
-    line-height: 1;
     padding: 3px 5px;
     border-radius: var(--radius-md);
     cursor: pointer;
     color: var(--color-muted-foreground);
+    display: inline-flex;
   }
   .fav:hover { color: var(--color-primary); background: var(--color-muted); }
   .fav.faved { color: #f0b429; }

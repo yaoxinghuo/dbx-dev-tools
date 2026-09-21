@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import GripIcon from "../components/GripIcon.svelte";
+  import Icon from "../components/Icon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
   import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite } from "../lib/prefs.svelte.js";
@@ -83,12 +84,15 @@
 
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
   <div class="controls">
-    <input class="dbx-input search" bind:value={query} placeholder={s.home.searchPlaceholder} />
+    <div class="searchwrap">
+      <Icon name="search" size={15} />
+      <input class="dbx-input search" bind:value={query} placeholder={s.home.searchPlaceholder} />
+    </div>
   </div>
 
   {#if !query.trim() && !activeTag && recentTools.length}
     <div class="recent">
-      <span class="recent-label dbx-hint">🕘 {s.home.recent}</span>
+      <span class="recent-label dbx-hint"><Icon name="clock" size={12} />{s.home.recent}</span>
       {#each recentTools as tool}
         <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>{s.tools[tool.key].name}</button>
       {/each}
@@ -147,17 +151,17 @@
         class:faved={isFavorite(tool.key)}
         title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
         onclick={() => toggleFavorite(tool.key)}
-      >{isFavorite(tool.key) ? "★" : "☆"}</button>
+      ><Icon name="star" size={14} filled={isFavorite(tool.key)} /></button>
     </div>
   {/snippet}
 
   {#if visible.length}
     {#if canSort && favOrdered.length}
-      <div class="section dbx-hint">★ {s.home.favs}</div>
+      <div class="section dbx-hint"><Icon name="star" size={12} filled />{s.home.favs}</div>
       <div class="grid">
         {#each favOrdered as tool}{@render cell(tool)}{/each}
       </div>
-      <div class="section dbx-hint mid">{s.home.allTools}</div>
+      <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}</div>
       <div class="grid">
         {#each restOrdered as tool}{@render cell(tool)}{/each}
       </div>
@@ -173,8 +177,17 @@
 
 <style>
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .search { max-width: 480px; height: 40px; font-size: 14px; padding: 0 14px; }
-  .section { font-size: 12px; margin: 0 0 8px; }
+  .searchwrap { position: relative; max-width: 480px; }
+  .searchwrap > :global(.ic) {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-muted-foreground);
+    pointer-events: none;
+  }
+  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; }
+  .section { font-size: 12px; margin: 0 0 8px; display: flex; align-items: center; gap: 5px; }
   .section.mid { margin-top: 16px; }
   .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
   .cat {
@@ -196,7 +209,7 @@
   .cat.on { border-color: var(--color-primary); background: var(--color-muted); }
   .cnt { font-size: 12px; color: var(--color-muted-foreground); }
   .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
-  .recent-label { font-size: 12px; margin-right: 2px; }
+  .recent-label { font-size: 12px; margin-right: 2px; display: inline-flex; align-items: center; gap: 5px; }
   .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
   .cell { position: relative; display: flex; }
@@ -207,11 +220,10 @@
     right: 8px;
     border: 0;
     background: none;
-    font-size: 14px;
-    line-height: 1;
     cursor: pointer;
     color: var(--color-muted-foreground);
     padding: 2px;
+    display: inline-flex;
   }
   .star:hover { color: var(--color-primary); }
   .star.faved { color: #f0b429; }
