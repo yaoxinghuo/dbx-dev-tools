@@ -10,10 +10,10 @@
   --color-input: #d4d4d8;
   --color-muted: #f4f4f5;
   --color-muted-foreground: #71717a;
-  --color-primary: #2563eb;
+  --color-primary: #0d9488;
   --color-primary-foreground: #ffffff;
   --color-destructive: #dc2626;
-  --color-ring: #93c5fd;
+  --color-ring: #0d9488;
   --radius-md: 8px;
   --radius-lg: 10px;
 }
@@ -25,7 +25,8 @@
   --color-input: #3f3f46;
   --color-muted: #26262a;
   --color-muted-foreground: #a1a1aa;
-  --color-ring: #2563eb;
+  --color-primary: #14b8a6;
+  --color-ring: #2dd4bf;
 }
 
 * { box-sizing: border-box; }

@@ -5,7 +5,7 @@
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
   import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite, clearRecent } from "../lib/prefs.svelte.js";
-  import { t, onLangChange } from "../lib/i18n.js";
+  import { t, onLangChange, allMessages } from "../lib/i18n.js";
 
   let { onPick } = $props();
   let s = $state(t());
@@ -81,13 +81,75 @@
     dragKey = null;
     dropKey = null;
   }
+
+  // Typewriter placeholder: erase the static hint once, then cycle through
+  // representative tool names (they double as valid search queries). Pauses
+  // while the input is focused; restarts on blur and on language switch.
+  // Each tool contributes three phrases — its name in the UI language, in
+  // English, and its primary tag — so the placeholder cycles 中文/EN/tag.
+  const typeKeys = ["password", "qrcode", "json", "time", "color", "ipcalc"];
+  const typeSamples = $derived.by(() => {
+    const enTools = allMessages().en.tools;
+    const out = [];
+    for (const k of typeKeys) {
+      const local = s.tools[k]?.name;
+      const eng = enTools[k]?.name;
+      const tag = toolByKey.get(k)?.tags[0];
+      for (const v of [local, eng, tag && tagName(tag)]) {
+        if (v && v !== out[out.length - 1]) out.push(v);
+      }
+    }
+    return out;
+  });
+  let searchFocused = $state(false);
+  let typed = $state("");
+  let typing = $state(false);
+  $effect(() => {
+    const list = typeSamples;
+    const base = s.home.searchPlaceholder;
+    if (searchFocused || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let chars = Array.from(base);
+    let target = chars;
+    let del = true;
+    let li = 0;
+    typing = true;
+    let timer;
+    const step = () => {
+      if (del) {
+        chars = chars.slice(0, -1);
+        typed = chars.join("");
+        if (!chars.length) {
+          del = false;
+          target = Array.from(list[li]);
+          li = (li + 1) % list.length;
+          timer = setTimeout(step, 500);
+          return;
+        }
+        timer = setTimeout(step, 28);
+        return;
+      }
+      chars = target.slice(0, chars.length + 1);
+      typed = chars.join("");
+      timer = setTimeout(step, chars.length >= target.length ? ((del = true), 1700) : 90);
+    };
+    timer = setTimeout(step, 1400);
+    return () => { clearTimeout(timer); typing = false; };
+  });
+
 </script>
 
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
   <div class="controls">
     <div class="searchwrap">
       <Icon name="search" size={15} />
-      <input class="dbx-input search" class:has-clear={query} bind:value={query} placeholder={s.home.searchPlaceholder} />
+      <input
+        class="dbx-input search"
+        class:has-clear={query}
+        bind:value={query}
+        placeholder={typing ? typed + "▏" : s.home.searchPlaceholder}
+        onfocus={() => (searchFocused = true)}
+        onblur={() => (searchFocused = false)}
+      />
       {#if query}
         <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
           <Icon name="x" size={13} />
@@ -186,16 +248,45 @@
 
 <style>
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .searchwrap { position: relative; max-width: 480px; }
+  /* Gradient ring: the wrapper's padding shows a faint static gradient; the
+     ::before overlay is a 2px hollow ring (mask-composite) whose gradient
+     flows slowly — dim while idle, full-strength as the focus indicator. */
+  .searchwrap {
+    position: relative;
+    max-width: 480px;
+    padding: 2px;
+    border-radius: calc(var(--radius-md) + 2px);
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.24), rgba(45, 212, 191, 0.16));
+  }
+  .searchwrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(120deg, #0d9488, #5eead4, #99f6e4, #14b8a6, #0d9488);
+    background-size: 320% 320%;
+    animation: ringflow 6s ease infinite;
+    opacity: 0.4;
+    transition: opacity 0.35s ease;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .searchwrap:focus-within::before { opacity: 1; }
   .searchwrap > :global(.ic) {
     position: absolute;
-    left: 12px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; }
+  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; border-color: transparent; }
+  /* the flowing ring is the focus indicator; suppress the default outline */
+  .searchwrap .search:focus { outline: none; }
   .search.has-clear { padding-right: 30px; }
   .clearbtn {
     position: absolute;
@@ -304,4 +395,16 @@
   }
   .fav-empty { font-size: 12px; margin: 0 0 8px; }
   .empty { font-size: 14px; }
+
+  @keyframes ringflow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  :global(:root[data-dbx-theme="dark"]) .searchwrap::before { opacity: 0.22; }
+  :global(:root[data-dbx-theme="dark"]) .searchwrap:focus-within::before { opacity: 0.85; }
+  @media (prefers-reduced-motion: reduce) {
+    .searchwrap::before { animation: none; }
+  }
+
+
 </style>

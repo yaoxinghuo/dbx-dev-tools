@@ -101,6 +101,20 @@
     return resolveTool(context()?.tool) || resolveTool(contributionId());
   }
 
+  // Mouse parallax for the ambient blob layers; skipped under reduced motion.
+  let par = $state({ x: 0, y: 0 });
+  $effect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const move = (e) => {
+      par = {
+        x: (e.clientX / window.innerWidth - 0.5) * 46,
+        y: (e.clientY / window.innerHeight - 0.5) * 46,
+      };
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => window.removeEventListener("pointermove", move);
+  });
+
   $effect(() => {
     ready().then(() => {
       if (!booted) active = initialTool();
@@ -145,7 +159,7 @@
         </button>
       {:else}
       <div class="navtop">
-        <span class="brand">Dev Tools</span>
+        <button type="button" class="brand" title={s.home.back} onclick={() => (active = null)}>{s.homeTitle}</button>
         <button type="button" class="railbtn collapser" title={s.home.collapseNav} onclick={() => setNavCollapsed(true)}>
           <Icon name="chevrons-left" size={14} />
         </button>
@@ -170,7 +184,7 @@
         {/if}
       </div>
       {#snippet toolRow(tool)}
-        <div class="toolitem" class:active={active === tool}>
+        <div class="toolitem" class:active={active?.key === tool.key}>
           <button type="button" class="toolpick" onclick={() => pick(tool)}>
             {s.tools[tool.key].name}
           </button>
@@ -198,7 +212,7 @@
               <button
                 type="button"
                 class="item fav-item"
-                class:active={active === tool}
+                class:active={active?.key === tool.key}
                 class:drop={dropKey === tool.key}
                 draggable="true"
                 title={s.home.dragReorder}
@@ -224,7 +238,7 @@
             </button>
           </div>
           {#each recentTools as tool}
-            <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+            <button type="button" class="item" class:active={active?.key === tool.key} onclick={() => pick(tool)}>
               {s.tools[tool.key].name}
             </button>
           {/each}
@@ -242,6 +256,13 @@
       {/if}
     </nav>
     <main>
+      <div class="ambient" aria-hidden="true">
+        <span class="layer" style:transform="translate3d({par.x * 0.9}px, {par.y * 0.7}px, 0)"><span class="blob gold"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * -0.8}px, {par.y * 0.6}px, 0)"><span class="blob blue"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * 0.6}px, {par.y * -0.5}px, 0)"><span class="blob peach"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * -0.5}px, {par.y * -0.8}px, 0)"><span class="blob lavender"></span></span>
+        <span class="grain"></span>
+      </div>
       {#if active}
         <active.component />
       {:else}
@@ -252,7 +273,24 @@
 {/if}
 
 <style>
-  .layout { display: flex; min-height: 100vh; }
+  .layout {
+    display: flex;
+    min-height: 100vh;
+    /* Brand teal. The host injects --color-* tokens as inline styles on <html>,
+       which beat :root rules — redefining on .layout wins inside the plugin
+       subtree regardless of host defaults. */
+    --color-primary: #0d9488;
+    --color-ring: #0d9488;
+    /* Native controls (checkbox/radio/range) use accent-color, not
+       --color-primary — inherit the brand color into them here. */
+    accent-color: var(--color-primary);
+  }
+  /* Teal-500 reads better on dark backgrounds than teal-600, and the lighter
+     ring keeps the focus outline visible there. */
+  :global(:root[data-dbx-theme="dark"]) .layout {
+    --color-primary: #14b8a6;
+    --color-ring: #2dd4bf;
+  }
   nav {
     width: 176px;
     flex-shrink: 0;
@@ -271,7 +309,18 @@
   nav > * { flex-shrink: 0; }
   nav.collapsed { width: 46px; padding: 14px 8px; align-items: center; }
   .navtop { display: flex; align-items: center; justify-content: space-between; }
-  .brand { font-size: 14px; font-weight: 650; padding-left: 8px; }
+  .brand {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    padding: 2px 8px;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+  }
+  .brand:hover { background: var(--color-muted); }
   .navitem { display: flex; align-items: center; gap: 6px; }
   .railbtn {
     border: 0;
@@ -312,6 +361,80 @@
   }
   .searchwrap .navsearch { width: 100%; padding-left: 27px; }
   .searchwrap .navsearch.has-clear { padding-right: 24px; }
+
+  /* Ambient backdrop shared by every page: fixed behind everything (negative
+     z paints above the page background but below in-flow content),
+     pointer-transparent. */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .layer {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.18;
+    will-change: transform, filter;
+    animation: ambient-float 18s ease-in-out infinite alternate,
+      ambient-tint 42s ease-in-out infinite alternate;
+  }
+  .blob.gold {
+    top: -10%;
+    left: 14%;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle at 34% 32%, rgba(246, 213, 148, 0.95), rgba(246, 213, 148, 0) 70%);
+  }
+  .blob.blue {
+    top: 2%;
+    right: -8%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle at 58% 40%, rgba(178, 205, 244, 0.9), rgba(178, 205, 244, 0) 70%);
+    animation-duration: 22s, 52s;
+    animation-delay: -5s, -12s;
+  }
+  .blob.peach {
+    bottom: -18%;
+    left: 24%;
+    width: 460px;
+    height: 460px;
+    background: radial-gradient(circle at 50% 50%, rgba(248, 224, 190, 0.85), rgba(248, 224, 190, 0) 70%);
+    animation-duration: 26s, 61s;
+    animation-delay: -9s, -26s;
+  }
+  .blob.lavender {
+    right: 12%;
+    bottom: -14%;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle at 46% 46%, rgba(206, 205, 245, 0.72), rgba(206, 205, 245, 0) 70%);
+    animation-duration: 24s, 47s;
+    animation-delay: -14s, -33s;
+  }
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.22;
+    mix-blend-mode: soft-light;
+    background-image: radial-gradient(rgba(90, 80, 60, 0.16) 0.5px, transparent 0.6px);
+    background-size: 3px 3px;
+  }
+  :global(:root[data-dbx-theme="dark"]) .blob { opacity: 0.09; }
+  :global(:root[data-dbx-theme="dark"]) .grain { opacity: 0.08; }
+  @media (prefers-reduced-motion: reduce) {
+    .layer { transition: none; }
+    .blob { animation: none; opacity: 0.12; }
+  }
   .clearbtn {
     position: absolute;
     right: 5px;
