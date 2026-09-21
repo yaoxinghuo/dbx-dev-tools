@@ -110,6 +110,8 @@ const messages = {
       unfav: "Remove favorite",
       filterAll: "All",
       noResults: "No tools match the current search/filter.",
+      recentEmpty: "Nothing opened yet.",
+      favEmpty: "No favorites — star a tool first.",
       tagLabel: "Tags",
     },
     password: {
@@ -781,6 +783,8 @@ const messages = {
       unfav: "取消收藏",
       filterAll: "全部",
       noResults: "没有匹配的工具。",
+      recentEmpty: "暂无最近使用。",
+      favEmpty: "暂无收藏——先给工具标星。",
       tagLabel: "标签",
     },
     password: {

@@ -1,8 +1,9 @@
 <script>
+  import { setContext } from "svelte";
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent } from "./lib/prefs.svelte.js";
+  import { recordRecent, isFavorite, recentKeys } from "./lib/prefs.svelte.js";
   import { t, onLangChange } from "./lib/i18n.js";
 
   let s = $state(t());
@@ -11,8 +12,21 @@
   let active = $state(null); // tool entry or null => Home
   let booted = $state(false);
 
+  // ToolShell reads this so every tool title gets a favorite star without
+  // passing the key through 40 components by hand.
+  setContext("currentTool", () => active);
+
   let navQuery = $state("");
   let navOpen = $state(false);
+  let panel = $state(null); // "recent" | "fav" | null
+
+  const recentTools = $derived.by(() =>
+    recentKeys()
+      .map((key) => TOOLS.find((tool) => tool.key === key))
+      .filter(Boolean)
+      .slice(0, 8)
+  );
+  const favTools = $derived.by(() => TOOLS.filter((tool) => isFavorite(tool.key)));
 
   // `s` is tracked so the index re-localizes when the UI language changes.
   const navIndex = $derived.by(() => {
@@ -30,11 +44,25 @@
   $effect(() => {
     if (active) recordRecent(active.key);
     navQuery = "";
+    panel = null;
   });
 
   function pick(tool) {
     active = tool;
     navOpen = false;
+    panel = null;
+  }
+
+  function togglePanel(which) {
+    panel = panel === which ? null : which;
+  }
+
+  // Blur only closes this button's own panel, so switching between the two
+  // quick-open buttons doesn't race the 150ms close timeout.
+  function blurClose(which) {
+    setTimeout(() => {
+      if (panel === which) panel = null;
+    }, 150);
   }
 
   function onNavKey(e) {
@@ -85,6 +113,48 @@
       {#if active}
         <div class="topbar">
           <button type="button" class="back" onclick={() => (active = null)}>‹ 🏠 {s.home.back}</button>
+          <div class="quick">
+            <button
+              type="button"
+              class="back qbtn"
+              class:open={panel === "recent"}
+              onclick={() => togglePanel("recent")}
+              onblur={() => blurClose("recent")}
+            >🕘 {s.home.recent}</button>
+            {#if panel === "recent"}
+              <div class="navdrop qdrop">
+                {#each recentTools as tool}
+                  <button type="button" class="navitem" onmousedown={() => pick(tool)}>
+                    <span class="nname">{s.tools[tool.key].name}</span>
+                    <span class="ndesc">{s.tools[tool.key].desc}</span>
+                  </button>
+                {:else}
+                  <div class="navitem empty">{s.home.recentEmpty}</div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+          <div class="quick">
+            <button
+              type="button"
+              class="back qbtn"
+              class:open={panel === "fav"}
+              onclick={() => togglePanel("fav")}
+              onblur={() => blurClose("fav")}
+            >★ {s.home.fav}</button>
+            {#if panel === "fav"}
+              <div class="navdrop qdrop">
+                {#each favTools as tool}
+                  <button type="button" class="navitem" onmousedown={() => pick(tool)}>
+                    <span class="nname">{s.tools[tool.key].name}</span>
+                    <span class="ndesc">{s.tools[tool.key].desc}</span>
+                  </button>
+                {:else}
+                  <div class="navitem empty">{s.home.favEmpty}</div>
+                {/each}
+              </div>
+            {/if}
+          </div>
           <div class="navsearch">
             <input
               class="dbx-input"
@@ -182,6 +252,9 @@
     white-space: nowrap;
   }
   .back:hover { color: var(--color-foreground); background: var(--color-muted); }
+  .back.open { color: var(--color-foreground); background: var(--color-muted); }
+  .quick { position: relative; }
+  .navdrop.qdrop { left: 0; right: auto; width: 280px; }
   .navsearch { position: relative; margin-left: auto; width: 320px; max-width: 55%; }
   .navsearch .dbx-input { width: 100%; }
   .navdrop {
