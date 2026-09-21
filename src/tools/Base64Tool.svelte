@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
+  import { base32Encode, base32Decode, base58Encode, base58Decode, hexEncode, hexDecode } from "../lib/codec.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let s = $state(t());
@@ -9,6 +10,7 @@
   const b = $derived(s.base64);
 
   let mode = $state("encode");
+  let codec = $state("base64");
   let urlSafe = $state(false);
   let input = $state("");
   let output = $state("");
@@ -19,13 +21,27 @@
     output = "";
     if (!input) return;
     try {
-      output = mode === "encode" ? encode(input, urlSafe) : decode(input, urlSafe);
+      output = mode === "encode" ? encode(input) : decode(input);
     } catch {
       error = b.invalid;
     }
   });
 
-  function encode(text, url) {
+  function encode(text) {
+    if (codec === "base64") return encodeB64(text, urlSafe);
+    if (codec === "base32") return base32Encode(text);
+    if (codec === "base58") return base58Encode(text);
+    return hexEncode(text);
+  }
+
+  function decode(text) {
+    if (codec === "base64") return decodeB64(text, urlSafe);
+    if (codec === "base32") return base32Decode(text);
+    if (codec === "base58") return base58Decode(text.trim());
+    return hexDecode(text);
+  }
+
+  function encodeB64(text, url) {
     const bytes = new TextEncoder().encode(text);
     let binary = "";
     for (let i = 0; i < bytes.length; i += 8192) {
@@ -36,7 +52,7 @@
     return b64;
   }
 
-  function decode(text, url) {
+  function decodeB64(text, url) {
     let normalized = text.trim();
     if (url) normalized = normalized.replaceAll("-", "+").replaceAll("_", "/");
     const remainder = normalized.length % 4;
@@ -51,7 +67,12 @@
     <div class="modes">
       <label class="check"><input type="radio" bind:group={mode} value="encode" /> {b.encode}</label>
       <label class="check"><input type="radio" bind:group={mode} value="decode" /> {b.decode}</label>
-      <label class="check"><input type="checkbox" bind:checked={urlSafe} /> {b.urlSafe}</label>
+      <label class="check"><input type="checkbox" bind:checked={urlSafe} disabled={codec !== "base64"} /> {b.urlSafe}</label>
+    </div>
+    <div class="modes">
+      {#each ["base64", "base32", "base58", "hex"] as c}
+        <label class="check"><input type="radio" bind:group={codec} value={c} /> {b["codec_" + c]}</label>
+      {/each}
     </div>
     <label class="dbx-label" for="b64-in">{s.input}</label>
     <textarea id="b64-in" class="dbx-textarea" rows="5" bind:value={input}
@@ -69,7 +90,7 @@
 
 <style>
   .controls { display: flex; flex-direction: column; gap: 12px; }
-  .modes { display: flex; gap: 18px; align-items: center; }
+  .modes { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
   .check { display: flex; align-items: center; gap: 8px; font-size: 13px; }
   .out-head { display: flex; align-items: center; justify-content: space-between; }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }

@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
+  import { runRegex } from "../lib/regexworker.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let s = $state(t());
@@ -15,28 +16,33 @@
   let flags = $state({ g: true, i: true, m: false, s: false, u: false });
 
   const flagStr = $derived(flagList.filter((f) => flags[f]).join(""));
-  // matchAll needs /g — force it for the preview so users see every hit
-  // regardless of the g checkbox (which still affects the reported flags).
+
+  // Compile errors are still synchronous and cheap to detect up front.
   const compiled = $derived.by(() => {
     if (!pattern) return { re: null, error: null };
     try {
-      const f = flagStr.includes("g") ? flagStr : flagStr + "g";
-      return { re: new RegExp(pattern, f), error: null };
+      return { re: new RegExp(pattern, flagStr.includes("g") ? flagStr : flagStr + "g"), error: null };
     } catch (e) {
       return { re: null, error: e.message };
     }
   });
 
+  // Matching runs in a worker so catastrophic backtracking can't freeze the UI.
   const MAX_MATCHES = 500;
-  const matches = $derived.by(() => {
-    if (!compiled.re || !text) return [];
-    const out = [];
-    for (const m of text.matchAll(compiled.re)) {
-      out.push({ index: m.index, text: m[0], groups: m.slice(1) });
-      if (out.length >= MAX_MATCHES) break;
+  let result = $state({ matches: [], replaced: "", elapsed: null });
+  let runSeq = 0;
+  $effect(() => {
+    const seq = ++runSeq;
+    if (!compiled.re || !text) {
+      result = { matches: [], replaced: "", elapsed: null };
+      return;
     }
-    return out;
+    runRegex({ pattern, flags: flagStr, text, replacement, maxMatches: MAX_MATCHES }).then((res) => {
+      if (seq === runSeq) result = res;
+    });
   });
+
+  const matches = $derived(result.matches || []);
 
   // Segments for the highlighted preview (alternating plain/match text)
   const segments = $derived.by(() => {
@@ -52,7 +58,7 @@
     return segs;
   });
 
-  const replaced = $derived(compiled.re && text ? text.replace(compiled.re, replacement) : "");
+  const replaced = $derived(compiled.re && text ? result.replaced || "" : "");
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>
@@ -76,7 +82,7 @@
     <div class="dbx-card">
       <h2 class="dbx-section-title">{r.preview}</h2>
       <pre class="preview mono">{#each segments as seg}{#if seg.match}<mark>{seg.s}</mark>{:else}{seg.s}{/if}{/each}</pre>
-      <p class="meta">{matches.length}{matches.length >= MAX_MATCHES ? "+" : ""} {r.matches}</p>
+      <p class="meta">{matches.length}{matches.length >= MAX_MATCHES ? "+" : ""} {r.matches}{#if result.elapsed != null} · {result.elapsed.toFixed(1)}ms{/if}</p>
     </div>
 
     {#if matches.length}
@@ -100,7 +106,7 @@
     <div class="dbx-card">
       <label class="dbx-label" for="rx-rep">{r.replace}</label>
       <input id="rx-rep" class="dbx-input mono" bind:value={replacement} placeholder="$1…" spellcheck="false" />
-      {#if replaced !== text}
+      {#if replaced && replaced !== text}
         <div class="rep-row">
           <pre class="preview mono">{replaced}</pre>
           <CopyButton text={replaced} small />

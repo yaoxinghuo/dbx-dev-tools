@@ -31,6 +31,14 @@ import ImageCompTool from "../tools/ImageCompTool.svelte";
 import RsaTool from "../tools/RsaTool.svelte";
 import CertTool from "../tools/CertTool.svelte";
 import IpTool from "../tools/IpTool.svelte";
+import CronTool from "../tools/CronTool.svelte";
+import PunycodeTool from "../tools/PunycodeTool.svelte";
+import QpTool from "../tools/QpTool.svelte";
+import DataUriTool from "../tools/DataUriTool.svelte";
+import SqlInTool from "../tools/SqlInTool.svelte";
+import UnicodeTool from "../tools/UnicodeTool.svelte";
+import TotpTool from "../tools/TotpTool.svelte";
+import PlaceholderTool from "../tools/PlaceholderTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -46,13 +54,19 @@ export const TOOLS = [
   { key: "base64", contributionId: "terry.devtools.base64", component: Base64Tool, tags: ["codec", "converter", "base64"] },
   { key: "url", contributionId: "terry.devtools.url", component: UrlTool, tags: ["codec", "converter", "url"] },
   { key: "escape", contributionId: "terry.devtools.escape", component: EscapeTool, tags: ["converter", "text", "escape", "xml"] },
+  { key: "punycode", contributionId: "terry.devtools.punycode", component: PunycodeTool, tags: ["codec", "converter", "domain", "idn"] },
+  { key: "qp", contributionId: "terry.devtools.qp", component: QpTool, tags: ["codec", "converter", "email", "mime"] },
+  { key: "datauri", contributionId: "terry.devtools.datauri", component: DataUriTool, tags: ["codec", "converter", "base64", "image"] },
+  { key: "sqlin", contributionId: "terry.devtools.sqlin", component: SqlInTool, tags: ["converter", "text", "sql"] },
   { key: "imgb64", contributionId: "terry.devtools.imgb64", component: ImageBase64Tool, tags: ["converter", "image", "base64"] },
   { key: "imgcomp", contributionId: "terry.devtools.imgcomp", component: ImageCompTool, tags: ["converter", "image", "compress"] },
+  { key: "placeholder", contributionId: "terry.devtools.placeholder", component: PlaceholderTool, tags: ["generator", "image"] },
   { key: "hash", contributionId: "terry.devtools.hash", component: HashTool, tags: ["hash", "security", "digest", "crypto"] },
   { key: "jwt", contributionId: "terry.devtools.jwt", component: JwtTool, tags: ["security", "parser", "token"] },
   { key: "aes", contributionId: "terry.devtools.aes", component: AesTool, tags: ["security", "crypto"] },
   { key: "rsa", contributionId: "terry.devtools.rsa", component: RsaTool, tags: ["generator", "security", "crypto", "key"] },
   { key: "cert", contributionId: "terry.devtools.cert", component: CertTool, tags: ["security", "parser", "certificate", "x509", "pem"] },
+  { key: "totp", contributionId: "terry.devtools.totp", component: TotpTool, tags: ["security", "totp", "otp", "2fa"] },
   { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff"] },
   { key: "regex", contributionId: "terry.devtools.regex", component: RegexTool, tags: ["text", "regex", "test"] },
@@ -60,9 +74,11 @@ export const TOOLS = [
   { key: "lines", contributionId: "terry.devtools.lines", component: LinesTool, tags: ["text"] },
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
   { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
+  { key: "unicode", contributionId: "terry.devtools.unicode", component: UnicodeTool, tags: ["text", "debug", "unicode"] },
   { key: "mojibake", contributionId: "terry.devtools.mojibake", component: MojibakeTool, tags: ["codec", "chinese", "text"] },
   { key: "time", contributionId: "terry.devtools.time", component: TimeTool, tags: ["converter", "time", "date"] },
   { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date"] },
+  { key: "cron", contributionId: "terry.devtools.cron", component: CronTool, tags: ["time", "cron", "schedule"] },
   { key: "filesize", contributionId: "terry.devtools.filesize", component: FileSizeTool, tags: ["converter", "filesize", "unit"] },
   { key: "numbase", contributionId: "terry.devtools.numbase", component: NumBaseTool, tags: ["converter", "number"] },
   { key: "semver", contributionId: "terry.devtools.semver", component: SemverTool, tags: ["version", "semver", "compare", "sort"] },

@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline, zero permissions**. 32 tools in a package at ~100KB; pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline, zero permissions**. 40 tools in a package at ~100KB; pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![32 tools](https://img.shields.io/badge/tools-32-orange) ![package ~100KB](https://img.shields.io/badge/package-~100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 tools](https://img.shields.io/badge/tools-40-orange) ![package ~100KB](https://img.shields.io/badge/package-~100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
 
 <img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 
@@ -13,14 +13,14 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Password Generator** — `crypto.getRandomValues` + rejection sampling (no modulo bias), charset rules, batch generation, entropy meter
 - **QR Code Generator** — `qrcode-generator`, adjustable EC level / module size / quiet zone, optional center logo (auto-suggests EC H), SVG & PNG export
 - **Barcode Generator** — hand-rolled encoders for CODE-128 (auto A/B/C set switching), CODE-39, EAN-13/8, UPC-A, ITF/ITF-14, Codabar; auto check digits, adjustable bar width / height / caption, SVG & PNG export
-- **Hash Generator** — MD5 + SHA-1/256/384/512 digests for text **and files**; optional key switches to HMAC-SHA digests
+- **Hash Generator** — MD5 + SHA-1/256/384/512 + CRC32 digests for text **and files**; optional key switches to HMAC-SHA digests
 - **ID Generator** — UUID v4, NanoID and ULID in bulk; uppercase / hyphen options for UUID
-- **Base64** — UTF-8 safe encode/decode, URL-safe variant
+- **Base64 / Base32 / Base58 / Hex** — UTF-8 safe multi-alphabet encode/decode, URL-safe variant
 - **JWT Parser / Generator** — decodes header/payload, claims table with exp/nbf validity badges, HS256/384/512 signature verification, plus JWT signing (payload JSON + secret → token)
 - **RMB Uppercase** — numeric amount to Chinese RMB uppercase (correct 零 folding, negatives, up to 兆)
 - **URL Encoder / Decoder** — `encodeURIComponent`/`encodeURI` modes, form `+` toggle, query parameter breakdown
 - **Image ⇄ Base64** — image to Base64 (drop / paste / pick, optional data-URI prefix, size inflation shown); Base64 to image with magic-byte sniffing, preview & export
-- **Timestamp ⇄ Date** — Unix timestamps auto-detected across s/ms/µs/ns (decimals treated as seconds), date strings parsed both ways; shows Unix s/ms, local & UTC, ISO 8601, day of week, day of year, ISO week, leap year, timezone offset, relative time
+- **Timestamp ⇄ Date** — Unix timestamps auto-detected across s/ms/µs/ns (decimals treated as seconds), date strings parsed both ways; shows Unix s/ms, local & UTC, ISO 8601, day of week, day of year, ISO week, leap year, timezone offset, relative time; duration ⇄ ms conversion
 - **File Size Converter** — bare bytes or `"1.5 GB"`/`"2 GiB"`/`"10M"` style input parsed to bytes; best-fit unit plus full SI (1000) and IEC (1024) tables
 - **Word Counter** — words (Latin tokens + per-CJK-char), characters (with/without spaces), letters, digits, punctuation, whitespace, lines, paragraphs, sentences, UTF-8 byte size, reading time
 - **Escape / Unescape** — HTML/XML entities, JavaScript string escapes, regex metacharacters, CSV field quoting, POSIX shell single-quoting
@@ -33,7 +33,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Mojibake Fixer** — repairs text garbled by the wrong charset (UTF-8 mistaken as Windows-1252/GBK/Big5/Shift_JIS), ranked candidates
 - **Invisible Characters** — visualizes zero-width chars, BOM, NBSP, bidi controls and friends, with a code-point/count summary and one-click cleanup
 - **Date Calculator** — difference between two dates (days/weeks/months/years, working days, h/m/s) and date ± N days/weeks/months
-- **Color Converter & Contrast** — HEX/RGB/HSL/HSV conversion with swatch + color picker, WCAG contrast ratio vs white, black or a custom background (AA/AAA badges)
+- **Color Converter & Contrast** — HEX/RGB/HSL/HSV/CMYK conversion with swatch + color picker + screen eyedropper, WCAG contrast ratio vs white, black or a custom background (AA/AAA badges)
 - **Line Operations** — trim, remove empty, dedupe, sort A→Z/Z→A, add line numbers, reverse — combined in a fixed pipeline
 - **AES Encrypt / Decrypt** — PBKDF2 (100k, SHA-256) → AES-256-GCM; output is `base64(salt|iv|ciphertext)`, GCM tag rejects wrong passwords
 - **Chmod Calculator** — owner/group/other rwx checkboxes ⇄ octal, live symbolic (`rwxr-xr-x`), common presets
@@ -43,6 +43,14 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **RSA Key Generator** — RSA key pairs (RSASSA / RSA-PSS / RSA-OAEP, 2048–4096 bits) exported as PEM/PKCS#8
 - **Certificate Decoder** — parse X.509 PEM/DER: subject/issuer, validity, SAN, key usage, SHA-1/256 fingerprints
 - **IP Calculator** — IPv4 subnet math (network/broadcast/usable hosts/mask/wildcard/scope/PTR) with subnet splitting; IPv6 compress/expand, prefix, type detection, ip6.arpa PTR
+- **Cron Expression** — standard 5-field cron explained in words, with next-run preview
+- **Punycode / IDN** — internationalized domain names ⇄ `xn--` ASCII form
+- **Quoted-Printable** — RFC 2045 quoted-printable encode/decode for email bodies
+- **Data URI Generator** — text or file → `data:` URI for inline embedding
+- **SQL IN Builder** — line-separated lists → quoted `IN (...)` values
+- **Unicode Inspector** — per-code-point breakdown: hex, UTF-8/UTF-16 bytes, block name
+- **TOTP Generator** — RFC 6238 one-time codes from a base32 secret or `otpauth://` URI
+- **Placeholder Image** — PNG/JPEG/WebP placeholder images at any size
 
 The home page offers multilingual search (queries match names/descriptions/tags in **all** languages, not just the active one) and tag filtering localized to the current UI language.
 

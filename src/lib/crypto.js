@@ -24,6 +24,22 @@ export function entropyBits(charsetSize, length) {
 
 const SHA_ALGOS = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
 
+// CRC-32 (IEEE 802.3, same as zlib) — lazily built lookup table.
+let crcTable = null;
+function crc32Bytes(bytes) {
+  if (!crcTable) {
+    crcTable = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      crcTable[n] = c >>> 0;
+    }
+  }
+  let crc = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) crc = crcTable[(crc ^ bytes[i]) & 255] ^ (crc >>> 8);
+  return ((crc ^ 0xffffffff) >>> 0).toString(16).padStart(8, "0");
+}
+
 function toHex(buffer) {
   return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -31,7 +47,7 @@ function toHex(buffer) {
 // Returns [{ name, hex }] for MD5 + the WebCrypto SHA family.
 export async function hashText(text) {
   const bytes = new TextEncoder().encode(text);
-  const results = [{ name: "MD5", hex: md5(text) }];
+  const results = [{ name: "MD5", hex: md5(text) }, { name: "CRC32", hex: crc32Bytes(bytes) }];
   for (const algo of SHA_ALGOS) {
     const digest = await crypto.subtle.digest(algo, bytes);
     results.push({ name: algo, hex: toHex(digest) });
@@ -41,7 +57,8 @@ export async function hashText(text) {
 
 // Same set, on a binary buffer (file hashing).
 export async function hashBuffer(buffer) {
-  const results = [{ name: "MD5", hex: md5(new Uint8Array(buffer)) }];
+  const bytes = new Uint8Array(buffer);
+  const results = [{ name: "MD5", hex: md5(bytes) }, { name: "CRC32", hex: crc32Bytes(bytes) }];
   for (const algo of SHA_ALGOS) {
     const digest = await crypto.subtle.digest(algo, buffer);
     results.push({ name: algo, hex: toHex(digest) });

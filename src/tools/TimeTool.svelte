@@ -12,6 +12,7 @@
   let input = $state("");
   let error = $state("");
   let rows = $state([]);
+  let mode = $state("timestamp"); // timestamp | duration
 
   const WEEKDAYS_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const WEEKDAYS_ZH = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
@@ -20,11 +21,69 @@
     input = String(Date.now());
   }
 
+  // Duration input: "90" (seconds), "3600000ms", "1h30m", "2d4h" …
+  function parseDuration(text) {
+    const t = text.trim().toLowerCase();
+    if (!t) return null;
+    if (/^\d+(\.\d+)?$/.test(t)) return { ms: Number(t) * 1000, unit: "s", raw: Number(t) };
+    if (/^\d+(\.\d+)?(ms|s|m|h|d|w)$/.test(t)) {
+      const mult = { ms: 1, s: 1000, m: 60000, h: 3600000, d: 86400000, w: 604800000 }[t.replace(/^\d+(\.\d+)?/, "")];
+      return { ms: Number(t.replace(/[^\d.]/g, "")) * mult, unit: t.replace(/^\d+(\.\d+)?/, ""), raw: Number(t.replace(/[^\d.]/g, "")) };
+    }
+    if (/^(\d+(\.\d+)?(ms|s|m|h|d|w))+$/.test(t)) {
+      let ms = 0;
+      for (const [, num, unit] of t.matchAll(/(\d+(?:\.\d+)?)(ms|s|m|h|d|w)/g)) {
+        ms += Number(num) * { ms: 1, s: 1000, m: 60000, h: 3600000, d: 86400000, w: 604800000 }[unit];
+      }
+      return { ms, unit: null, raw: null };
+    }
+    return null;
+  }
+
+  function durationRows(ms) {
+    const zh = lang() === "zh";
+    const parts = [];
+    const units = [
+      [86400000, zh ? "天" : "d"],
+      [3600000, zh ? "小时" : "h"],
+      [60000, zh ? "分" : "m"],
+      [1000, zh ? "秒" : "s"],
+      [1, "ms"],
+    ];
+    let rest = ms;
+    for (const [size, label] of units) {
+      const value = Math.floor(rest / size);
+      if (value > 0 || parts.length) {
+        parts.push(`${value} ${label}`);
+        rest -= value * size;
+      }
+    }
+    const human = parts.filter((p) => !p.startsWith("0 ")).join(" ") || "0 ms";
+    return [
+      [u.millis, String(ms)],
+      [u.seconds, String(ms / 1000)],
+      [u.minutes, String(ms / 60000)],
+      [u.hours, String(ms / 3600000)],
+      [u.days, String(ms / 86400000)],
+      [u.weeks, String(ms / 604800000)],
+      [u.human, human],
+    ];
+  }
+
   $effect(() => {
     error = "";
     rows = [];
     const text = input;
     if (!text.trim()) return;
+    if (mode === "duration") {
+      const parsed = parseDuration(text);
+      if (!parsed) {
+        error = u.invalidDuration;
+        return;
+      }
+      rows = durationRows(parsed.ms);
+      return;
+    }
     const parsed = parseTimeInput(text);
     if (!parsed) {
       error = u.invalid;
@@ -59,9 +118,11 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card">
     <div class="opts">
-      <button type="button" class="dbx-btn" onclick={setNow}>{u.now}</button>
+      <label class="check"><input type="radio" bind:group={mode} value="timestamp" /> {u.tsMode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="duration" /> {u.durMode}</label>
+      {#if mode === "timestamp"}<button type="button" class="dbx-btn" onclick={setNow}>{u.now}</button>{/if}
     </div>
-    <input class="dbx-input mono" bind:value={input} placeholder={u.placeholder} />
+    <input class="dbx-input mono" bind:value={input} placeholder={mode === "timestamp" ? u.placeholder : u.durPlaceholder} />
     {#if error}<p class="err">{error}</p>{/if}
   </div>
 

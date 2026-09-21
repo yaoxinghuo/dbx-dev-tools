@@ -39,6 +39,26 @@
   }
 
   const hex6 = $derived(color ? describe({ ...color, a: 1 }).hex : "#000000");
+
+  function rgbToCmyk(r, g, b) {
+    if (r === 0 && g === 0 && b === 0) return "cmyk(0%, 0%, 0%, 100%)";
+    const rr = 1 - r / 255, gg = 1 - g / 255, bb = 1 - b / 255;
+    const k = Math.min(rr, gg, bb);
+    const c = (rr - k) / (1 - k), m = (gg - k) / (1 - k), y = (bb - k) / (1 - k);
+    return `cmyk(${Math.round(c * 100)}%, ${Math.round(m * 100)}%, ${Math.round(y * 100)}%, ${Math.round(k * 100)}%)`;
+  }
+
+  const cmyk = $derived(color ? rgbToCmyk(color.r, color.g, color.b) : "");
+  const eyedropperSupported = $state(typeof window !== "undefined" && "EyeDropper" in window);
+
+  async function pickFromScreen() {
+    try {
+      const result = await new window.EyeDropper().open();
+      input = result.sRGBHex;
+    } catch {
+      // user cancelled — keep current input
+    }
+  }
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>
@@ -48,6 +68,9 @@
       <input id="col-in" class="dbx-input mono" bind:value={input} placeholder={c.placeholder} />
       <input type="color" class="picker" value={hex6}
         oninput={(e) => (input = e.target.value)} />
+      {#if eyedropperSupported}
+        <button type="button" class="dbx-btn" onclick={pickFromScreen} title={c.eyedropper}>⌖</button>
+      {/if}
       {#if color}
         <span class="swatch" style="background:{info.rgb}"></span>
       {/if}
@@ -63,6 +86,7 @@
           <tr><td class="k">RGB</td><td class="v"><code>{info.rgb}</code></td><td class="act"><CopyButton text={info.rgb} small /></td></tr>
           <tr><td class="k">HSL</td><td class="v"><code>{info.hsl}</code></td><td class="act"><CopyButton text={info.hsl} small /></td></tr>
           <tr><td class="k">HSV</td><td class="v"><code>{info.hsv}</code></td><td class="act"><CopyButton text={info.hsv} small /></td></tr>
+          <tr><td class="k">CMYK</td><td class="v"><code>{cmyk}</code></td><td class="act"><CopyButton text={cmyk} small /></td></tr>
         </tbody>
       </table>
     </div>
