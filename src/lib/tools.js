@@ -90,6 +90,13 @@ export const TOOLS = [
 
 export const HOME_ID = "terry.devtools.home";
 
+// Two-tier tags: category-level tags (shared by 3+ tools) render as filter
+// chips and card/detail badges; niche tags stay hidden but remain searchable
+// through the multilingual index.
+const tagCounts = new Map();
+for (const tool of TOOLS) for (const tag of tool.tags) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+export const VISIBLE_TAGS = new Set([...tagCounts.keys()].filter((key) => tagCounts.get(key) >= 3));
+
 // Resolve a tool by its registry key or its manifest contribution id.
 export function resolveTool(ref) {
   if (!ref) return null;

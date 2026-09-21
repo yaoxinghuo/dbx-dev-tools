@@ -126,7 +126,7 @@ const messages = {
       picker: "Picker",
     },
     home: {
-      searchPlaceholder: "Search tools (any language)…",
+      searchPlaceholder: "Search tools (name/tag, any language)…",
       back: "Home",
       recent: "Recently used",
       fav: "Favorite",
@@ -822,7 +822,7 @@ const messages = {
       picker: "取色器",
     },
     home: {
-      searchPlaceholder: "搜索工具（中英文均可）…",
+      searchPlaceholder: "搜索工具（中英文、Tag均可）…",
       back: "首页",
       recent: "最近使用",
       fav: "收藏",

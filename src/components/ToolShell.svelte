@@ -1,6 +1,7 @@
 <script>
   import { getContext } from "svelte";
   import { isFavorite, toggleFavorite } from "../lib/prefs.svelte.js";
+  import { VISIBLE_TAGS } from "../lib/tools.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let { title = "", desc = "", children } = $props();
@@ -26,6 +27,16 @@
       {/if}
     </h1>
     {#if desc}<p class="dbx-hint">{desc}</p>{/if}
+    {#if currentTool?.()}
+      {@const tags = currentTool().tags.filter((tag) => VISIBLE_TAGS.has(tag))}
+      {#if tags.length}
+        <div class="tagrow">
+          {#each tags as tag}
+            <span class="mini-tag">{s.tags[tag] || tag}</span>
+          {/each}
+        </div>
+      {/if}
+    {/if}
   </header>
   <div class="body">
     {@render children?.()}
@@ -63,5 +74,18 @@
   }
   header p {
     margin: 0;
+  }
+  .tagrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .mini-tag {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 9px;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
   }
 </style>
