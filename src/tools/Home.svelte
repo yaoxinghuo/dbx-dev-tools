@@ -228,8 +228,9 @@
   .star.faved { color: #f0b429; }
   .gripbox {
     position: absolute;
-    top: 5px;
-    left: 8px;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
     padding: 3px 4px;
     cursor: grab;
     color: var(--color-input);
@@ -253,7 +254,10 @@
     transform: translateY(-1px);
   }
   .name { font-weight: 600; font-size: 14px; padding-right: 22px; }
-  .cell.faved .name { padding-left: 20px; }
+  /* faved cards reserve a right gutter for the centered grip + star, so the
+     name's own star clearance is redundant there */
+  .cell.faved .card { padding-right: 30px; }
+  .cell.faved .name { padding-right: 0; }
   .desc { flex: 1; }
   .tagrow { display: flex; flex-wrap: wrap; gap: 4px; }
   .mini-tag {

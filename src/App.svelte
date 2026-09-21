@@ -193,7 +193,7 @@
                 ondragover={(e) => favDragOver(e, tool)}
                 ondrop={(e) => favDrop(e, tool)}
                 onclick={() => pick(tool)}
-              ><GripIcon /><span class="label">{s.tools[tool.key].name}</span></button>
+              ><span class="label">{s.tools[tool.key].name}</span><GripIcon /></button>
             {/each}
           </div>
         {/if}
