@@ -1,8 +1,12 @@
+import { untrack } from "svelte";
+import { SvelteSet } from "svelte/reactivity";
 import { storageGet, storageSet } from "./storage.js";
 
 const RECENT_MAX = 10;
 
-const favorites = $state(new Set());
+// $state only proxies plain objects/arrays — a Set passed through it stays a
+// raw, non-reactive Set. SvelteSet is the reactive implementation.
+const favorites = new SvelteSet();
 const recent = $state([]);
 
 const ready = (async () => {
@@ -17,9 +21,13 @@ export function isFavorite(key) {
 }
 
 export function toggleFavorite(key) {
-  if (favorites.has(key)) favorites.delete(key);
-  else favorites.add(key);
-  storageSet("favorites", [...favorites]);
+  // Reads+writes favorites; untracked so callers inside $effect don't end up
+  // depending on the very signal this mutates (self-invalidation loop).
+  untrack(() => {
+    if (favorites.has(key)) favorites.delete(key);
+    else favorites.add(key);
+    storageSet("favorites", [...favorites]);
+  });
 }
 
 export function recentKeys() {
@@ -27,11 +35,13 @@ export function recentKeys() {
 }
 
 export function recordRecent(key) {
-  const index = recent.indexOf(key);
-  if (index >= 0) recent.splice(index, 1);
-  recent.unshift(key);
-  if (recent.length > RECENT_MAX) recent.length = RECENT_MAX;
-  storageSet("recent", [...recent]);
+  untrack(() => {
+    const index = recent.indexOf(key);
+    if (index >= 0) recent.splice(index, 1);
+    recent.unshift(key);
+    if (recent.length > RECENT_MAX) recent.length = RECENT_MAX;
+    storageSet("recent", [...recent]);
+  });
 }
 
 // Tests and callers that must observe the restored snapshot await this.

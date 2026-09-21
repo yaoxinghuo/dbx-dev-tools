@@ -19,7 +19,7 @@
   let base64 = $state("");
   let previewUrl = $state("");
   let meta = $state(null); // { name, mime, size, dims, b64Len }
-  let fileInput;
+  let fileInput = $state();
 
   // decode state
   let decInput = $state("");
