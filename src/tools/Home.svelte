@@ -95,7 +95,6 @@
                 <span class="mini-tag">{tagName(tag)}</span>
               {/each}
             </span>
-            <span class="open dbx-link">{s.open} ›</span>
           </button>
           <button
             type="button"
@@ -161,6 +160,5 @@
     border: 1px solid var(--color-border);
     color: var(--color-muted-foreground);
   }
-  .open { font-size: 12px; }
   .empty { font-size: 14px; }
 </style>

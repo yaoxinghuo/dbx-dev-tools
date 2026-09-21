@@ -4,7 +4,6 @@ const messages = {
   en: {
     homeTitle: "Dev Tools",
     homeSubtitle: "A collection of small tools for everyday development.",
-    open: "Open",
     copy: "Copy",
     copied: "Copied",
     copyAll: "Copy all",
@@ -701,7 +700,6 @@ const messages = {
   zh: {
     homeTitle: "Dev Tools",
     homeSubtitle: "日常开发工具集合。",
-    open: "打开",
     copy: "复制",
     copied: "已复制",
     copyAll: "全部复制",
