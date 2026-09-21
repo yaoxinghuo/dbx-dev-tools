@@ -144,14 +144,14 @@
           <Icon name="grid" size={15} />
         </button>
       {:else}
-      <div class="navhead">
-        <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
-          <Icon name="home" size={14} />{s.home.back}
-        </button>
+      <div class="navtop">
         <button type="button" class="railbtn collapser" title={s.home.collapseNav} onclick={() => setNavCollapsed(true)}>
           <Icon name="chevrons-left" size={14} />
         </button>
       </div>
+      <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
+        <Icon name="home" size={14} />{s.home.back}
+      </button>
       <div class="searchwrap">
         <Icon name="search" size={13} />
         <input
@@ -248,8 +248,7 @@
      heights when the nav overflows; disable it so the nav scrolls */
   nav > * { flex-shrink: 0; }
   nav.collapsed { width: 46px; padding: 14px 8px; align-items: center; }
-  .navhead { display: flex; align-items: center; gap: 2px; }
-  .navhead .navitem { flex: 1; min-width: 0; }
+  .navtop { display: flex; justify-content: flex-end; }
   .navitem { display: flex; align-items: center; gap: 6px; }
   .railbtn {
     border: 0;
