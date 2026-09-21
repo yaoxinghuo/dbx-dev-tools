@@ -105,8 +105,8 @@
 {#if booted}
   <div class="layout">
     <nav>
-      <button type="button" class="brand" onclick={() => (active = null)}>
-        {s.homeTitle}
+      <button type="button" class="item" class:active={!active} onclick={() => (active = null)}>
+        🏠 {s.home.back}
       </button>
       <input
         class="navsearch dbx-input"
@@ -114,9 +114,6 @@
         placeholder={s.home.searchShort}
         onkeydown={onNavKey}
       />
-      <button type="button" class="item" class:active={!active} onclick={() => (active = null)}>
-        🏠 {s.home.back}
-      </button>
       {#if navResults}
         {#each navResults as tool}
           <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
@@ -188,19 +185,6 @@
     height: 100vh;
     overflow-y: auto;
   }
-  .brand {
-    border: 0;
-    background: none;
-    font: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    text-align: left;
-    padding: 6px 10px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    color: var(--color-foreground);
-  }
-  .brand:hover { background: var(--color-muted); }
   .navsearch {
     width: 100%;
     box-sizing: border-box;
