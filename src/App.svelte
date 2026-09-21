@@ -163,11 +163,23 @@
           onkeydown={onNavKey}
         />
       </div>
-      {#if navResults}
-        {#each navResults as tool}
-          <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
+      {#snippet toolRow(tool)}
+        <div class="toolitem" class:active={active === tool}>
+          <button type="button" class="toolpick" onclick={() => pick(tool)}>
             {s.tools[tool.key].name}
           </button>
+          <button
+            type="button"
+            class="favicon"
+            class:faved={isFavorite(tool.key)}
+            title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
+            onclick={() => toggleFavorite(tool.key)}
+          ><Icon name="star" size={12} filled={isFavorite(tool.key)} /></button>
+        </div>
+      {/snippet}
+      {#if navResults}
+        {#each navResults as tool}
+          {@render toolRow(tool)}
         {:else}
           <div class="empty dbx-hint">{s.home.noResults}</div>
         {/each}
@@ -217,18 +229,7 @@
         </button>
         {#if !isAllCollapsed()}
           {#each TOOLS as tool}
-            <div class="toolitem" class:active={active === tool}>
-              <button type="button" class="toolpick" onclick={() => pick(tool)}>
-                {s.tools[tool.key].name}
-              </button>
-              <button
-                type="button"
-                class="favicon"
-                class:faved={isFavorite(tool.key)}
-                title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
-                onclick={() => toggleFavorite(tool.key)}
-              ><Icon name="star" size={12} filled={isFavorite(tool.key)} /></button>
-            </div>
+            {@render toolRow(tool)}
           {/each}
         {/if}
       {/if}
