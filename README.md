@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, fully offline, one minimal permission (`host.storage`, local UI-state storage only) — smaller and safer**. 40+ tools in ~100KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/cron, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more. Pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, fully offline, one minimal permission (`host.storage`, local UI-state storage only) — smaller and safer**. 40+ tools in ~120KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/cron, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more. Pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 tools](https://img.shields.io/badge/tools-40-orange) ![package ~100KB](https://img.shields.io/badge/package-~100KB-brightgreen) ![permissions: host.storage](https://img.shields.io/badge/permissions-host.storage-blueviolet)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 tools](https://img.shields.io/badge/tools-40-orange) ![package ~120KB](https://img.shields.io/badge/package-~120KB-brightgreen) ![permissions: host.storage](https://img.shields.io/badge/permissions-host.storage-blueviolet)
 
 <img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 

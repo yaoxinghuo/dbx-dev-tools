@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite } from "./lib/prefs.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
@@ -217,9 +217,18 @@
         </button>
         {#if !isAllCollapsed()}
           {#each TOOLS as tool}
-            <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
-              {s.tools[tool.key].name}
-            </button>
+            <div class="toolitem" class:active={active === tool}>
+              <button type="button" class="toolpick" onclick={() => pick(tool)}>
+                {s.tools[tool.key].name}
+              </button>
+              <button
+                type="button"
+                class="favicon"
+                class:faved={isFavorite(tool.key)}
+                title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
+                onclick={() => toggleFavorite(tool.key)}
+              ><Icon name="star" size={12} filled={isFavorite(tool.key)} /></button>
+            </div>
           {/each}
         {/if}
       {/if}
@@ -344,6 +353,36 @@
   .fav-item.active :global(.grip),
   .fav-item.active:hover :global(.grip) { color: var(--color-primary-foreground); }
   .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
+  /* all-tools rows: name button + a quick-fav star on the right */
+  .toolitem { display: flex; align-items: center; border-radius: var(--radius-md); }
+  .toolitem:hover { background: var(--color-muted); }
+  .toolitem.active { background: var(--color-primary); }
+  .toolpick {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    padding: 7px 4px 7px 10px;
+    cursor: pointer;
+    color: var(--color-foreground);
+  }
+  .toolitem.active .toolpick { color: var(--color-primary-foreground); }
+  .favicon {
+    border: 0;
+    background: none;
+    padding: 5px 8px 5px 4px;
+    cursor: pointer;
+    color: var(--color-input);
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  .toolitem:hover .favicon { color: var(--color-muted-foreground); }
+  .favicon.faved { color: #f0b429; }
+  .toolitem.active .favicon { color: var(--color-primary-foreground); }
+  .toolitem.active .favicon.faved { color: #f0b429; }
   .empty { font-size: 12px; padding: 8px 10px; }
   main { flex: 1; min-width: 0; }
 </style>

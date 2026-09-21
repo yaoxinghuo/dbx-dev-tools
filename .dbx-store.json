@@ -1,6 +1,6 @@
 {
   "name": "Dev Tools",
-  "description": "Sandboxed, fully offline, one minimal permission (local UI storage only) — smaller and safer. 40+ tools in ~100KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/cron, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more.",
+  "description": "Sandboxed, fully offline, one minimal permission (local UI storage only) — smaller and safer. 40+ tools in ~120KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/cron, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more.",
   "icon": "assets/plugin.svg",
   "tags": [
     "devtools",
@@ -22,7 +22,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "沙箱离线运行，零联网、仅1项本地权限——更轻更安全。40+款开发工具仅~100KB：密码学生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳与 Cron、IP 子网、文本 Diff、颜色对比度、Unicode 检查、乱码修复、正则测试等一应俱全。"
+      "description": "沙箱离线运行，零联网、仅1项本地权限——更轻更安全。40+款开发工具仅 ~120KB：密码生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳与 Cron、IP 子网、文本 Diff、颜色对比度、Unicode 检查、乱码修复、正则测试等一应俱全。"
     }
   }
 }
