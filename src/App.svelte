@@ -106,7 +106,7 @@
   <div class="layout">
     <nav>
       <button type="button" class="brand" onclick={() => (active = null)}>
-        🏠 {s.homeTitle}
+        {s.homeTitle}
       </button>
       <input
         class="navsearch dbx-input"
