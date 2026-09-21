@@ -105,7 +105,7 @@
 {#if booted}
   <div class="layout">
     <nav>
-      <button type="button" class="brand" class:active={!active} onclick={() => (active = null)}>
+      <button type="button" class="brand" onclick={() => (active = null)}>
         🏠 {s.homeTitle}
       </button>
       <input
@@ -114,6 +114,9 @@
         placeholder={s.home.searchShort}
         onkeydown={onNavKey}
       />
+      <button type="button" class="item" class:active={!active} onclick={() => (active = null)}>
+        🏠 {s.home.back}
+      </button>
       {#if navResults}
         {#each navResults as tool}
           <button type="button" class="item" class:active={active === tool} onclick={() => pick(tool)}>
@@ -228,7 +231,7 @@
     color: var(--color-foreground);
   }
   .item:hover { background: var(--color-muted); }
-  .item.active, .brand.active { background: var(--color-primary); color: var(--color-primary-foreground); }
+  .item.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .fav-item { cursor: grab; }
   .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
   .empty { font-size: 12px; padding: 8px 10px; }
