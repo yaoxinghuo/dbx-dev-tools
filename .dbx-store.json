@@ -18,7 +18,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "40 tools: password/ID/lorem/QR/barcode/RSA/TOTP/placeholder generators, Base64/32/58/URL/escape/punycode/quoted-printable/data-URI/image codecs, image compressor, hash & HMAC & CRC32, JWT decode & sign, AES, certificate decoder, RMB uppercase, JSON formatter, text diff, regex tester, case/line/invisible-char/mojibake tools, timestamp & date calc & duration, cron expression, SQL IN builder, Unicode inspector, file size, number base, semver, IP calculator, color & contrast & CMYK, chmod. Per-tool state persistence, favorites and recently-used (host.storage).",
+  "releaseNotes": "Navigation overhaul: one Dev Tools workbench entry with an in-plugin sidebar — home, search with clear button, favorites, recently used and a collapsible all-tools group; the sidebar itself collapses to an icon rail. Favorites are pinned to a dedicated home section and reorderable by drag-and-drop in both places, with proper drag ghosts and grip affordances. Quick-fav stars on every tool row including search results, clear-recent action, and a hand-drawn lucide-style SVG icon set replacing emoji. Still ~120KB, fully offline.",
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
