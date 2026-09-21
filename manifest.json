@@ -3,7 +3,7 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
- "version": "0.5.1",
+ "version": "0.5.2",
   "publisher": "terry",
   "description": "Sandboxed, offline, zero permissions — 40 tools in ~100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, TOTP, Base64/32/58, timestamp/duration/cron, CIDR, diff, color & contrast, punycode, SQL IN builder and more.",
   "icon": "assets/plugin.svg",
