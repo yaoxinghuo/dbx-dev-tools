@@ -223,7 +223,7 @@
     gap: 4px;
   }
   .grouptoggle:hover { color: var(--color-foreground); }
-  .chev { display: inline-block; transition: transform .15s; font-size: 9px; }
+  .chev { display: inline-block; transition: transform .15s; font-size: 12px; line-height: 1; }
   .chev.open { transform: rotate(90deg); }
   .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }
   .item {
@@ -241,8 +241,10 @@
   .item.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .fav-item { display: flex; align-items: center; gap: 6px; cursor: grab; }
   .fav-item .label { flex: 1; min-width: 0; }
-  .fav-item :global(.grip) { color: var(--color-muted-foreground); flex-shrink: 0; }
-  .fav-item.active :global(.grip) { color: var(--color-primary-foreground); }
+  .fav-item :global(.grip) { color: var(--color-input); flex-shrink: 0; }
+  .fav-item:hover :global(.grip) { color: var(--color-muted-foreground); }
+  .fav-item.active :global(.grip),
+  .fav-item.active:hover :global(.grip) { color: var(--color-primary-foreground); }
   .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
   .empty { font-size: 12px; padding: 8px 10px; }
   main { flex: 1; min-width: 0; }

@@ -63,13 +63,8 @@
     dragKey = tool.key;
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", tool.key);
-    // The grip is tiny; use the whole card as the drag image so the dragged
-    // card visually follows the cursor.
-    const card = e.currentTarget.closest(".cell")?.querySelector(".card");
-    if (card) {
-      const r = card.getBoundingClientRect();
-      e.dataTransfer.setDragImage(card, e.clientX - r.left, e.clientY - r.top);
-    }
+    // The card itself is the drag source, so the browser's default drag
+    // image already follows the cursor as a card ghost.
   }
 
   function favDragOver(e, tool) {
@@ -93,7 +88,7 @@
 
   {#if !query.trim() && !activeTag && recentTools.length}
     <div class="recent">
-      <span class="recent-label dbx-hint">{s.home.recent}</span>
+      <span class="recent-label dbx-hint">🕘 {s.home.recent}</span>
       {#each recentTools as tool}
         <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>{s.tools[tool.key].name}</button>
       {/each}
@@ -127,7 +122,14 @@
       ondragover={(e) => canSort && isFavorite(tool.key) && favDragOver(e, tool)}
       ondrop={(e) => canSort && isFavorite(tool.key) && favDrop(e, tool)}
     >
-      <button type="button" class="card dbx-card" onclick={() => onPick?.(tool)}>
+      <button
+        type="button"
+        class="card dbx-card"
+        draggable={canSort && isFavorite(tool.key) ? "true" : "false"}
+        ondragstart={(e) => canSort && isFavorite(tool.key) && favDragStart(e, tool)}
+        ondragend={() => { dragKey = null; dropKey = null; }}
+        onclick={() => onPick?.(tool)}
+      >
         <span class="name">{s.tools[tool.key].name}</span>
         <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
         <span class="tagrow">
@@ -137,13 +139,7 @@
         </span>
       </button>
       {#if canSort && isFavorite(tool.key)}
-        <span
-          class="gripbox"
-          title={s.home.dragReorder}
-          draggable="true"
-          ondragstart={(e) => favDragStart(e, tool)}
-          ondragend={() => { dragKey = null; dropKey = null; }}
-        ><GripIcon /></span>
+        <span class="gripbox" title={s.home.dragReorder}><GripIcon /></span>
       {/if}
       <button
         type="button"
@@ -222,15 +218,14 @@
   .gripbox {
     position: absolute;
     top: 5px;
-    right: 26px;
+    left: 8px;
     padding: 3px 4px;
     cursor: grab;
-    color: var(--color-muted-foreground);
+    color: var(--color-input);
     line-height: 0;
     border-radius: 4px;
   }
-  .gripbox:hover { color: var(--color-primary); background: var(--color-muted); }
-  .gripbox:active { cursor: grabbing; }
+  .cell:hover .gripbox { color: var(--color-muted-foreground); }
   .cell.drop .card { box-shadow: inset 3px 0 0 var(--color-primary); }
   .card {
     display: flex;
@@ -247,7 +242,7 @@
     transform: translateY(-1px);
   }
   .name { font-weight: 600; font-size: 14px; padding-right: 22px; }
-  .cell.faved .name { padding-right: 44px; }
+  .cell.faved .name { padding-left: 20px; }
   .desc { flex: 1; }
   .tagrow { display: flex; flex-wrap: wrap; gap: 4px; }
   .mini-tag {
