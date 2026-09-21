@@ -43,15 +43,16 @@ export function toggleFavorite(key) {
   });
 }
 
-// Drag-to-reorder: `key` is inserted at `overKey`'s position (before it);
-// null overKey means dropped past the end.
-export function moveFavorite(key, overKey) {
+// Drag-to-reorder: `key` is inserted at `overKey`'s position — before it, or
+// after it when `after` is set (pointer past the item's midpoint); a null or
+// unknown overKey lands at the end.
+export function moveFavorite(key, overKey, after = false) {
   untrack(() => {
     const from = favorites.indexOf(key);
     if (from < 0 || key === overKey) return;
     favorites.splice(from, 1);
-    if (overKey == null) favorites.push(key);
-    else favorites.splice(favorites.indexOf(overKey), 0, key);
+    const to = overKey == null ? -1 : favorites.indexOf(overKey);
+    favorites.splice(to < 0 ? favorites.length : to + (after ? 1 : 0), 0, key);
     storageSet("favorites", [...favorites]);
   });
 }

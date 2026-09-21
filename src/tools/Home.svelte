@@ -4,7 +4,8 @@
   import Icon from "../components/Icon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite, clearRecent } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent } from "../lib/prefs.svelte.js";
+  import { favPointerDown, dnd } from "../lib/favdnd.svelte.js";
   import { t, onLangChange, allMessages } from "../lib/i18n.js";
 
   let { onPick } = $props();
@@ -58,28 +59,12 @@
   // Favorite-card reordering only makes sense in the unfiltered grid — with a
   // search/category filter active, hidden favorites would shift invisibly.
   const canSort = $derived(!query.trim() && !activeTag);
-  let dragKey = $state(null);
-  let dropKey = $state(null);
 
-  function favDragStart(e, tool) {
-    dragKey = tool.key;
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", tool.key);
-    // The card itself is the drag source, so the browser's default drag
-    // image already follows the cursor as a card ghost.
-  }
-
-  function favDragOver(e, tool) {
-    if (!dragKey || dragKey === tool.key) return;
-    e.preventDefault();
-    dropKey = tool.key;
-  }
-
-  function favDrop(e, tool) {
-    e.preventDefault();
-    if (dragKey) moveFavorite(dragKey, tool.key);
-    dragKey = null;
-    dropKey = null;
+  function favClick(tool) {
+    // A pointer drag ends with a click on whatever card the pointer released
+    // over — swallow it so a reorder doesn't also open a tool.
+    if (dnd.moved) return;
+    onPick?.(tool);
   }
 
   // Typewriter placeholder: erase the static hint once, then cycle through
@@ -195,17 +180,14 @@
     <div
       class="cell"
       class:faved={canSort && isFavorite(tool.key)}
-      class:drop={dropKey === tool.key}
-      ondragover={(e) => canSort && isFavorite(tool.key) && favDragOver(e, tool)}
-      ondrop={(e) => canSort && isFavorite(tool.key) && favDrop(e, tool)}
+      class:dragging={dnd.key === tool.key}
+      data-favkey={tool.key}
     >
       <button
         type="button"
         class="card dbx-card"
-        draggable={canSort && isFavorite(tool.key) ? "true" : "false"}
-        ondragstart={(e) => canSort && isFavorite(tool.key) && favDragStart(e, tool)}
-        ondragend={() => { dragKey = null; dropKey = null; }}
-        onclick={() => onPick?.(tool)}
+        onpointerdown={(e) => canSort && isFavorite(tool.key) && favPointerDown(e, tool.key, "home")}
+        onclick={() => favClick(tool)}
       >
         <span class="name">{s.tools[tool.key].name}</span>
         <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
@@ -243,6 +225,12 @@
     </div>
   {:else}
     <p class="dbx-hint empty">{s.home.noResults}</p>
+  {/if}
+  {#if dnd.origin === "home" && dnd.key}
+    <div class="card-ghost dbx-card" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;min-height:{dnd.h}px">
+      <span class="name">{s.tools[dnd.key]?.name}</span>
+      <span class="desc dbx-hint">{s.tools[dnd.key]?.desc}</span>
+    </div>
   {/if}
 </ToolShell>
 
@@ -364,7 +352,17 @@
     border-radius: 4px;
   }
   .cell:hover .gripbox { color: var(--color-muted-foreground); }
-  .cell.drop .card { box-shadow: inset 3px 0 0 var(--color-primary); }
+  .cell.dragging .card { opacity: 0.45; cursor: grabbing; }
+  .card-ghost {
+    position: fixed;
+    z-index: 120;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+  }
   .card {
     display: flex;
     flex-direction: column;

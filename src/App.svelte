@@ -3,7 +3,8 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite } from "./lib/prefs.svelte.js";
+  import { favPointerDown, dnd } from "./lib/favdnd.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
@@ -19,8 +20,6 @@
   setContext("currentTool", () => active);
 
   let navQuery = $state("");
-  let dragKey = $state(null); // favorites drag-to-reorder payload
-  let dropKey = $state(null); // item currently hovered as a drop target
 
   const toolByKey = new Map(TOOLS.map((tool) => [tool.key, tool]));
 
@@ -79,20 +78,11 @@
     }
   }
 
-  // HTML5 DnD: favorites reorder. Dragging over an item marks it as the
-  // insertion point; dropping reorders via moveFavorite.
-  function favDragOver(e, tool) {
-    if (!dragKey || dragKey === tool.key) return;
-    e.preventDefault();
-    dropKey = tool.key;
-  }
-
-  function favDrop(e, tool) {
-    e.preventDefault();
-    e.stopPropagation(); // item drop must not bubble to the list's own handler
-    if (dragKey) moveFavorite(dragKey, tool?.key ?? null);
-    dragKey = null;
-    dropKey = null;
+  function favClick(tool) {
+    // A pointer drag ends with a click on whatever row the pointer released
+    // over — swallow it so a reorder doesn't also navigate.
+    if (dnd.moved) return;
+    pick(tool);
   }
 
   function initialTool() {
@@ -207,27 +197,24 @@
         {#if favTools.length}
           <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}</div>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div class="droplist" ondragover={(e) => e.preventDefault()} ondrop={(e) => favDrop(e, null)}>
+          <div class="droplist">
             {#each favTools as tool (tool.key)}
               <button
                 type="button"
                 class="item fav-item"
                 class:active={active?.key === tool.key}
-                class:drop={dropKey === tool.key}
-                draggable="true"
+                class:dragging={dnd.key === tool.key}
+                data-favkey={tool.key}
                 title={s.home.dragReorder}
-                ondragstart={(e) => {
-                  dragKey = tool.key;
-                  e.dataTransfer.effectAllowed = "move";
-                  e.dataTransfer.setData("text/plain", tool.key);
-                  e.dataTransfer.setDragImage(e.currentTarget, e.offsetX, e.offsetY);
-                }}
-                ondragend={() => { dragKey = null; dropKey = null; }}
-                ondragover={(e) => favDragOver(e, tool)}
-                ondrop={(e) => favDrop(e, tool)}
-                onclick={() => pick(tool)}
+                onpointerdown={(e) => favPointerDown(e, tool.key, "nav")}
+                onclick={() => favClick(tool)}
               ><span class="label">{s.tools[tool.key].name}</span><GripIcon /></button>
             {/each}
+          </div>
+        {/if}
+        {#if dnd.origin === "nav" && dnd.key}
+          <div class="fav-ghost" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;height:{dnd.h}px">
+            <GripIcon /><span class="label">{s.tools[dnd.key]?.name}</span>
           </div>
         {/if}
         {#if recentTools.length}
@@ -497,7 +484,24 @@
   .fav-item:hover :global(.grip) { color: var(--color-muted-foreground); }
   .fav-item.active :global(.grip),
   .fav-item.active:hover :global(.grip) { color: var(--color-primary-foreground); }
-  .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
+  .fav-item.dragging { opacity: 0.45; cursor: grabbing; }
+  .fav-ghost {
+    position: fixed;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    font-size: 13px;
+    color: var(--color-foreground);
+    background: var(--color-popover, var(--color-card));
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+  }
+  .fav-ghost .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fav-ghost :global(.grip) { color: var(--color-muted-foreground); flex-shrink: 0; }
   /* all-tools rows: name button + a quick-fav star on the right */
   .toolitem { display: flex; align-items: center; border-radius: var(--radius-md); }
   .toolitem:hover { background: var(--color-muted); }
