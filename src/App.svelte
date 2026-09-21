@@ -111,7 +111,7 @@
       <input
         class="navsearch dbx-input"
         bind:value={navQuery}
-        placeholder={s.home.searchPlaceholder}
+        placeholder={s.home.searchShort}
         onkeydown={onNavKey}
       />
       {#if navResults}
@@ -202,8 +202,9 @@
     width: 100%;
     box-sizing: border-box;
     margin: 8px 0 10px;
-    height: 30px;
-    font-size: 12px;
+    height: 36px;
+    font-size: 13px;
+    padding: 0 10px;
   }
   .group {
     font-size: 11px;

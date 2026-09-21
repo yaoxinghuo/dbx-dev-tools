@@ -127,6 +127,7 @@ const messages = {
     },
     home: {
       searchPlaceholder: "Search tools (name/tag, any language)…",
+      searchShort: "Search tools…",
       back: "Home",
       recent: "Recently used",
       fav: "Favorite",
@@ -827,6 +828,7 @@ const messages = {
     },
     home: {
       searchPlaceholder: "搜索工具（中英文、Tag均可）…",
+      searchShort: "搜索工具…",
       back: "首页",
       recent: "最近使用",
       fav: "收藏",
