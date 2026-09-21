@@ -22,7 +22,7 @@
     {
       "type": "workbench",
       "id": "terry.devtools.home",
-      "label": "Dev Tools",
+      "label": "🏠 Dev Tools",
       "description": "Developer tools collection home.",
       "icon": "assets/plugin.svg"
     },
@@ -225,7 +225,7 @@
       "description": "沙箱离线运行，零权限——32 个工具，约 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、Base64、时间戳、文本对比、颜色与对比度、乱码修复等。",
       "contributions": {
         "terry.devtools.home": {
-          "label": "Dev Tools",
+          "label": "🏠 Dev Tools",
           "description": "开发者工具集合首页。"
         },
         "terry.devtools.password": {
