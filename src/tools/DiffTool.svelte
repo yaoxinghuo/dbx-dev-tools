@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { diffLines, diffChars, diffStats } from "../lib/diff.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -30,6 +31,14 @@
       ? ops.flatMap((o) => o.text.split("\n").map((line) => ({ op: o.op, line })))
       : [],
   );
+  persistState("diff", {
+    get: () => ({ mode, a, b }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      a = v.a ?? a;
+      b = v.b ?? b;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

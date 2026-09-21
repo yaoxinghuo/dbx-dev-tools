@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -76,6 +77,16 @@
     const n = Math.round(v * 10 ** digits) / 10 ** digits;
     return Number.isInteger(n) ? String(n) : String(n);
   };
+  persistState("datecalc", {
+    get: () => ({ a, b, base, amount, unit }),
+    set: (v) => {
+      a = v.a ?? a;
+      b = v.b ?? b;
+      base = v.base ?? base;
+      amount = v.amount ?? amount;
+      unit = v.unit ?? unit;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

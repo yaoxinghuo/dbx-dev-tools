@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { analyze, clean } from "../lib/invis.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -15,6 +16,10 @@
   const cleaned = $derived(input ? clean(input) : "");
 
   const hex = (cp) => "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+  persistState("invis", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

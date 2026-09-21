@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { parseCron, nextRuns, describeCron } from "../lib/cron.js";
   import { t, lang, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -33,6 +34,10 @@
     const text = input.trim().toLowerCase();
     const parts = (SHORTHAND[text] || text).split(/\s+/);
     return parts.length === 5 ? parts : null;
+  });
+  persistState("cron", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
   });
 </script>
 

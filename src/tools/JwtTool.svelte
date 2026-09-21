@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -130,6 +131,17 @@
       verifyState = "invalid";
     }
   }
+  // Secrets (verify secret, signing secret) are deliberately not persisted.
+  persistState("jwt", {
+    get: () => ({ mode, input, alg, genPayload, genAlg }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      input = v.input ?? input;
+      alg = v.alg ?? alg;
+      genPayload = v.genPayload ?? genPayload;
+      genAlg = v.genAlg ?? genAlg;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

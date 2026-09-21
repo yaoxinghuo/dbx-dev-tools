@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -28,6 +29,17 @@
 
   const output = $derived(list.length ? list.join(", ") : "");
   const outputSql = $derived(parenthesize && list.length > 1 ? `(${output})` : output);
+  persistState("sqlin", {
+    get: () => ({ input, quote, parenthesize, dedupe, sort, skipEmpty }),
+    set: (v) => {
+      input = v.input ?? input;
+      quote = v.quote ?? quote;
+      parenthesize = v.parenthesize ?? parenthesize;
+      dedupe = v.dedupe ?? dedupe;
+      sort = v.sort ?? sort;
+      skipEmpty = v.skipEmpty ?? skipEmpty;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

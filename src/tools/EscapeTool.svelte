@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { ESCAPE_FORMATS } from "../lib/escape.js";
 
   let s = $state(t());
@@ -32,6 +33,14 @@
     } catch {
       error = u.invalid;
     }
+  });
+  persistState("escape", {
+    get: () => ({ input, mode, format }),
+    set: (v) => {
+      input = v.input ?? input;
+      mode = v.mode ?? mode;
+      format = v.format ?? format;
+    },
   });
 </script>
 

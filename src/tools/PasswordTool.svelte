@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { generatePassword, entropyBits } from "../lib/crypto.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   const LOWER = "abcdefghijklmnopqrstuvwxyz";
   const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -50,6 +51,20 @@
   }
 
   $effect(generate);
+  // Options persist; generated passwords never do — they are secrets.
+  persistState("password", {
+    get: () => ({ length, count, useLower, useUpper, useDigits, useSymbols, customSymbols, noAmbiguous }),
+    set: (v) => {
+      length = v.length ?? length;
+      count = v.count ?? count;
+      useLower = v.useLower ?? useLower;
+      useUpper = v.useUpper ?? useUpper;
+      useDigits = v.useDigits ?? useDigits;
+      useSymbols = v.useSymbols ?? useSymbols;
+      customSymbols = v.customSymbols ?? customSymbols;
+      noAmbiguous = v.noAmbiguous ?? noAmbiguous;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

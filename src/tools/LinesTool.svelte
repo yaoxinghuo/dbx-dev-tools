@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { processLines } from "../lib/lines.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -18,6 +19,18 @@
   let number = $state(false);
 
   const output = $derived(processLines(input, { trim, removeEmpty, dedupe, sort, reverse, number }));
+  persistState("lines", {
+    get: () => ({ input, trim, removeEmpty, dedupe, sort, reverse, number }),
+    set: (v) => {
+      input = v.input ?? input;
+      trim = v.trim ?? trim;
+      removeEmpty = v.removeEmpty ?? removeEmpty;
+      dedupe = v.dedupe ?? dedupe;
+      sort = v.sort ?? sort;
+      reverse = v.reverse ?? reverse;
+      number = v.number ?? number;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

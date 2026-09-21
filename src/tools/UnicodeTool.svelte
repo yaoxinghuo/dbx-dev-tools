@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -43,6 +44,10 @@
     if (cp >= 0x10000) return "Supplementary Plane";
     return "Other";
   }
+  persistState("unicode", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

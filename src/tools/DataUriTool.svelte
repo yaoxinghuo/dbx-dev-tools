@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -45,6 +46,14 @@
 
   $effect(() => {
     if (mode === "text") output = textUri;
+  });
+  persistState("datauri", {
+    get: () => ({ mode, text, mime }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      text = v.text ?? text;
+      mime = v.mime ?? mime;
+    },
   });
 </script>
 

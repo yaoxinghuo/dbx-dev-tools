@@ -4,6 +4,7 @@
   import { generateRsaPair, RSA_ALGS } from "../lib/rsa.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -34,6 +35,14 @@
   function download(name, text) {
     saveFile({ fileName: name, contentType: "application/x-pem-file" }, text);
   }
+  // Generated key material is never persisted — only the chosen parameters.
+  persistState("rsa", {
+    get: () => ({ alg, bits }),
+    set: (v) => {
+      alg = v.alg ?? alg;
+      bits = v.bits ?? bits;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

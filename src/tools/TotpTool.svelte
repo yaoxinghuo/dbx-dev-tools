@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { base32ToBytes, parseOtpauth, totp } from "../lib/totp.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -59,6 +60,15 @@
     tick();
     timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
+  });
+  // The secret / otpauth URI are deliberately not persisted — they are credentials.
+  persistState("totp", {
+    get: () => ({ digits, period, algorithm }),
+    set: (v) => {
+      digits = v.digits ?? digits;
+      period = v.period ?? period;
+      algorithm = v.algorithm ?? algorithm;
+    },
   });
 </script>
 

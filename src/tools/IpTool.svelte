@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { parseIpv4Input, ipv4Info, ipv4Split, parseIpv6Input, ipv6Info } from "../lib/ipcalc.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -49,6 +50,13 @@
       row(ip.ptr, i.ptr),
       row(ip.ipInt, String(i.ipInt)),
     ];
+  });
+  persistState("ipcalc", {
+    get: () => ({ input, splitBits }),
+    set: (v) => {
+      input = v.input ?? input;
+      splitBits = v.splitBits ?? splitBits;
+    },
   });
 </script>
 

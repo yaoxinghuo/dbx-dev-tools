@@ -2,6 +2,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
+  import { recordRecent } from "./lib/prefs.svelte.js";
   import { t, onLangChange } from "./lib/i18n.js";
 
   let s = $state(t());
@@ -24,9 +25,10 @@
     return TOOLS.filter((tool) => (navIndex.get(tool.key) || "").includes(q)).slice(0, 8);
   });
 
-  // Any tool switch (sidebar, dropdown or host context) clears the search.
+  // Any tool switch (sidebar, dropdown or host context) clears the search and
+  // counts as usage for the home page's recent list.
   $effect(() => {
-    active;
+    if (active) recordRecent(active.key);
     navQuery = "";
   });
 

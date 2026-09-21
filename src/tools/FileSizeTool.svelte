@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { parseSize, formatSize, sizeTable, SI_UNITS, IEC_UNITS } from "../lib/filesize.js";
 
   let s = $state(t());
@@ -39,6 +40,13 @@
     }
     bytes = parsed.bytes;
     family = parsed.family;
+  });
+  persistState("filesize", {
+    get: () => ({ input, family }),
+    set: (v) => {
+      input = v.input ?? input;
+      family = v.family ?? family;
+    },
   });
 </script>
 

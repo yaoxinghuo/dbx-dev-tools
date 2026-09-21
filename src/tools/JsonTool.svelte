@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { formatJson, tokenizeJson } from "../lib/json.js";
 
   let s = $state(t());
@@ -38,6 +39,14 @@
     const ext = indent === "min" ? "min.json" : "json";
     saveFile({ fileName: `formatted.${ext}`, contentType: "application/json" }, new TextEncoder().encode(result.output));
   }
+  persistState("json", {
+    get: () => ({ input, indent, sortKeys }),
+    set: (v) => {
+      input = v.input ?? input;
+      indent = v.indent ?? indent;
+      sortKeys = v.sortKeys ?? sortKeys;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

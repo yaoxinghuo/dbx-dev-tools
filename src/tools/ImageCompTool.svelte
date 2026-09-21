@@ -3,6 +3,7 @@
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -117,6 +118,18 @@
     const name = file.name.replace(/\.[^.]+$/, "") + "." + out.ext;
     await saveFile({ fileName: name, contentType: out.type }, new Uint8Array(await out.blob.arrayBuffer()));
   }
+  // Per-image edits (rotate/flip/crop) are not persisted — they are meaningless
+  // without the source image. Output options are.
+  persistState("imagecomp", {
+    get: () => ({ format, quality, watermark, wmCorner, wmSize }),
+    set: (v) => {
+      format = v.format ?? format;
+      quality = v.quality ?? quality;
+      watermark = v.watermark ?? watermark;
+      wmCorner = v.wmCorner ?? wmCorner;
+      wmSize = v.wmSize ?? wmSize;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

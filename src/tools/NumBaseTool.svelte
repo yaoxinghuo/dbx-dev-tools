@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { baseConvert } from "../lib/numbase.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -25,6 +26,10 @@
         ]
       : [],
   );
+  persistState("numbase", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

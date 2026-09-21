@@ -5,13 +5,13 @@
   "name": "Dev Tools",
  "version": "0.5.2",
   "publisher": "terry",
-  "description": "Sandboxed, offline, zero permissions — 40 tools in ~100KB: password/QR/barcode/ID generators, hash & HMAC, AES, JWT, TOTP, Base64/32/58, timestamp/duration/cron, CIDR, diff, color & contrast, punycode, SQL IN builder and more.",
+  "description": "Sandboxed, offline — 40 tools in ~100KB, one permission (local UI-state storage): password/QR/barcode/ID generators, hash & HMAC, AES, JWT, TOTP, Base64/32/58, timestamp/duration/cron, CIDR, diff, color & contrast, punycode, SQL IN builder and more.",
   "icon": "assets/plugin.svg",
   "engines": {
     "dbx": ">=0.5.68",
     "host_api": "1"
   },
-  "permissions": [],
+  "permissions": ["host.storage"],
   "entrypoints": {
     "ui": {
       "root": "ui",
@@ -270,7 +270,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev Tools",
-      "description": "沙箱离线运行，零权限——40 个工具，约 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、TOTP、Base64/32/58、时间戳/时长/Cron、CIDR、文本对比、颜色与对比度、Punycode、SQL IN 拼接等。",
+      "description": "沙箱离线运行，仅本地 UI 状态存储权限——40 个工具，约 100KB：密码/二维码/条码/ID 生成、哈希与 HMAC、AES、JWT、TOTP、Base64/32/58、时间戳/时长/Cron、CIDR、文本对比、颜色与对比度、Punycode、SQL IN 拼接等。",
       "contributions": {
         "terry.devtools.home": {
           "label": "🏠 Dev Tools",

@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { textStats } from "../lib/counter.js";
 
   let s = $state(t());
@@ -41,6 +42,10 @@
       [u.byteSize, `${stats.bytes} B`],
       [u.readingTime, reading],
     ];
+  });
+  persistState("counter", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
   });
 </script>
 

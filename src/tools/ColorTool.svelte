@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { parseColor, describe, contrast } from "../lib/color.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -59,6 +60,13 @@
       // user cancelled — keep current input
     }
   }
+  persistState("color", {
+    get: () => ({ input, bgInput }),
+    set: (v) => {
+      input = v.input ?? input;
+      bgInput = v.bgInput ?? bgInput;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

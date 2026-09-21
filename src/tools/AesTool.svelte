@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { aesEncrypt, aesDecrypt } from "../lib/aescrypt.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -33,6 +34,16 @@
       busy = false;
     }
   }
+  // Password is deliberately not persisted — it is a secret.
+  persistState("aes", {
+    get: () => ({ mode, input, keyBits, iterations }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      input = v.input ?? input;
+      keyBits = v.keyBits ?? keyBits;
+      iterations = v.iterations ?? iterations;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { generate } from "../lib/lorem.js";
 
   let s = $state(t());
@@ -20,6 +21,15 @@
 
   $effect(() => {
     result = generate({ length, unit, mode, pattern });
+  });
+  persistState("lorem", {
+    get: () => ({ length, unit, mode, pattern }),
+    set: (v) => {
+      length = v.length ?? length;
+      unit = v.unit ?? unit;
+      mode = v.mode ?? mode;
+      pattern = v.pattern ?? pattern;
+    },
   });
 </script>
 

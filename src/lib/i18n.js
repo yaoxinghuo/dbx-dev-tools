@@ -105,6 +105,9 @@ const messages = {
     home: {
       searchPlaceholder: "Search tools (any language)…",
       back: "Home",
+      recent: "Recently used",
+      fav: "Favorite",
+      unfav: "Remove favorite",
       filterAll: "All",
       noResults: "No tools match the current search/filter.",
       tagLabel: "Tags",
@@ -773,6 +776,9 @@ const messages = {
     home: {
       searchPlaceholder: "搜索工具（中英文均可）…",
       back: "首页",
+      recent: "最近使用",
+      fav: "收藏",
+      unfav: "取消收藏",
       filterAll: "全部",
       noResults: "没有匹配的工具。",
       tagLabel: "标签",

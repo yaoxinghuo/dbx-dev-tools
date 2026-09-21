@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline, zero permissions**. 40 tools in a package at ~100KB; pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, offline**. 40 tools in a package at ~100KB; the only permission is `host.storage` (local UI-state persistence); pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 tools](https://img.shields.io/badge/tools-40-orange) ![package ~100KB](https://img.shields.io/badge/package-~100KB-brightgreen) ![permissions none](https://img.shields.io/badge/permissions-none-blueviolet)
+![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 tools](https://img.shields.io/badge/tools-40-orange) ![package ~100KB](https://img.shields.io/badge/package-~100KB-brightgreen) ![permissions: host.storage](https://img.shields.io/badge/permissions-host.storage-blueviolet)
 
 <img width="2236" height="1522" alt="image" src="https://github.com/user-attachments/assets/0047105c-e365-4018-b697-97608b20700c" />
 

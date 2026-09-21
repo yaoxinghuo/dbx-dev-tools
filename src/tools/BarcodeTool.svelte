@@ -3,6 +3,7 @@
   import { barcodeSvg, svgToPngBytes, SYMBOLOGIES } from "../lib/barcode.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -44,6 +45,16 @@
     const bytes = await svgToPngBytes(exportSvg(), 2);
     await saveFile({ fileName: "barcode.png", contentType: "image/png" }, bytes);
   }
+  persistState("barcode", {
+    get: () => ({ content, sym, barWidth, height, showText }),
+    set: (v) => {
+      content = v.content ?? content;
+      sym = v.sym ?? sym;
+      barWidth = v.barWidth ?? barWidth;
+      height = v.height ?? height;
+      showText = v.showText ?? showText;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

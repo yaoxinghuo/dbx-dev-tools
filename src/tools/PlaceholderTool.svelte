@@ -3,6 +3,7 @@
   import { saveFile } from "../lib/bridge.js";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -51,6 +52,17 @@
     if (!out) return;
     await saveFile({ fileName: `placeholder-${width}x${height}.${out.ext}`, contentType: out.type }, new Uint8Array(await out.blob.arrayBuffer()));
   }
+  persistState("placeholder", {
+    get: () => ({ width, height, format, text, bg, fg }),
+    set: (v) => {
+      width = v.width ?? width;
+      height = v.height ?? height;
+      format = v.format ?? format;
+      text = v.text ?? text;
+      bg = v.bg ?? bg;
+      fg = v.fg ?? fg;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

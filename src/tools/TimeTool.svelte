@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, lang, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { parseTimeInput, dayOfYear, isoWeek, isLeapYear, utcOffsetString, relativeString } from "../lib/time.js";
 
   let s = $state(t());
@@ -112,6 +113,13 @@
       [u.tz, utcOffsetString(d)],
       [u.relative, relativeString(ms, Date.now(), lang() === "zh" ? "zh" : "en")],
     ];
+  });
+  persistState("time", {
+    get: () => ({ input, mode }),
+    set: (v) => {
+      input = v.input ?? input;
+      mode = v.mode ?? mode;
+    },
   });
 </script>
 

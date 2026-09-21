@@ -4,6 +4,7 @@
   import { hashText, hashBuffer, hmacBuffer } from "../lib/crypto.js";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -41,6 +42,15 @@
   });
 
   const shown = $derived(results.map((r) => ({ ...r, hex: uppercase ? r.hex.toUpperCase() : r.hex })));
+  // The HMAC key is deliberately not persisted — it is a secret.
+  persistState("hash", {
+    get: () => ({ mode, input, uppercase }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      input = v.input ?? input;
+      uppercase = v.uppercase ?? uppercase;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { base32Encode, base32Decode, base58Encode, base58Decode, hexEncode, hexDecode } from "../lib/codec.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -60,6 +61,15 @@
     const bytes = Uint8Array.from(atob(normalized), (c) => c.charCodeAt(0));
     return new TextDecoder().decode(bytes);
   }
+  persistState("base64", {
+    get: () => ({ mode, codec, urlSafe, input }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      codec = v.codec ?? codec;
+      urlSafe = v.urlSafe ?? urlSafe;
+      input = v.input ?? input;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

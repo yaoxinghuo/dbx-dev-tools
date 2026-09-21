@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { fixMojibake } from "../lib/mojibake.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -14,6 +15,10 @@
 
   const candidates = $derived(input.trim() ? fixMojibake(input) : []);
   const chosen = $derived(candidates[picked] ?? candidates[0]);
+  persistState("mojibake", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

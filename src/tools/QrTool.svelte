@@ -3,6 +3,7 @@
   import { qrSvg, svgToPngBytes } from "../lib/qrcode.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -53,6 +54,16 @@
     return svg.replaceAll('fill="currentColor"', 'fill="#000000"')
       .replace(/<svg /, '<svg style="background:#fff" ');
   }
+  // The logo data URI is intentionally excluded — it can exceed the storage cap.
+  persistState("qrcode", {
+    get: () => ({ content, ecLevel, scale, margin }),
+    set: (v) => {
+      content = v.content ?? content;
+      ecLevel = v.ecLevel ?? ecLevel;
+      scale = v.scale ?? scale;
+      margin = v.margin ?? margin;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

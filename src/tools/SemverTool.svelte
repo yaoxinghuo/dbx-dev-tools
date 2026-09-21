@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { parseSemver, compareSemver, sortSemvers } from "../lib/semver.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -24,6 +25,16 @@
 
   const sorted = $derived(sortSemvers(list, { desc, unique }));
   const sortedText = $derived(sorted.valid.join("\n"));
+  persistState("semver", {
+    get: () => ({ a, b, list, desc, unique }),
+    set: (v) => {
+      a = v.a ?? a;
+      b = v.b ?? b;
+      list = v.list ?? list;
+      desc = v.desc ?? desc;
+      unique = v.unique ?? unique;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

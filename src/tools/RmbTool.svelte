@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { rmbUppercase } from "../lib/rmb.js";
 
   let s = $state(t());
@@ -25,6 +26,10 @@
     const upper = rmbUppercase(parseFloat(text));
     if (upper === null) error = r.invalid;
     else result = upper;
+  });
+  persistState("rmb", {
+    get: () => ({ input }),
+    set: (v) => { input = v.input ?? input; },
   });
 </script>
 

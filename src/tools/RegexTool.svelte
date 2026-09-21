@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { runRegex } from "../lib/regexworker.js";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -59,6 +60,15 @@
   });
 
   const replaced = $derived(compiled.re && text ? result.replaced || "" : "");
+  persistState("regex", {
+    get: () => ({ pattern, text, replacement, flags }),
+    set: (v) => {
+      pattern = v.pattern ?? pattern;
+      text = v.text ?? text;
+      replacement = v.replacement ?? replacement;
+      if (v.flags && typeof v.flags === "object") flags = v.flags;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

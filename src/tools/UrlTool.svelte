@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -59,6 +60,15 @@
       error = u.invalid;
     }
     urlInfo = parseUrl(mode === "encode" ? text : output || text);
+  });
+  persistState("url", {
+    get: () => ({ input, mode, scope, plusSpace }),
+    set: (v) => {
+      input = v.input ?? input;
+      mode = v.mode ?? mode;
+      scope = v.scope ?? scope;
+      plusSpace = v.plusSpace ?? plusSpace;
+    },
   });
 </script>
 

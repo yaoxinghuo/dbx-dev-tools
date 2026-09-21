@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -40,6 +41,13 @@
   }
 
   const PRESETS = ["755", "644", "700", "600", "777", "400", "664", "750"];
+  persistState("chmod", {
+    get: () => ({ bits, octalInput }),
+    set: (v) => {
+      if (Array.isArray(v.bits)) bits = v.bits;
+      octalInput = v.octalInput ?? octalInput;
+    },
+  });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>

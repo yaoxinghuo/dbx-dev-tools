@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -48,6 +49,13 @@
     } catch {
       error = q.invalid;
     }
+  });
+  persistState("qp", {
+    get: () => ({ mode, input }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      input = v.input ?? input;
+    },
   });
 </script>
 

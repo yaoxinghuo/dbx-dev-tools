@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
+  import { persistState } from "../lib/persist.svelte.js";
   import { saveFile } from "../lib/bridge.js";
 
   let s = $state(t());
@@ -147,6 +148,15 @@
     const ext = MIME_EXT[decMime] || "bin";
     saveFile({ fileName: `image.${ext}`, contentType: decMime }, decBytes);
   }
+  // File-derived payloads (base64, previews) are not persisted — they can be large.
+  persistState("imagebase64", {
+    get: () => ({ mode, includePrefix, decInput }),
+    set: (v) => {
+      mode = v.mode ?? mode;
+      includePrefix = v.includePrefix ?? includePrefix;
+      decInput = v.decInput ?? decInput;
+    },
+  });
 </script>
 
 <svelte:window onpaste={onPaste} />
