@@ -4,6 +4,7 @@
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
   import { recordRecent, recentKeys, favoriteKeys, moveFavorite } from "./lib/prefs.svelte.js";
+  import GripIcon from "./components/GripIcon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
 
   let s = $state(t());
@@ -140,7 +141,7 @@
                 ondragover={(e) => favDragOver(e, tool)}
                 ondrop={(e) => favDrop(e, tool)}
                 onclick={() => pick(tool)}
-              >{s.tools[tool.key].name}</button>
+              ><GripIcon /><span class="label">{s.tools[tool.key].name}</span></button>
             {/each}
           </div>
         {/if}
@@ -214,7 +215,10 @@
   }
   .item:hover { background: var(--color-muted); }
   .item.active { background: var(--color-primary); color: var(--color-primary-foreground); }
-  .fav-item { cursor: grab; }
+  .fav-item { display: flex; align-items: center; gap: 6px; cursor: grab; }
+  .fav-item .label { flex: 1; min-width: 0; }
+  .fav-item :global(.grip) { color: var(--color-muted-foreground); flex-shrink: 0; }
+  .fav-item.active :global(.grip) { color: var(--color-primary-foreground); }
   .fav-item.drop { box-shadow: inset 0 2px 0 var(--color-primary); }
   .empty { font-size: 12px; padding: 8px 10px; }
   main { flex: 1; min-width: 0; }

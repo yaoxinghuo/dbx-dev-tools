@@ -1,8 +1,9 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
+  import GripIcon from "../components/GripIcon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, moveFavorite } from "../lib/prefs.svelte.js";
   import { t, onLangChange } from "../lib/i18n.js";
 
   let { onPick } = $props();
@@ -51,6 +52,25 @@
       .filter(Boolean)
       .slice(0, 8)
   );
+
+  // Favorite-card reordering only makes sense in the unfiltered grid — with a
+  // search/category filter active, hidden favorites would shift invisibly.
+  const canSort = $derived(!query.trim() && !activeTag);
+  let dragKey = $state(null);
+  let dropKey = $state(null);
+
+  function favDragOver(e, tool) {
+    if (!dragKey || dragKey === tool.key) return;
+    e.preventDefault();
+    dropKey = tool.key;
+  }
+
+  function favDrop(e, tool) {
+    e.preventDefault();
+    if (dragKey) moveFavorite(dragKey, tool.key);
+    dragKey = null;
+    dropKey = null;
+  }
 </script>
 
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
@@ -88,7 +108,14 @@
   {#if visible.length}
     <div class="grid">
       {#each ordered as tool}
-        <div class="cell">
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="cell"
+          class:faved={canSort && isFavorite(tool.key)}
+          class:drop={dropKey === tool.key}
+          ondragover={(e) => canSort && isFavorite(tool.key) && favDragOver(e, tool)}
+          ondrop={(e) => canSort && isFavorite(tool.key) && favDrop(e, tool)}
+        >
           <button type="button" class="card dbx-card" onclick={() => onPick?.(tool)}>
             <span class="name">{s.tools[tool.key].name}</span>
             <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
@@ -98,6 +125,15 @@
               {/each}
             </span>
           </button>
+          {#if canSort && isFavorite(tool.key)}
+            <span
+              class="gripbox"
+              title={s.home.dragReorder}
+              draggable="true"
+              ondragstart={() => (dragKey = tool.key)}
+              ondragend={() => { dragKey = null; dropKey = null; }}
+            ><GripIcon /></span>
+          {/if}
           <button
             type="button"
             class="star"
@@ -156,6 +192,19 @@
   }
   .star:hover { color: var(--color-primary); }
   .star.faved { color: #f0b429; }
+  .gripbox {
+    position: absolute;
+    top: 5px;
+    right: 26px;
+    padding: 3px 4px;
+    cursor: grab;
+    color: var(--color-muted-foreground);
+    line-height: 0;
+    border-radius: 4px;
+  }
+  .gripbox:hover { color: var(--color-primary); background: var(--color-muted); }
+  .gripbox:active { cursor: grabbing; }
+  .cell.drop .card { box-shadow: inset 3px 0 0 var(--color-primary); }
   .card {
     display: flex;
     flex-direction: column;
@@ -170,7 +219,8 @@
     border-color: var(--color-primary);
     transform: translateY(-1px);
   }
-  .name { font-weight: 600; font-size: 14px; }
+  .name { font-weight: 600; font-size: 14px; padding-right: 22px; }
+  .cell.faved .name { padding-right: 44px; }
   .desc { flex: 1; }
   .tagrow { display: flex; flex-wrap: wrap; gap: 4px; }
   .mini-tag {
