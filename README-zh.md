@@ -68,14 +68,14 @@
 
 ## 使用
 
-**插件中心 → 已安装 → Dev Tools**，每个工具以独立工作台标签页打开。插件标签页跨重启恢复，打开一次后保留该标签即可，不用每次进插件中心；标签内左侧导航可切换所有工具。
+**插件中心 → 已安装 → Dev Tools**，只打开一个 `Dev Tools` 工作台标签页；插件内左侧导航切换所有工具。标签页跨重启恢复，打开一次后保留即可。
 
 ## 架构
 
-每个工具是一个 manifest `workbench` contribution（独立入口/标签页），共享同一个 Svelte + Vite 构建的 `ui/`。路由规则：
+manifest 只有一个 `workbench` contribution（`terry.devtools.home`），加载 `ui/` 下共享的 Svelte + Vite bundle；所有工具注册在 `src/lib/tools.js`，由插件内路由调度：
 
 1. `context.tool` —— 插件内部导航显式指定的工具 key
-2. `contributionId` —— 生产宿主 init 消息携带的 workbench ID（dev host 不提供，此时显示首页）
+2. `contributionId` —— 宿主 init 消息携带的 workbench ID（固定为 `terry.devtools.home`，解析到首页）
 3. 兜底 —— Home 工具列表页
 
 复制走 `dbxPlugin.copy()`（宿主剪贴板桥），导出走 `dbxPlugin.saveFile()`（宿主原生保存对话框），两者在 dev host 下自动降级为浏览器实现。
@@ -88,8 +88,9 @@
 
 1. `src/tools/` 下新建 `XxxTool.svelte`（用 `ToolShell` 包裹内容，复用 `dbx-*` 样式类与 `CopyButton`）
 2. `src/lib/tools.js` 的 `TOOLS` 数组注册 `{ key, contributionId, component, tags }`（tags 为语言无关的 canonical key，并在 `t().tags` 补中英文显示名）
-3. `manifest.json` 增加对应 `workbench` contribution（id 形如 `terry.devtools.xxx`）及 `zh-CN` 本地化
-4. `src/lib/i18n.js` 补充 `tools.xxx` 的中英文案
+3. `src/lib/i18n.js` 补充 `tools.xxx` 的中英文案
+
+无需改 manifest —— 唯一的 `terry.devtools.home` 工作台入口覆盖所有工具。
 
 ## 开发
 

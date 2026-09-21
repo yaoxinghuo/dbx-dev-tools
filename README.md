@@ -68,14 +68,14 @@ The home page offers multilingual search (queries match names/descriptions/tags 
 
 ## Usage
 
-**Plugin Center → Installed → Dev Tools** — each tool opens as its own workbench tab. Plugin tabs are restored across restarts, so open once and keep the tab; no need to revisit the plugin center. Inside any tab, the left sidebar switches between tools.
+**Plugin Center → Installed → Dev Tools** — opens a single `Dev Tools` workbench tab; the in-plugin sidebar switches between all tools. The tab is restored across restarts, so open once and keep it.
 
 ## Architecture
 
-Each tool is a manifest `workbench` contribution (independent entry/tab), all sharing one Svelte + Vite bundle under `ui/`. Route resolution:
+A single manifest `workbench` contribution (`terry.devtools.home`) loads the shared Svelte + Vite bundle under `ui/`; all tools live behind it and are registered in `src/lib/tools.js`. Route resolution inside the app:
 
 1. `context.tool` — explicit tool key from in-plugin navigation
-2. `contributionId` — workbench id from the host init message (production only; the dev host omits it and shows Home)
+2. `contributionId` — workbench id from the host init message (always `terry.devtools.home`, resolves to Home)
 3. Fallback — Home tool grid
 
 Copy goes through `dbxPlugin.copy()` (host clipboard bridge) and export through `dbxPlugin.saveFile()` (native save dialog); both degrade to browser implementations under the dev host.
@@ -88,8 +88,9 @@ Have a small tool you reach for every day? This collection is meant to grow — 
 
 1. Create `src/tools/XxxTool.svelte` (wrap content in `ToolShell`, reuse `dbx-*` classes and `CopyButton`)
 2. Register `{ key, contributionId, component, tags }` in `src/lib/tools.js` (tags are canonical keys; add their en+zh display names to `t().tags`)
-3. Add a `workbench` contribution (`terry.devtools.xxx`) and `zh-CN` localization in `manifest.json`
-4. Add `tools.xxx` strings (en + zh) in `src/lib/i18n.js`
+3. Add `tools.xxx` strings (en + zh) in `src/lib/i18n.js`
+
+No manifest change needed — the single `terry.devtools.home` workbench entry covers all tools.
 
 ## Development
 
