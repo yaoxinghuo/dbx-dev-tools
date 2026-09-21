@@ -9,6 +9,8 @@ const favorites = $state([]);
 const recent = $state([]);
 // Sidebar "全部工具" group collapsed state, persisted so it survives reloads.
 let allCollapsed = $state(false);
+// Whole-sidebar icon-rail mode; persisted so it survives reloads.
+let navCollapsed = $state(false);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
@@ -16,6 +18,7 @@ const ready = (async () => {
   const rec = await storageGet("recent");
   if (Array.isArray(rec)) recent.push(...rec.filter((key) => typeof key === "string").slice(0, RECENT_MAX));
   allCollapsed = (await storageGet("navAllCollapsed")) === true;
+  navCollapsed = (await storageGet("navCollapsed")) === true;
 })();
 
 export function isFavorite(key) {
@@ -71,6 +74,15 @@ export function isAllCollapsed() {
 export function toggleAllCollapsed() {
   allCollapsed = !allCollapsed;
   storageSet("navAllCollapsed", allCollapsed);
+}
+
+export function isNavCollapsed() {
+  return navCollapsed;
+}
+
+export function setNavCollapsed(value) {
+  navCollapsed = value;
+  storageSet("navCollapsed", navCollapsed);
 }
 
 // Tests and callers that must observe the restored snapshot await this.

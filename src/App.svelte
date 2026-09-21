@@ -1,9 +1,9 @@
 <script>
-  import { setContext } from "svelte";
+  import { setContext, tick } from "svelte";
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, moveFavorite, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed } from "./lib/prefs.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
   import { t, onLangChange } from "./lib/i18n.js";
@@ -57,6 +57,19 @@
     active = tool;
   }
 
+  // Icon-rail shortcuts: section icons expand the sidebar (and, for search,
+  // focus the input); the grid icon also un-collapses the 全部工具 group.
+  let navSearchEl;
+  async function railSearch() {
+    setNavCollapsed(false);
+    await tick();
+    navSearchEl?.focus();
+  }
+  function railAllTools() {
+    setNavCollapsed(false);
+    if (isAllCollapsed()) toggleAllCollapsed();
+  }
+
   function onNavKey(e) {
     if (e.key === "Escape") {
       navQuery = "";
@@ -106,14 +119,44 @@
 
 {#if booted}
   <div class="layout">
-    <nav>
-      <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
-        <Icon name="home" size={14} />{s.home.back}
-      </button>
+    <nav class:collapsed={isNavCollapsed()}>
+      {#if isNavCollapsed()}
+        <button type="button" class="railbtn" title={s.home.expandNav} onclick={() => setNavCollapsed(false)}>
+          <Icon name="chevrons-right" size={15} />
+        </button>
+        <button type="button" class="railbtn" class:active={!active} title={s.home.back} onclick={() => (active = null)}>
+          <Icon name="home" size={16} />
+        </button>
+        <button type="button" class="railbtn" title={s.home.searchNav} onclick={railSearch}>
+          <Icon name="search" size={15} />
+        </button>
+        {#if favTools.length}
+          <button type="button" class="railbtn" title={s.home.favs} onclick={() => setNavCollapsed(false)}>
+            <Icon name="star" size={15} />
+          </button>
+        {/if}
+        {#if recentTools.length}
+          <button type="button" class="railbtn" title={s.home.recent} onclick={() => setNavCollapsed(false)}>
+            <Icon name="clock" size={15} />
+          </button>
+        {/if}
+        <button type="button" class="railbtn" title={s.home.allTools} onclick={railAllTools}>
+          <Icon name="grid" size={15} />
+        </button>
+      {:else}
+      <div class="navhead">
+        <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
+          <Icon name="home" size={14} />{s.home.back}
+        </button>
+        <button type="button" class="railbtn collapser" title={s.home.collapseNav} onclick={() => setNavCollapsed(true)}>
+          <Icon name="chevrons-left" size={14} />
+        </button>
+      </div>
       <div class="searchwrap">
         <Icon name="search" size={13} />
         <input
           class="navsearch dbx-input"
+          bind:this={navSearchEl}
           bind:value={navQuery}
           placeholder={s.home.searchPlaceholder}
           onkeydown={onNavKey}
@@ -173,6 +216,7 @@
           {/each}
         {/if}
       {/if}
+      {/if}
     </nav>
     <main>
       {#if active}
@@ -202,7 +246,26 @@
   /* column flex children shrink by default and squish below their set
      heights when the nav overflows; disable it so the nav scrolls */
   nav > * { flex-shrink: 0; }
+  nav.collapsed { width: 46px; padding: 14px 8px; align-items: center; }
+  .navhead { display: flex; align-items: center; gap: 2px; }
+  .navhead .navitem { flex: 1; min-width: 0; }
   .navitem { display: flex; align-items: center; gap: 6px; }
+  .railbtn {
+    border: 0;
+    background: none;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--color-foreground);
+    flex-shrink: 0;
+  }
+  .railbtn:hover { background: var(--color-muted); }
+  .railbtn.active { background: var(--color-primary); color: var(--color-primary-foreground); }
+  .collapser { color: var(--color-muted-foreground); }
   .searchwrap { position: relative; margin: 8px 0 10px; }
   /* the magnifier sits inside the input; padding keeps text clear of it */
   .searchwrap > :global(.ic) {
