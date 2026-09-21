@@ -88,6 +88,11 @@
     <div class="searchwrap">
       <Icon name="search" size={15} />
       <input class="dbx-input search" bind:value={query} placeholder={s.home.searchPlaceholder} />
+      {#if query}
+        <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
+          <Icon name="x" size={13} />
+        </button>
+      {/if}
     </div>
   </div>
 
@@ -190,7 +195,21 @@
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; }
+  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 30px 0 34px; }
+  .clearbtn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--color-muted-foreground);
+    display: inline-flex;
+    border-radius: 3px;
+  }
+  .clearbtn:hover { color: var(--color-foreground); }
   .section { font-size: 12px; margin: 0 0 8px; display: flex; align-items: center; gap: 5px; }
   .section.mid { margin-top: 16px; }
   .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }

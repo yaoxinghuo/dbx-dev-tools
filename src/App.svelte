@@ -162,6 +162,11 @@
           placeholder={s.home.searchPlaceholder}
           onkeydown={onNavKey}
         />
+        {#if navQuery}
+          <button type="button" class="clearbtn" title={s.home.clear} onclick={() => { navQuery = ""; navSearchEl?.focus(); }}>
+            <Icon name="x" size={12} />
+          </button>
+        {/if}
       </div>
       {#snippet toolRow(tool)}
         <div class="toolitem" class:active={active === tool}>
@@ -304,7 +309,21 @@
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .searchwrap .navsearch { width: 100%; padding-left: 27px; }
+  .searchwrap .navsearch { width: 100%; padding-left: 27px; padding-right: 24px; }
+  .clearbtn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--color-muted-foreground);
+    display: inline-flex;
+    border-radius: 3px;
+  }
+  .clearbtn:hover { color: var(--color-foreground); }
   .group {
     font-size: 11px;
     font-weight: 600;
