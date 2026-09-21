@@ -111,7 +111,7 @@
       <input
         class="navsearch dbx-input"
         bind:value={navQuery}
-        placeholder={s.home.searchShort}
+        placeholder={s.home.searchPlaceholder}
         onkeydown={onNavKey}
       />
       {#if navResults}
@@ -185,13 +185,11 @@
     height: 100vh;
     overflow-y: auto;
   }
+  /* column flex children shrink by default and squish below their set
+     heights when the nav overflows; disable it so the nav scrolls */
+  nav > * { flex-shrink: 0; }
   .navsearch {
-    width: 100%;
-    box-sizing: border-box;
     margin: 8px 0 10px;
-    height: 36px;
-    font-size: 13px;
-    padding: 0 10px;
   }
   .group {
     font-size: 11px;
