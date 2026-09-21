@@ -206,7 +206,8 @@
           {/each}
         {/if}
         <button type="button" class="group grouptoggle dbx-hint" onclick={toggleAllCollapsed}>
-          <span class="chev" class:open={!isAllCollapsed()}><Icon name="chevron" size={10} /></span><Icon name="grid" size={11} />{s.home.allTools}
+          <Icon name="grid" size={11} />{s.home.allTools}
+          <span class="chev" class:open={!isAllCollapsed()}><Icon name="chevron" size={13} /></span>
         </button>
         {#if !isAllCollapsed()}
           {#each TOOLS as tool}
@@ -266,7 +267,7 @@
   .railbtn:hover { background: var(--color-muted); }
   .railbtn.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .collapser { color: var(--color-muted-foreground); }
-  .searchwrap { position: relative; margin: 8px 0 10px; }
+  .searchwrap { position: relative; margin: 10px 0 4px; }
   /* the magnifier sits inside the input; padding keeps text clear of it */
   .searchwrap > :global(.ic) {
     position: absolute;
@@ -302,6 +303,7 @@
     gap: 4px;
   }
   .grouptoggle:hover { color: var(--color-foreground); }
+  .grouptoggle .chev { margin-left: auto; }
   .chev { display: inline-flex; transition: transform .15s; }
   .chev.open { transform: rotate(90deg); }
   .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }

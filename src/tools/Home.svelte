@@ -37,15 +37,16 @@
     });
   });
 
-  // Favorites float to the top of the grid in the user's drag-sorted order.
-  const favOrdered = $derived.by(() => {
-    const order = new Map(favoriteKeys().map((key, i) => [key, i]));
-    return visible
-      .filter((tool) => order.has(tool.key))
-      .sort((a, b) => order.get(a.key) - order.get(b.key));
-  });
+  // Favorites are a pinned block in the user's drag-sorted order — always
+  // shown in full, unaffected by the category/search filter below (which
+  // only scopes the 全部工具 grid).
+  const toolByKey = new Map(TOOLS.map((tool) => [tool.key, tool]));
+  const favOrdered = $derived.by(() =>
+    favoriteKeys()
+      .map((key) => toolByKey.get(key))
+      .filter(Boolean)
+  );
   const restOrdered = $derived(visible.filter((tool) => !isFavorite(tool.key)));
-  const ordered = $derived([...favOrdered, ...restOrdered]);
 
   const recentTools = $derived.by(() =>
     recentKeys()
@@ -90,7 +91,7 @@
     </div>
   </div>
 
-  {#if !query.trim() && !activeTag && recentTools.length}
+  {#if recentTools.length}
     <div class="recent">
       <span class="recent-label dbx-hint"><Icon name="clock" size={12} />{s.home.recent}</span>
       {#each recentTools as tool}
@@ -155,21 +156,19 @@
     </div>
   {/snippet}
 
-  {#if visible.length}
-    {#if canSort && favOrdered.length}
-      <div class="section dbx-hint"><Icon name="star" size={12} filled />{s.home.favs}</div>
-      <div class="grid">
-        {#each favOrdered as tool}{@render cell(tool)}{/each}
-      </div>
-      <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}</div>
-      <div class="grid">
-        {#each restOrdered as tool}{@render cell(tool)}{/each}
-      </div>
-    {:else}
-      <div class="grid">
-        {#each ordered as tool}{@render cell(tool)}{/each}
-      </div>
-    {/if}
+  <div class="section dbx-hint"><Icon name="star" size={12} filled />{s.home.favs}</div>
+  {#if favOrdered.length}
+    <div class="grid">
+      {#each favOrdered as tool}{@render cell(tool)}{/each}
+    </div>
+  {:else}
+    <p class="fav-empty dbx-hint">{s.home.favEmpty}</p>
+  {/if}
+  <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}</div>
+  {#if restOrdered.length}
+    <div class="grid">
+      {#each restOrdered as tool}{@render cell(tool)}{/each}
+    </div>
   {:else}
     <p class="dbx-hint empty">{s.home.noResults}</p>
   {/if}
@@ -264,5 +263,6 @@
     border: 1px solid var(--color-border);
     color: var(--color-muted-foreground);
   }
+  .fav-empty { font-size: 12px; margin: 0 0 8px; }
   .empty { font-size: 14px; }
 </style>
