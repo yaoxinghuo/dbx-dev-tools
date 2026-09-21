@@ -124,6 +124,7 @@ const messages = {
       contrast: "Contrast",
       wcag: "WCAG",
       picker: "Picker",
+      calc: "Calc",
     },
     home: {
       searchPlaceholder: "Search tools (name/tag, any language)…",
@@ -820,6 +821,7 @@ const messages = {
       contrast: "对比度",
       wcag: "WCAG",
       picker: "取色器",
+      calc: "计算",
     },
     home: {
       searchPlaceholder: "搜索工具（中英文、Tag均可）…",

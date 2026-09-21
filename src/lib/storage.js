@@ -8,6 +8,12 @@ const PREFIX = "devtools:";
 const memory = new Map();
 const pending = new Map();
 
+// Host quota: 256KiB serialized per key, 1MiB total per plugin. Persisted
+// states are tiny (<1KiB typical), but inputs can hold pasted blobs — a
+// value over the per-key cap would be rejected on every debounced write, so
+// it stays in the session memory instead.
+const MAX_VALUE_BYTES = 200 * 1024;
+
 function backend() {
   const bridge = window.dbxPlugin;
   if (bridge?.capabilities?.storage && bridge.storage) return "bridge";
@@ -34,6 +40,7 @@ export async function storageGet(key) {
 
 async function writeNow(key, value) {
   try {
+    if (JSON.stringify(value).length > MAX_VALUE_BYTES) return memory.set(PREFIX + key, value);
     const mode = backend();
     if (mode === "bridge") return await window.dbxPlugin.storage.set(PREFIX + key, value);
     if (mode === "local") {
