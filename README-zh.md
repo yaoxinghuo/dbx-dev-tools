@@ -6,7 +6,7 @@
 
 ![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 个工具](https://img.shields.io/badge/工具-40-orange) ![安装包 约120KB](https://img.shields.io/badge/安装包-约120KB-brightgreen) ![权限 host.storage](https://img.shields.io/badge/权限-host.storage-blueviolet)
 
-<img width="2232" height="1516" alt="image" src="https://github.com/user-attachments/assets/c260afbf-559d-4f82-8262-0132cda81db2" />
+<img width="2232" height="1524" alt="image" src="https://github.com/user-attachments/assets/77be2ad2-bced-4afb-883b-5536e086d691" />
 
 ## 工具列表
 
