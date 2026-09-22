@@ -4,7 +4,7 @@
 
 日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网、仅 1 项本地权限（`host.storage`，本地 UI 状态存储）——更轻更安全**。40+ 款开发工具仅 ~120KB：密码生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳与 Cron、IP 子网、文本 Diff、颜色对比度、Unicode 检查、乱码修复、正则测试等一应俱全。纯前端实现、universal 包、无原生 Sidecar。
 
-![DBX >=0.6.12](https://img.shields.io/badge/DBX-%3E%3D0.6.12-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 个工具](https://img.shields.io/badge/工具-40-orange) ![安装包 约120KB](https://img.shields.io/badge/安装包-约120KB-brightgreen) ![权限 host.storage](https://img.shields.io/badge/权限-host.storage-blueviolet)
+![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 个工具](https://img.shields.io/badge/工具-40-orange) ![安装包 约120KB](https://img.shields.io/badge/安装包-约120KB-brightgreen) ![权限 host.storage](https://img.shields.io/badge/权限-host.storage-blueviolet)
 
 <img width="2232" height="1524" alt="image" src="https://github.com/user-attachments/assets/77be2ad2-bced-4afb-883b-5536e086d691" />
 
