@@ -297,7 +297,9 @@
   nav {
     width: 176px;
     flex-shrink: 0;
-    padding: 14px 10px;
+    /* Horizontal inset lives on the sections, not the nav: navscroll carries
+       it as padding so its scrollbar hugs the nav's right edge. */
+    padding: 14px 0;
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
@@ -311,7 +313,7 @@
      heights when the nav overflows; disable it so the nav scrolls */
   nav > * { flex-shrink: 0; }
   nav.collapsed { width: 46px; padding: 14px 8px; align-items: center; }
-  .navtop { display: flex; align-items: center; justify-content: space-between; }
+  .navtop { display: flex; align-items: center; justify-content: space-between; margin: 0 10px; }
   .brand {
     font: inherit;
     font-size: 14px;
@@ -324,7 +326,7 @@
     border-radius: var(--radius-md);
   }
   .brand:hover { background: var(--color-muted); }
-  .navitem { display: flex; align-items: center; gap: 6px; }
+  .navitem { display: flex; align-items: center; gap: 6px; margin: 0 10px; }
   .railbtn {
     border: 0;
     background: none;
@@ -352,7 +354,7 @@
     border-radius: 3px;
   }
   .miniact:hover { color: var(--color-foreground); }
-  .searchwrap { position: relative; margin: 10px 0 4px; }
+  .searchwrap { position: relative; margin: 10px 10px 4px; }
   /* the magnifier sits inside the input; padding keeps text clear of it */
   .searchwrap > :global(.ic) {
     position: absolute;
@@ -482,11 +484,11 @@
   .chev.open { transform: rotate(90deg); }
   /* Middle scroll region: top block (brand/home/search) and the bottom
      recent dock stay fixed, only this band scrolls. */
-  .navscroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+  .navscroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 0 10px; }
   .navscroll > * { flex-shrink: 0; }
   /* 最近使用 pinned to the nav bottom: a stable strip that doesn't push the
      lists above around as entries rotate. */
-  .recentdock { border-top: 1px solid var(--color-border); margin-top: 4px; }
+  .recentdock { border-top: 1px solid var(--color-border); margin-top: 4px; padding: 0 10px; }
   .recentdock .group { border-top: 0; margin-top: 0; padding-top: 8px; padding-bottom: 3px; }
   .recentlist { display: flex; flex-direction: column; gap: 1px; max-height: 130px; overflow-y: auto; }
   /* Recent rows are denser than nav rows, and recent/favorites active use a
