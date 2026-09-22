@@ -1,10 +1,11 @@
 <script>
+  import { onMount } from "svelte";
   import ToolShell from "../components/ToolShell.svelte";
   import GripIcon from "../components/GripIcon.svelte";
   import Icon from "../components/Icon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled } from "../lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "../lib/favdnd.svelte.js";
   import { t, onLangChange, allMessages } from "../lib/i18n.js";
 
@@ -49,12 +50,20 @@
   );
   const restOrdered = $derived(visible.filter((tool) => !isFavorite(tool.key)));
 
-  const recentTools = $derived.by(() =>
-    recentKeys()
+  const recentTools = $derived.by(() => {
+    if (!isRecentEnabled()) return [];
+    return recentKeys()
       .map((key) => TOOLS.find((tool) => tool.key === key))
       .filter(Boolean)
-      .slice(0, 8)
-  );
+      .slice(0, 8);
+  });
+
+  // Deterministic per-tool dot hue so each recent chip gets a stable accent.
+  function dotColor(key) {
+    let h = 0;
+    for (const c of key) h = (h * 31 + c.charCodeAt(0)) % 360;
+    return `hsl(${h} 70% 50%)`;
+  }
 
   // Favorite-card reordering only makes sense in the unfiltered grid — with a
   // search/category filter active, hidden favorites would shift invisibly.
@@ -68,8 +77,9 @@
   }
 
   // Typewriter placeholder: erase the static hint once, then cycle through
-  // representative tool names (they double as valid search queries). Pauses
-  // while the input is focused; restarts on blur and on language switch.
+  // representative tool names (they double as valid search queries). Runs even
+  // while the input is focused — the placeholder only shows while the input is
+  // empty anyway, so a single typed character replaces (and stops) it.
   // Each tool contributes three phrases — its name in the UI language, in
   // English, and its primary tag — so the placeholder cycles 中文/EN/tag.
   const typeKeys = ["password", "qrcode", "json", "time", "color", "ipcalc"];
@@ -86,13 +96,13 @@
     }
     return out;
   });
-  let searchFocused = $state(false);
+  let searchEl;
   let typed = $state("");
   let typing = $state(false);
   $effect(() => {
     const list = typeSamples;
     const base = s.home.searchPlaceholder;
-    if (searchFocused || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (query || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let chars = Array.from(base);
     let target = chars;
     let del = true;
@@ -121,6 +131,10 @@
     return () => { clearTimeout(timer); typing = false; };
   });
 
+  // Home is search-first: focus the box on mount so the typewriter placeholder
+  // animates under the caret until the user types.
+  onMount(() => searchEl?.focus());
+
 </script>
 
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
@@ -130,10 +144,9 @@
       <input
         class="dbx-input search"
         class:has-clear={query}
+        bind:this={searchEl}
         bind:value={query}
         placeholder={typing ? typed + "▏" : s.home.searchPlaceholder}
-        onfocus={() => (searchFocused = true)}
-        onblur={() => (searchFocused = false)}
       />
       {#if query}
         <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
@@ -152,7 +165,9 @@
         </button>
       </span>
       {#each recentTools as tool}
-        <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>{s.tools[tool.key].name}</button>
+        <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>
+          <span class="dot" style:background={dotColor(tool.key)}></span>{s.tools[tool.key].name}
+        </button>
       {/each}
     </div>
   {/if}
@@ -175,7 +190,9 @@
     {/each}
   </div>
 
-  {#snippet cell(tool)}
+  <!-- compact drops the tag row — favorites are tools the user already knows
+       well, so the cards stay slimmer without the discovery aids. -->
+  {#snippet cell(tool, compact)}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="cell"
@@ -191,11 +208,13 @@
       >
         <span class="name">{s.tools[tool.key].name}</span>
         <span class="desc dbx-hint">{s.tools[tool.key].desc}</span>
-        <span class="tagrow">
-          {#each tool.tags.filter((tag) => VISIBLE_TAGS.has(tag)) as tag}
-            <span class="mini-tag">{tagName(tag)}</span>
-          {/each}
-        </span>
+        {#if !compact}
+          <span class="tagrow">
+            {#each tool.tags.filter((tag) => VISIBLE_TAGS.has(tag)) as tag}
+              <span class="mini-tag">{tagName(tag)}</span>
+            {/each}
+          </span>
+        {/if}
       </button>
       {#if canSort && isFavorite(tool.key)}
         <span class="gripbox" title={s.home.dragReorder}><GripIcon /></span>
@@ -210,15 +229,15 @@
     </div>
   {/snippet}
 
-  <div class="section dbx-hint"><Icon name="star" size={12} filled />{s.home.favs}</div>
+  <div class="section dbx-hint"><Icon name="star" size={12} filled />{s.home.favs}{#if favOrdered.length}<span class="scount">{s.home.favTotal.replace("{n}", favOrdered.length)}</span>{/if}</div>
   {#if favOrdered.length}
     <div class="grid">
-      {#each favOrdered as tool}{@render cell(tool)}{/each}
+      {#each favOrdered as tool}{@render cell(tool, true)}{/each}
     </div>
   {:else}
     <p class="fav-empty dbx-hint">{s.home.favEmpty}</p>
   {/if}
-  <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}</div>
+  <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}<span class="scount">{s.home.allTotal.replace("{n}", TOOLS.length)}</span></div>
   {#if restOrdered.length}
     <div class="grid">
       {#each restOrdered as tool}{@render cell(tool)}{/each}
@@ -241,7 +260,6 @@
      flows slowly — dim while idle, full-strength as the focus indicator. */
   .searchwrap {
     position: relative;
-    max-width: 480px;
     padding: 2px;
     border-radius: calc(var(--radius-md) + 2px);
     background: linear-gradient(135deg, rgba(13, 148, 136, 0.24), rgba(45, 212, 191, 0.16));
@@ -290,7 +308,10 @@
     border-radius: 3px;
   }
   .clearbtn:hover { color: var(--color-foreground); }
-  .section { font-size: 12px; margin: 0 0 8px; display: flex; align-items: center; gap: 5px; }
+  /* Match the sidebar .group label style so section headers read the same
+     in both places. */
+  .section { font-size: 11px; font-weight: 600; letter-spacing: .05em; margin: 0 0 8px; display: flex; align-items: center; gap: 5px; }
+  .section .scount { margin-left: auto; font-weight: 400; }
   .section.mid { margin-top: 16px; }
   .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
   .cat {
@@ -313,7 +334,8 @@
   .cnt { font-size: 12px; color: var(--color-muted-foreground); }
   .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
   .recent-label { font-size: 12px; margin-right: 2px; display: inline-flex; align-items: center; gap: 5px; }
-  .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; }
+  .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; display: inline-flex; align-items: center; gap: 6px; }
+  .recent-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .miniact {
     border: 0;
     background: none;
@@ -391,7 +413,7 @@
     border: 1px solid var(--color-border);
     color: var(--color-muted-foreground);
   }
-  .fav-empty { font-size: 12px; margin: 0 0 8px; }
+  .fav-empty { font-size: 12px; margin: 0 0 8px; font-style: italic; }
   .empty { font-size: 14px; }
 
   @keyframes ringflow {

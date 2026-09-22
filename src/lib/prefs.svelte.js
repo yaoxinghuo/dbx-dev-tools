@@ -15,6 +15,9 @@ let navCollapsed = $state(false);
 // Sidebar "最近使用" dock collapsed state; defaults to collapsed so the
 // bottom dock stays a slim strip, and the user's toggle is persisted.
 let recentCollapsed = $state(true);
+// Recent-history feature switch; when off, nothing is recorded and the
+// stored history is dropped (privacy).
+let recentEnabled = $state(true);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
@@ -26,6 +29,7 @@ const ready = (async () => {
   allCollapsed = (await storageGet("navAllCollapsed")) !== false;
   navCollapsed = (await storageGet("navCollapsed")) === true;
   recentCollapsed = (await storageGet("navRecentCollapsed")) !== false;
+  recentEnabled = (await storageGet("recentEnabled")) !== false;
 })();
 
 export function isFavorite(key) {
@@ -67,6 +71,7 @@ export function recentKeys() {
 
 export function recordRecent(key) {
   untrack(() => {
+    if (!recentEnabled) return;
     const index = recent.indexOf(key);
     if (index >= 0) recent.splice(index, 1);
     recent.unshift(key);
@@ -111,6 +116,17 @@ export function setRecentCollapsed(value) {
 
 export function toggleRecentCollapsed() {
   setRecentCollapsed(!recentCollapsed);
+}
+
+export function isRecentEnabled() {
+  return recentEnabled;
+}
+
+export function setRecentEnabled(value) {
+  recentEnabled = value;
+  storageSet("recentEnabled", recentEnabled);
+  // Disabling is a privacy gesture: wipe the recorded history as well.
+  if (!recentEnabled) clearRecent();
 }
 
 // Tests and callers that must observe the restored snapshot await this.

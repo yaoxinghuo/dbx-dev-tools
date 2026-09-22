@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite, isRecentCollapsed, toggleRecentCollapsed, setRecentCollapsed } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite, isRecentCollapsed, toggleRecentCollapsed, setRecentCollapsed, isRecentEnabled, setRecentEnabled } from "./lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "./lib/favdnd.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
@@ -23,11 +23,12 @@
 
   const toolByKey = new Map(TOOLS.map((tool) => [tool.key, tool]));
 
-  const recentTools = $derived.by(() =>
-    recentKeys()
+  const recentTools = $derived.by(() => {
+    if (!isRecentEnabled()) return [];
+    return recentKeys()
       .map((key) => toolByKey.get(key))
-      .filter(Boolean)
-  );
+      .filter(Boolean);
+  });
   const favTools = $derived.by(() =>
     favoriteKeys()
       .map((key) => toolByKey.get(key))
@@ -139,11 +140,9 @@
             <Icon name="star" size={15} />
           </button>
         {/if}
-        {#if recentTools.length}
-          <button type="button" class="railbtn" title={s.home.recent} onclick={() => { setNavCollapsed(false); setRecentCollapsed(false); }}>
-            <Icon name="clock" size={15} />
-          </button>
-        {/if}
+        <button type="button" class="railbtn" title={s.home.recent} onclick={() => { setNavCollapsed(false); setRecentCollapsed(false); }}>
+          <Icon name="clock" size={15} />
+        </button>
         <button type="button" class="railbtn" title={s.home.allTools} onclick={railAllTools}>
           <Icon name="grid" size={15} />
         </button>
@@ -155,7 +154,7 @@
         </button>
       </div>
       <button type="button" class="item navitem" class:active={!active} onclick={() => (active = null)}>
-        <Icon name="home" size={14} />{s.home.back}
+        <Icon name="home" size={14} />{s.home.back}<span class="count">{TOOLS.length}</span>
       </button>
       <div class="searchwrap">
         <Icon name="search" size={13} />
@@ -196,7 +195,7 @@
         {/each}
       {:else}
         {#if favTools.length}
-          <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}</div>
+          <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}<span class="count">{favTools.length}</span></div>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="droplist">
             {#each favTools as tool (tool.key)}
@@ -229,41 +228,62 @@
         {/if}
       {/if}
       </div>
-      {#if recentTools.length}
-        <div class="recentdock">
+      <!-- The dock is a permanent fixture: it hosts the privacy switch, so it
+           must stay reachable even when recents are off or simply empty. -->
+      <div class="recentdock">
           <div class="group dbx-hint">
             <Icon name="clock" size={11} />{s.home.recent}
-            <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
-              <Icon name="trash" size={11} />
-            </button>
-            <button
-              type="button"
-              class="miniact"
-              title={isRecentCollapsed() ? s.home.expandGroup : s.home.collapseGroup}
-              onclick={toggleRecentCollapsed}
-            >
-              <span class="chev" class:open={!isRecentCollapsed()}><Icon name="chevron" size={13} /></span>
-            </button>
+            {#if isRecentEnabled()}
+              <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
+                <Icon name="trash" size={11} />
+              </button>
+            {/if}
+            <span class="dockacts">
+              <button
+                type="button"
+                class="switch"
+                class:on={isRecentEnabled()}
+                role="switch"
+                aria-checked={isRecentEnabled()}
+                title={isRecentEnabled() ? s.home.recentOff : s.home.recentOn}
+                onclick={() => { const on = !isRecentEnabled(); setRecentEnabled(on); if (on) setRecentCollapsed(false); }}
+              ><span class="knob"></span></button>
+              {#if isRecentEnabled()}
+                <button
+                  type="button"
+                  class="miniact"
+                  title={isRecentCollapsed() ? s.home.expandGroup : s.home.collapseGroup}
+                  aria-expanded={!isRecentCollapsed()}
+                  onclick={toggleRecentCollapsed}
+                >
+                  <span class="chev" class:open={!isRecentCollapsed()}><Icon name="chevron" size={13} /></span>
+                </button>
+              {/if}
+            </span>
           </div>
-          {#if !isRecentCollapsed()}
+          {#if isRecentEnabled() && !isRecentCollapsed()}
             <div class="recentlist">
               {#each recentTools as tool}
                 <button type="button" class="item" class:active={active?.key === tool.key} onclick={() => pick(tool)}>
                   {s.tools[tool.key].name}
                 </button>
+              {:else}
+                <div class="empty dbx-hint">{s.home.recentEmpty}</div>
               {/each}
             </div>
           {/if}
+          {#if !isRecentEnabled()}
+            <div class="empty dbx-hint">{s.home.recentOffNote}</div>
+          {/if}
         </div>
-      {/if}
       {/if}
     </nav>
     <main>
       <div class="ambient" aria-hidden="true">
-        <span class="layer" style:transform="translate3d({par.x * 0.9}px, {par.y * 0.7}px, 0)"><span class="blob gold"></span></span>
-        <span class="layer" style:transform="translate3d({par.x * -0.8}px, {par.y * 0.6}px, 0)"><span class="blob blue"></span></span>
-        <span class="layer" style:transform="translate3d({par.x * 0.6}px, {par.y * -0.5}px, 0)"><span class="blob peach"></span></span>
-        <span class="layer" style:transform="translate3d({par.x * -0.5}px, {par.y * -0.8}px, 0)"><span class="blob lavender"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * 0.9}px, {par.y * 0.7}px, 0)"><span class="blob mint"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * -0.8}px, {par.y * 0.6}px, 0)"><span class="blob cyan"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * 0.6}px, {par.y * -0.5}px, 0)"><span class="blob aqua"></span></span>
+        <span class="layer" style:transform="translate3d({par.x * -0.5}px, {par.y * -0.8}px, 0)"><span class="blob teal"></span></span>
         <span class="grain"></span>
       </div>
       {#if active}
@@ -299,7 +319,7 @@
     flex-shrink: 0;
     /* Horizontal inset lives on the sections, not the nav: navscroll carries
        it as padding so its scrollbar hugs the nav's right edge. */
-    padding: 14px 0;
+    padding: 8px 0;
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
@@ -327,6 +347,17 @@
   }
   .brand:hover { background: var(--color-muted); }
   .navitem { display: flex; align-items: center; gap: 6px; margin: 0 10px; }
+  .navitem .count {
+    margin-left: auto;
+    font-size: 10.5px;
+    line-height: 16px;
+    padding: 0 7px;
+    border-radius: 99px;
+    background: var(--color-muted);
+    color: var(--color-muted-foreground);
+  }
+  .navitem.active .count { background: rgba(0, 0, 0, 0.16); color: inherit; }
+  .group .count { margin-left: auto; font-weight: 500; }
   .railbtn {
     border: 0;
     background: none;
@@ -344,7 +375,6 @@
   .railbtn.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .collapser { color: var(--color-muted-foreground); }
   .miniact {
-    margin-left: auto;
     border: 0;
     background: none;
     padding: 1px 2px;
@@ -354,6 +384,33 @@
     border-radius: 3px;
   }
   .miniact:hover { color: var(--color-foreground); }
+  /* Recents dock actions: switch + chevron pinned to the row's right edge,
+     trash sits next to the label like the home recents row does. */
+  .dockacts { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+  .switch {
+    position: relative;
+    width: 24px;
+    height: 14px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    background: var(--color-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .switch .knob {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-muted-foreground);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .switch.on { background: var(--color-primary); border-color: var(--color-primary); }
+  .switch.on .knob { transform: translateX(10px); background: #fff; }
   .searchwrap { position: relative; margin: 10px 10px 4px; }
   /* the magnifier sits inside the input; padding keeps text clear of it */
   .searchwrap > :global(.ic) {
@@ -392,37 +449,39 @@
     animation: ambient-float 18s ease-in-out infinite alternate,
       ambient-tint 42s ease-in-out infinite alternate;
   }
-  .blob.gold {
+  /* Blob hues stay in the teal/cyan family so the ambient wash matches the
+     brand color instead of the original gold/lavender palette. */
+  .blob.mint {
     top: -10%;
     left: 14%;
     width: 520px;
     height: 520px;
-    background: radial-gradient(circle at 34% 32%, rgba(246, 213, 148, 0.95), rgba(246, 213, 148, 0) 70%);
+    background: radial-gradient(circle at 34% 32%, rgba(94, 234, 212, 0.9), rgba(94, 234, 212, 0) 70%);
   }
-  .blob.blue {
+  .blob.cyan {
     top: 2%;
     right: -8%;
     width: 480px;
     height: 480px;
-    background: radial-gradient(circle at 58% 40%, rgba(178, 205, 244, 0.9), rgba(178, 205, 244, 0) 70%);
+    background: radial-gradient(circle at 58% 40%, rgba(103, 232, 249, 0.85), rgba(103, 232, 249, 0) 70%);
     animation-duration: 22s, 52s;
     animation-delay: -5s, -12s;
   }
-  .blob.peach {
+  .blob.aqua {
     bottom: -18%;
     left: 24%;
     width: 460px;
     height: 460px;
-    background: radial-gradient(circle at 50% 50%, rgba(248, 224, 190, 0.85), rgba(248, 224, 190, 0) 70%);
+    background: radial-gradient(circle at 50% 50%, rgba(153, 246, 228, 0.8), rgba(153, 246, 228, 0) 70%);
     animation-duration: 26s, 61s;
     animation-delay: -9s, -26s;
   }
-  .blob.lavender {
+  .blob.teal {
     right: 12%;
     bottom: -14%;
     width: 420px;
     height: 420px;
-    background: radial-gradient(circle at 46% 46%, rgba(206, 205, 245, 0.72), rgba(206, 205, 245, 0) 70%);
+    background: radial-gradient(circle at 46% 46%, rgba(45, 212, 191, 0.7), rgba(45, 212, 191, 0) 70%);
     animation-duration: 24s, 47s;
     animation-delay: -14s, -33s;
   }
@@ -431,7 +490,7 @@
     inset: 0;
     opacity: 0.22;
     mix-blend-mode: soft-light;
-    background-image: radial-gradient(rgba(90, 80, 60, 0.16) 0.5px, transparent 0.6px);
+    background-image: radial-gradient(rgba(45, 85, 80, 0.15) 0.5px, transparent 0.6px);
     background-size: 3px 3px;
   }
   :global(:root[data-dbx-theme="dark"]) .blob { opacity: 0.09; }
