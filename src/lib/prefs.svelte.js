@@ -12,6 +12,9 @@ const recent = $state([]);
 let allCollapsed = $state(true);
 // Whole-sidebar icon-rail mode; persisted so it survives reloads.
 let navCollapsed = $state(false);
+// Sidebar "最近使用" dock collapsed state; defaults to collapsed so the
+// bottom dock stays a slim strip, and the user's toggle is persisted.
+let recentCollapsed = $state(true);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
@@ -22,6 +25,7 @@ const ready = (async () => {
   // "expanded" choice is still honored.
   allCollapsed = (await storageGet("navAllCollapsed")) !== false;
   navCollapsed = (await storageGet("navCollapsed")) === true;
+  recentCollapsed = (await storageGet("navRecentCollapsed")) !== false;
 })();
 
 export function isFavorite(key) {
@@ -94,6 +98,19 @@ export function isNavCollapsed() {
 export function setNavCollapsed(value) {
   navCollapsed = value;
   storageSet("navCollapsed", navCollapsed);
+}
+
+export function isRecentCollapsed() {
+  return recentCollapsed;
+}
+
+export function setRecentCollapsed(value) {
+  recentCollapsed = value;
+  storageSet("navRecentCollapsed", recentCollapsed);
+}
+
+export function toggleRecentCollapsed() {
+  setRecentCollapsed(!recentCollapsed);
 }
 
 // Tests and callers that must observe the restored snapshot await this.

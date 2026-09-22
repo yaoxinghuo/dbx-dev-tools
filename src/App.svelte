@@ -3,7 +3,7 @@
   import { ready, context, contributionId, onInit, onContext } from "./lib/bridge.js";
   import { resolveTool, TOOLS, Home } from "./lib/tools.js";
   import { buildSearchIndex } from "./lib/toolsearch.js";
-  import { recordRecent, recentKeys, favoriteKeys, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite } from "./lib/prefs.svelte.js";
+  import { recordRecent, recentKeys, favoriteKeys, isAllCollapsed, toggleAllCollapsed, isNavCollapsed, setNavCollapsed, clearRecent, isFavorite, toggleFavorite, isRecentCollapsed, toggleRecentCollapsed, setRecentCollapsed } from "./lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "./lib/favdnd.svelte.js";
   import GripIcon from "./components/GripIcon.svelte";
   import Icon from "./components/Icon.svelte";
@@ -140,7 +140,7 @@
           </button>
         {/if}
         {#if recentTools.length}
-          <button type="button" class="railbtn" title={s.home.recent} onclick={() => setNavCollapsed(false)}>
+          <button type="button" class="railbtn" title={s.home.recent} onclick={() => { setNavCollapsed(false); setRecentCollapsed(false); }}>
             <Icon name="clock" size={15} />
           </button>
         {/if}
@@ -173,6 +173,7 @@
           </button>
         {/if}
       </div>
+      <div class="navscroll">
       {#snippet toolRow(tool)}
         <div class="toolitem" class:active={active?.key === tool.key}>
           <button type="button" class="toolpick" onclick={() => pick(tool)}>
@@ -217,19 +218,6 @@
             <GripIcon /><span class="label">{s.tools[dnd.key]?.name}</span>
           </div>
         {/if}
-        {#if recentTools.length}
-          <div class="group dbx-hint">
-            <Icon name="clock" size={11} />{s.home.recent}
-            <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
-              <Icon name="trash" size={11} />
-            </button>
-          </div>
-          {#each recentTools as tool}
-            <button type="button" class="item" class:active={active?.key === tool.key} onclick={() => pick(tool)}>
-              {s.tools[tool.key].name}
-            </button>
-          {/each}
-        {/if}
         <button type="button" class="group grouptoggle dbx-hint" onclick={toggleAllCollapsed}>
           <Icon name="grid" size={11} />{s.home.allTools}
           <span class="chev" class:open={!isAllCollapsed()}><Icon name="chevron" size={13} /></span>
@@ -239,6 +227,34 @@
             {@render toolRow(tool)}
           {/each}
         {/if}
+      {/if}
+      </div>
+      {#if recentTools.length}
+        <div class="recentdock">
+          <div class="group dbx-hint">
+            <Icon name="clock" size={11} />{s.home.recent}
+            <button type="button" class="miniact" title={s.home.clearRecent} onclick={clearRecent}>
+              <Icon name="trash" size={11} />
+            </button>
+            <button
+              type="button"
+              class="miniact"
+              title={isRecentCollapsed() ? s.home.expandGroup : s.home.collapseGroup}
+              onclick={toggleRecentCollapsed}
+            >
+              <span class="chev" class:open={!isRecentCollapsed()}><Icon name="chevron" size={13} /></span>
+            </button>
+          </div>
+          {#if !isRecentCollapsed()}
+            <div class="recentlist">
+              {#each recentTools as tool}
+                <button type="button" class="item" class:active={active?.key === tool.key} onclick={() => pick(tool)}>
+                  {s.tools[tool.key].name}
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
       {/if}
       {/if}
     </nav>
@@ -464,6 +480,21 @@
   .grouptoggle .chev { margin-left: auto; }
   .chev { display: inline-flex; transition: transform .15s; }
   .chev.open { transform: rotate(90deg); }
+  /* Middle scroll region: top block (brand/home/search) and the bottom
+     recent dock stay fixed, only this band scrolls. */
+  .navscroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+  .navscroll > * { flex-shrink: 0; }
+  /* 最近使用 pinned to the nav bottom: a stable strip that doesn't push the
+     lists above around as entries rotate. */
+  .recentdock { border-top: 1px solid var(--color-border); margin-top: 4px; }
+  .recentdock .group { border-top: 0; margin-top: 0; padding-top: 8px; padding-bottom: 3px; }
+  .recentlist { display: flex; flex-direction: column; gap: 1px; max-height: 130px; overflow-y: auto; }
+  /* Recent rows are denser than nav rows, and recent/favorites active use a
+     text accent instead of a filled block — the big primary fill is reserved
+     for the all-tools list so competing highlights don't distract. */
+  .recentlist .item { font-size: 12px; padding: 4px 10px; }
+  .recentlist .item.active,
+  .fav-item.item.active { background: none; color: var(--color-primary); font-weight: 600; }
   .droplist { display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-md); }
   .item {
     border: 0;
@@ -482,8 +513,6 @@
   .fav-item .label { flex: 1; min-width: 0; }
   .fav-item :global(.grip) { color: var(--color-input); flex-shrink: 0; }
   .fav-item:hover :global(.grip) { color: var(--color-muted-foreground); }
-  .fav-item.active :global(.grip),
-  .fav-item.active:hover :global(.grip) { color: var(--color-primary-foreground); }
   .fav-item.dragging { opacity: 0.45; cursor: grabbing; }
   .fav-ghost {
     position: fixed;
