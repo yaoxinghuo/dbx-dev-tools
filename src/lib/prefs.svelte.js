@@ -7,9 +7,10 @@ const RECENT_MAX = 10;
 // in the sidebar; the order is also how they sort on the home grid.
 const favorites = $state([]);
 const recent = $state([]);
-// Sidebar "全部工具" group collapsed state; defaults to collapsed, and the
-// user's toggle is persisted so it survives reloads.
-let allCollapsed = $state(true);
+// Sidebar "全部工具" group collapsed state; defaults to expanded (the list
+// self-limits to a short preview now), and the user's toggle is persisted so
+// it survives reloads.
+let allCollapsed = $state(false);
 // Whole-sidebar icon-rail mode; persisted so it survives reloads.
 let navCollapsed = $state(false);
 // Sidebar "最近使用" dock collapsed state; defaults to collapsed so the
@@ -24,9 +25,9 @@ const ready = (async () => {
   if (Array.isArray(fav)) favorites.push(...fav.filter((key) => typeof key === "string"));
   const rec = await storageGet("recent");
   if (Array.isArray(rec)) recent.push(...rec.filter((key) => typeof key === "string").slice(0, RECENT_MAX));
-  // `!== false` so an unset key keeps the collapsed default while a stored
-  // "expanded" choice is still honored.
-  allCollapsed = (await storageGet("navAllCollapsed")) !== false;
+  // `=== true` so an unset key keeps the expanded default while a stored
+  // "collapsed" choice is still honored.
+  allCollapsed = (await storageGet("navAllCollapsed")) === true;
   navCollapsed = (await storageGet("navCollapsed")) === true;
   recentCollapsed = (await storageGet("navRecentCollapsed")) !== false;
   recentEnabled = (await storageGet("recentEnabled")) !== false;

@@ -70,6 +70,11 @@
     if (isAllCollapsed()) toggleAllCollapsed();
   }
 
+  // Sidebar all-tools list shows a short preview by default — 42 rows of
+  // scrolling is heavy when favorites/search already cover quick access.
+  const NAV_ALL_PREVIEW = 5;
+  let navAllOpen = $state(false);
+
   function onNavKey(e) {
     if (e.key === "Escape") {
       navQuery = "";
@@ -194,8 +199,8 @@
           <div class="empty dbx-hint">{s.home.noResults}</div>
         {/each}
       {:else}
+        <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}{#if favTools.length}<span class="count">{favTools.length}</span>{/if}</div>
         {#if favTools.length}
-          <div class="group dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}<span class="count">{favTools.length}</span></div>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="droplist">
             {#each favTools as tool (tool.key)}
@@ -211,6 +216,8 @@
               ><span class="label">{s.tools[tool.key].name}</span><GripIcon /></button>
             {/each}
           </div>
+        {:else}
+          <div class="empty dbx-hint">{s.home.favEmpty}</div>
         {/if}
         {#if dnd.origin === "nav" && dnd.key}
           <div class="fav-ghost" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;height:{dnd.h}px">
@@ -222,9 +229,18 @@
           <span class="chev" class:open={!isAllCollapsed()}><Icon name="chevron" size={13} /></span>
         </button>
         {#if !isAllCollapsed()}
-          {#each TOOLS as tool}
+          {#each navAllOpen ? TOOLS : TOOLS.slice(0, NAV_ALL_PREVIEW) as tool}
             {@render toolRow(tool)}
           {/each}
+          {#if TOOLS.length > NAV_ALL_PREVIEW}
+            <button type="button" class="item moreitem" onclick={() => (navAllOpen = !navAllOpen)}>
+              {#if navAllOpen}
+                <span class="label">{s.home.lessTools}</span>
+              {:else}
+                <span class="label">{s.home.moreCats}</span><span class="count">+{TOOLS.length - NAV_ALL_PREVIEW}</span>
+              {/if}
+            </button>
+          {/if}
         {/if}
       {/if}
       </div>
@@ -622,6 +638,25 @@
   .favicon.faved { color: #f0b429; }
   .toolitem.active .favicon { color: var(--color-primary-foreground); }
   .toolitem.active .favicon.faved { color: #f0b429; }
+  /* Sidebar more/less row: same dashed affordance as the home toggles. */
+  .moreitem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 6px 10px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-muted-foreground);
+    background: transparent;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    margin-top: 2px;
+  }
+  .moreitem:hover { border-color: var(--color-primary); color: var(--color-foreground); background: none; }
+  .moreitem .label { flex: 1; min-width: 0; text-align: left; }
+  .moreitem .count { font-size: 11px; }
   .empty { font-size: 12px; padding: 8px 10px; }
   main { flex: 1; min-width: 0; }
 </style>

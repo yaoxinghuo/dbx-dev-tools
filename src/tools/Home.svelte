@@ -97,9 +97,8 @@
   }
 
   // Typewriter placeholder: erase the static hint once, then cycle through
-  // representative tool names (they double as valid search queries). Runs even
-  // while the input is focused — the placeholder only shows while the input is
-  // empty anyway, so a single typed character replaces (and stops) it.
+  // representative tool names (they double as valid search queries). Stops
+  // while the box is focused or has content; resumes on blur when still empty.
   // Each tool contributes three phrases — its name in the UI language, in
   // English, and its primary tag — so the placeholder cycles 中文/EN/tag.
   const typeKeys = ["password", "qrcode", "json", "time", "color", "ipcalc"];
@@ -119,10 +118,13 @@
   let searchEl;
   let typed = $state("");
   let typing = $state(false);
+  let focused = $state(false);
   $effect(() => {
     const list = typeSamples;
     const base = s.home.searchPlaceholder;
-    if (query || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Focus also stops the animation: the sandbox iframe can't autofocus on
+    // open, so the first click is the real "I'm about to type" signal.
+    if (query || focused || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let chars = Array.from(base);
     let target = chars;
     let del = true;
@@ -177,6 +179,8 @@
         class:has-clear={query}
         bind:this={searchEl}
         bind:value={query}
+        onfocus={() => (focused = true)}
+        onblur={() => (focused = false)}
         placeholder={typing ? typed + "▏" : s.home.searchPlaceholder}
       />
       {#if query}
