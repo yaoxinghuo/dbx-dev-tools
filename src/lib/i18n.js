@@ -133,6 +133,8 @@ const messages = {
       gradient: "Gradient",
       shadow: "Shadow",
       slug: "Slug",
+      timezone: "Timezone",
+      palette: "Palette",
     },
     home: {
       searchPlaceholder: "Search by name/tag, EN or 中文",
@@ -160,7 +162,10 @@ const messages = {
       favEmpty: "No favorites — star a tool first.",
       favTotal: "{n} favorite tools",
       allTotal: "{n} tools",
+      catTotal: "{n} categories",
       tagLabel: "Tags",
+      moreCats: "More",
+      lessCats: "Less",
     },
     password: {
       length: "Length",
@@ -903,9 +908,11 @@ const messages = {
       gradient: "渐变",
       shadow: "阴影",
       slug: "Slug",
+      timezone: "时区",
+      palette: "配色",
     },
     home: {
-      searchPlaceholder: "中英文、Tag均可搜",
+      searchPlaceholder: "中英文、分类均可搜",
       back: "首页",
       recent: "最近使用",
       fav: "收藏",
@@ -930,7 +937,10 @@ const messages = {
       favEmpty: "暂无收藏——先给工具标星。",
       favTotal: "共 {n} 个常用工具",
       allTotal: "共 {n} 个工具",
+      catTotal: "共 {n} 个分类",
       tagLabel: "标签",
+      moreCats: "更多",
+      lessCats: "收起",
     },
     password: {
       length: "长度",

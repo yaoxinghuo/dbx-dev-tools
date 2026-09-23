@@ -26,9 +26,19 @@
     return buildSearchIndex();
   });
 
-  // Category cards list only category-level tags (shared by 3+ tools), sorted
-  // by tool count; the long tail of niche tags stays reachable through search.
+  // Category cards list only category-level tags (shared by 2+ tools), sorted
+  // by tool count; single-tool keyword tags stay reachable through search.
   const categories = CATEGORY_TAGS;
+
+  // Show at most two rows of category chips; the trailing slot becomes a
+  // "more" toggle that expands the rest. Column count mirrors the grid's
+  // auto-fill rule (≥120px tracks + 8px gaps), so we measure the container.
+  let catsEl;
+  let catsW = $state(0);
+  let catsOpen = $state(false);
+  const catCap = $derived(catsW ? Math.max(1, Math.floor((catsW + 8) / 128)) * 2 : categories.length + 1);
+  const catsFits = $derived(categories.length + 1 <= catCap);
+  const shownCats = $derived(catsOpen || catsFits ? categories : categories.slice(0, catCap - 2));
 
   const visible = $derived.by(() => {
     const q = query.trim().toLowerCase();
@@ -133,7 +143,12 @@
 
   // Home is search-first: focus the box on mount so the typewriter placeholder
   // animates under the caret until the user types.
-  onMount(() => searchEl?.focus());
+  onMount(() => {
+    searchEl?.focus();
+    const ro = new ResizeObserver(([entry]) => (catsW = entry.contentRect.width));
+    ro.observe(catsEl);
+    return () => ro.disconnect();
+  });
 
 </script>
 
@@ -172,15 +187,15 @@
     </div>
   {/if}
 
-  <div class="section dbx-hint">{s.home.browseCats}</div>
-  <div class="cats">
+  <div class="section dbx-hint">{s.home.browseCats}<span class="scount">{s.home.catTotal.replace("{n}", categories.length)}</span></div>
+  <div class="cats" bind:this={catsEl}>
     <button
       type="button"
       class="cat"
       class:on={activeTag === null}
       onclick={() => (activeTag = null)}
     ><span>{s.home.filterAll}</span><span class="cnt">{TOOLS.length}</span></button>
-    {#each categories as cat}
+    {#each shownCats as cat}
       <button
         type="button"
         class="cat"
@@ -188,6 +203,15 @@
         onclick={() => (activeTag = activeTag === cat.key ? null : cat.key)}
       ><span>{tagName(cat.key)}</span><span class="cnt">{cat.count}</span></button>
     {/each}
+    {#if !catsFits}
+      <button type="button" class="cat more" onclick={() => (catsOpen = !catsOpen)}>
+        {#if catsOpen}
+          <span>{s.home.lessCats}</span><Icon name="chevron" size={13} />
+        {:else}
+          <span>{s.home.moreCats}</span><span class="cnt">+{categories.length - shownCats.length}</span>
+        {/if}
+      </button>
+    {/if}
   </div>
 
   <!-- compact drops the tag row — favorites are tools the user already knows
@@ -331,6 +355,11 @@
   }
   .cat:hover { border-color: var(--color-primary); }
   .cat.on { border-color: var(--color-primary); background: var(--color-muted); }
+  /* The more/less toggle is an action, not a filter — dashed border keeps it
+     visually distinct from the selectable chips. */
+  .cat.more { border-style: dashed; color: var(--color-muted-foreground); }
+  .cat.more:hover { color: var(--color-foreground); }
+  .cat.more :global(.ic) { transform: rotate(-90deg); }
   .cnt { font-size: 12px; color: var(--color-muted-foreground); }
   .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
   .recent-label { font-size: 12px; margin-right: 2px; display: inline-flex; align-items: center; gap: 5px; }
