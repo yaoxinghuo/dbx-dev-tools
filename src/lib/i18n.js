@@ -716,7 +716,7 @@ const messages = {
     },
   },
   zh: {
-    homeTitle: "Dev工具集",
+    homeTitle: "Dev 工具集",
     homeSubtitle: "40 个日常开发工具 · 沙箱离线运行 · 仅 1 项本地权限。",
     copy: "复制",
     copied: "已复制",
