@@ -5,7 +5,7 @@
   import Icon from "../components/Icon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
-  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled } from "../lib/prefs.svelte.js";
+  import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled, isTypingFx, toggleTypingFx } from "../lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "../lib/favdnd.svelte.js";
   import { t, onLangChange, allMessages } from "../lib/i18n.js";
 
@@ -15,6 +15,7 @@
 
   let query = $state("");
   let activeTag = $state(null);
+  const isMac = /Mac|iP/.test(navigator.platform || navigator.userAgent);
 
   function tagName(key) {
     return s.tags[key] || key;
@@ -124,7 +125,7 @@
     const base = s.home.searchPlaceholder;
     // Focus also stops the animation: the sandbox iframe can't autofocus on
     // open, so the first click is the real "I'm about to type" signal.
-    if (query || focused || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (query || focused || !isTypingFx() || !list.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let chars = Array.from(base);
     let target = chars;
     let del = true;
@@ -153,10 +154,15 @@
     return () => { clearTimeout(timer); typing = false; };
   });
 
+  // ⌘K / Ctrl+K reaches here via App's global keydown → this event (when Home
+  // is already mounted the app-level handler can't reach the input directly).
+  const focusReq = () => searchEl?.focus();
+
   // Home is search-first: focus the box on mount so the typewriter placeholder
   // animates under the caret until the user types.
   onMount(() => {
     searchEl?.focus();
+    window.addEventListener("dbx-focus-home-search", focusReq);
     const ro = new ResizeObserver((entries) => {
       for (const e of entries) {
         if (e.target === catsEl) catsW = e.contentRect.width;
@@ -165,7 +171,7 @@
     });
     ro.observe(catsEl);
     if (gridEl) ro.observe(gridEl);
-    return () => ro.disconnect();
+    return () => { ro.disconnect(); window.removeEventListener("dbx-focus-home-search", focusReq); };
   });
 
 </script>
@@ -176,18 +182,29 @@
       <Icon name="search" size={15} />
       <input
         class="dbx-input search"
-        class:has-clear={query}
         bind:this={searchEl}
         bind:value={query}
         onfocus={() => (focused = true)}
         onblur={() => (focused = false)}
         placeholder={typing ? typed + "▏" : s.home.searchPlaceholder}
       />
-      {#if query}
-        <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
-          <Icon name="x" size={13} />
-        </button>
-      {/if}
+      <div class="searchacts">
+        {#if query}
+          <button type="button" class="clearbtn" title={s.home.clear} onclick={() => (query = "")}>
+            <Icon name="x" size={13} />
+          </button>
+        {/if}
+        <kbd class="kbd">{isMac ? "⌘K" : "Ctrl K"}</kbd>
+        <button
+          type="button"
+          class="fxpill"
+          class:on={isTypingFx()}
+          role="switch"
+          aria-checked={isTypingFx()}
+          title={s.home.fxTip}
+          onclick={toggleTypingFx}
+        ><span class="fxdot"></span>{s.home.fxLabel}: {isTypingFx() ? s.home.fxOn : s.home.fxOff}</button>
+      </div>
     </div>
   </div>
 
@@ -279,7 +296,14 @@
       {#each favOrdered as tool}{@render cell(tool, true)}{/each}
     </div>
   {:else}
-    <p class="fav-empty dbx-hint">{s.home.favEmpty}</p>
+    <div class="fav-empty">
+      <span class="fe-ic"><Icon name="star" size={15} /></span>
+      <span class="fe-text">
+        <span class="fe-title">{s.home.favEmptyTitle}</span>
+        <span class="fe-hint dbx-hint">{s.home.favEmptyHint}</span>
+      </span>
+      <span class="fe-act dbx-hint">{s.home.favEmptyAction}</span>
+    </div>
   {/if}
   <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}<span class="scount">{s.home.allTotal.replace("{n}", TOOLS.length)}</span></div>
   <div bind:this={gridEl}>
@@ -345,15 +369,19 @@
     color: var(--color-muted-foreground);
     pointer-events: none;
   }
-  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 14px 0 34px; border-color: transparent; }
+  .search { width: 100%; height: 40px; font-size: 14px; padding: 0 150px 0 34px; border-color: transparent; }
   /* the flowing ring is the focus indicator; suppress the default outline */
   .searchwrap .search:focus { outline: none; }
-  .search.has-clear { padding-right: 30px; }
-  .clearbtn {
+  .searchacts {
     position: absolute;
-    right: 8px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .clearbtn {
     border: 0;
     background: none;
     padding: 2px;
@@ -363,6 +391,41 @@
     border-radius: 3px;
   }
   .clearbtn:hover { color: var(--color-foreground); }
+  .kbd {
+    font: 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 3px 5px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-muted);
+    color: var(--color-muted-foreground);
+  }
+  /* Text-state pill toggle — quieter than a filled switch; the leading dot
+     breathes (dim→mid, never glaring) while effects are on. */
+  .fxpill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    background: transparent;
+    font: inherit;
+    font-size: 11px;
+    color: var(--color-muted-foreground);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .fxpill:hover { border-color: var(--color-primary); }
+  .fxpill.on { color: #215c58; border-color: #215c58; }
+  .fxdot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-muted-foreground); flex-shrink: 0; }
+  .fxpill.on .fxdot { background: #215c58; animation: fxbreath 2.4s ease-in-out infinite; }
+  @keyframes fxbreath {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.85; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fxpill.on .fxdot { animation: none; }
+  }
   /* Match the sidebar .group label style so section headers read the same
      in both places. */
   .section { font-size: 11px; font-weight: 600; letter-spacing: .05em; margin: 0 0 8px; display: flex; align-items: center; gap: 5px; }
@@ -493,7 +556,31 @@
     border: 1px solid var(--color-border);
     color: var(--color-muted-foreground);
   }
-  .fav-empty { font-size: 12px; margin: 0 0 8px; font-style: italic; }
+  /* Empty favorites panel: dashed call-to-action card (same affordance
+     language as the more toggles) with a gold star tile. */
+  .fav-empty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-muted-foreground);
+  }
+  .fe-ic {
+    display: inline-flex;
+    padding: 9px;
+    border-radius: 10px;
+    background: var(--color-muted);
+    color: #f0b429;
+    flex-shrink: 0;
+  }
+  .fe-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .fe-title { font-size: 13px; font-weight: 600; color: var(--color-foreground); }
+  .fe-hint { font-size: 12px; }
+  .fe-act { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; flex-shrink: 0; }
+  .fe-act :global(.ic) { color: #f0b429; }
   .empty { font-size: 14px; }
 
   @keyframes ringflow {

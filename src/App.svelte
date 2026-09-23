@@ -97,6 +97,20 @@
     return resolveTool(context()?.tool) || resolveTool(contributionId());
   }
 
+  // ⌘K (macOS) / Ctrl+K — the universal search chord. Inside the sandbox
+  // iframe we only see keys while the frame has focus, which is as close to
+  // global as a plugin can get.
+  $effect(() => {
+    const kd = (e) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== "k") return;
+      e.preventDefault();
+      if (active) active = null; // Home remounts and autofocuses on its own
+      else window.dispatchEvent(new CustomEvent("dbx-focus-home-search"));
+    };
+    window.addEventListener("keydown", kd);
+    return () => window.removeEventListener("keydown", kd);
+  });
+
   // Mouse parallax for the ambient blob layers; skipped under reduced motion.
   let par = $state({ x: 0, y: 0 });
   $effect(() => {

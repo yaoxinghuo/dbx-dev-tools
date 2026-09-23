@@ -19,6 +19,8 @@ let recentCollapsed = $state(true);
 // Recent-history feature switch; when off, nothing is recorded and the
 // stored history is dropped (privacy).
 let recentEnabled = $state(true);
+// Home search typewriter animation; persisted so the choice survives reloads.
+let typingFx = $state(true);
 
 const ready = (async () => {
   const fav = await storageGet("favorites");
@@ -31,6 +33,7 @@ const ready = (async () => {
   navCollapsed = (await storageGet("navCollapsed")) === true;
   recentCollapsed = (await storageGet("navRecentCollapsed")) !== false;
   recentEnabled = (await storageGet("recentEnabled")) !== false;
+  typingFx = (await storageGet("homeTypingFx")) !== false;
 })();
 
 export function isFavorite(key) {
@@ -128,6 +131,15 @@ export function setRecentEnabled(value) {
   storageSet("recentEnabled", recentEnabled);
   // Disabling is a privacy gesture: wipe the recorded history as well.
   if (!recentEnabled) clearRecent();
+}
+
+export function isTypingFx() {
+  return typingFx;
+}
+
+export function toggleTypingFx() {
+  typingFx = !typingFx;
+  storageSet("homeTypingFx", typingFx);
 }
 
 // Tests and callers that must observe the restored snapshot await this.
