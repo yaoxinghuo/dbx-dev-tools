@@ -166,6 +166,8 @@ const messages = {
       tagLabel: "Tags",
       moreCats: "More",
       lessCats: "Less",
+      moreTools: "Show {n} more",
+      lessTools: "Show less",
     },
     password: {
       length: "Length",
@@ -941,6 +943,8 @@ const messages = {
       tagLabel: "标签",
       moreCats: "更多",
       lessCats: "收起",
+      moreTools: "展开其余 {n} 个",
+      lessTools: "收起列表",
     },
     password: {
       length: "长度",

@@ -40,6 +40,16 @@
   const catsFits = $derived(categories.length + 1 <= catCap);
   const shownCats = $derived(catsOpen || catsFits ? categories : categories.slice(0, catCap - 2));
 
+  // Same two-row idea for the tool grid (≥220px tracks + 14px gaps), but only
+  // in the default browse state — an active search/category filter means the
+  // user asked for a specific list, so filtered results never collapse.
+  let gridEl;
+  let gridW = $state(0);
+  let toolsOpen = $state(false);
+  const gridCap = $derived(gridW ? Math.max(1, Math.floor((gridW + 14) / 234)) * 2 : restOrdered.length);
+  const toolsFit = $derived(restOrdered.length <= gridCap);
+  const shownTools = $derived(!canSort || toolsOpen || toolsFit ? restOrdered : restOrdered.slice(0, gridCap));
+
   const visible = $derived.by(() => {
     const q = query.trim().toLowerCase();
     return TOOLS.filter((tool) => {
@@ -145,8 +155,14 @@
   // animates under the caret until the user types.
   onMount(() => {
     searchEl?.focus();
-    const ro = new ResizeObserver(([entry]) => (catsW = entry.contentRect.width));
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        if (e.target === catsEl) catsW = e.contentRect.width;
+        else if (e.target === gridEl) gridW = e.contentRect.width;
+      }
+    });
     ro.observe(catsEl);
+    if (gridEl) ro.observe(gridEl);
     return () => ro.disconnect();
   });
 
@@ -262,13 +278,24 @@
     <p class="fav-empty dbx-hint">{s.home.favEmpty}</p>
   {/if}
   <div class="section dbx-hint mid"><Icon name="grid" size={12} />{s.home.allTools}<span class="scount">{s.home.allTotal.replace("{n}", TOOLS.length)}</span></div>
-  {#if restOrdered.length}
-    <div class="grid">
-      {#each restOrdered as tool}{@render cell(tool)}{/each}
-    </div>
-  {:else}
-    <p class="dbx-hint empty">{s.home.noResults}</p>
-  {/if}
+  <div bind:this={gridEl}>
+    {#if shownTools.length}
+      <div class="grid">
+        {#each shownTools as tool}{@render cell(tool)}{/each}
+      </div>
+    {:else}
+      <p class="dbx-hint empty">{s.home.noResults}</p>
+    {/if}
+    {#if canSort && !toolsFit}
+      <button type="button" class="morebar" onclick={() => (toolsOpen = !toolsOpen)}>
+        {#if toolsOpen}
+          {s.home.lessTools}<Icon name="chevron" size={13} />
+        {:else}
+          {s.home.moreTools.replace("{n}", restOrdered.length - shownTools.length)}
+        {/if}
+      </button>
+    {/if}
+  </div>
   {#if dnd.origin === "home" && dnd.key}
     <div class="card-ghost dbx-card" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;min-height:{dnd.h}px">
       <span class="name">{s.tools[dnd.key]?.name}</span>
@@ -376,6 +403,26 @@
   }
   .miniact:hover { color: var(--color-foreground); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  /* Full-width dashed bar for the grid's more/less toggle — same affordance
+     language as the dashed category chip, scaled to the card grid. */
+  .morebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 9px 12px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+    background: transparent;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .morebar:hover { border-color: var(--color-primary); color: var(--color-foreground); }
+  .morebar :global(.ic) { transform: rotate(-90deg); }
   .cell { position: relative; display: flex; }
   .cell .card { flex: 1; }
   .star {
