@@ -20,7 +20,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "Navigation overhaul: one Dev Tools workbench entry with an in-plugin sidebar — home, search with clear button, favorites, recently used and a collapsible all-tools group; the sidebar itself collapses to an icon rail. Favorites are pinned to a dedicated home section and reorderable by drag-and-drop in both places, with proper drag ghosts and grip affordances. Quick-fav stars on every tool row including search results, clear-recent action, and a hand-drawn lucide-style SVG icon set replacing emoji. Still ~120KB, fully offline.",
+  "releaseNotes": "Two new tools (42 total, ~150KB): HTTP helper (raw headers ⇄ JSON + status code/header reference) and a CSS generator (gradients, box-shadow, live preview). Time tool gains timezone conversion with bare-offset input (+8, UTC+8) and a local-zone shortcut; color gains harmony palettes; case converter gains URL slugs; ID generator gains deterministic UUID v5/v3. UI: 23 consolidated category chips capped at two rows, collapsible all-tools grids, privacy switch for recents, favorites empty-state card, persisted typewriter toggle, ⌘K/Ctrl+K search focus.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
