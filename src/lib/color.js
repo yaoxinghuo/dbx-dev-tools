@@ -108,3 +108,19 @@ export function contrast(c1, c2) {
   const [hi, lo] = l1 > l2 ? [l1, l2] : [l2, l1];
   return (hi + 0.05) / (lo + 0.05);
 }
+
+// Classic color-wheel harmonies: rotate the hue in HSL, keep S/L.
+// Each scheme is { key, colors: [{r,g,b,a:1}, …] } with the base color first.
+export function harmonies(c) {
+  const { h, s, l } = rgbToHsl(c);
+  const at = (dh, dl = 0, ds = 0) => ({ ...hslToRgb(h + dh, clamp(s + ds, 0, 1), clamp(l + dl, 0, 1)), a: 1 });
+  return [
+    { key: "complementary", colors: [at(0), at(180)] },
+    { key: "analogous", colors: [at(-30), at(0), at(30)] },
+    { key: "triadic", colors: [at(0), at(120), at(240)] },
+    { key: "split", colors: [at(0), at(150), at(210)] },
+    { key: "tetradic", colors: [at(0), at(90), at(180), at(270)] },
+    // Same hue, evenly spaced lightness — a ready-made tint/shade ramp.
+    { key: "shades", colors: [0.85, 0.68, 0.5, 0.32, 0.16].map((lv) => at(0, lv - l)) },
+  ];
+}

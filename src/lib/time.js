@@ -63,6 +63,119 @@ export function utcOffsetString(d) {
   return `UTC${sign}${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+// ── Timezone conversion ────────────────────────────────────────────────
+// All zone math goes through Intl — no bundled tz database.
+
+export const TIMEZONES = typeof Intl.supportedValuesOf === "function" ? Intl.supportedValuesOf("timeZone") : ["UTC"];
+
+// Shown first when the picker is open with an empty query.
+export const COMMON_TIMEZONES = [
+  "Asia/Shanghai",
+  "UTC",
+  "Asia/Tokyo",
+  "Asia/Singapore",
+  "Asia/Dubai",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "America/New_York",
+  "America/Chicago",
+  "America/Los_Angeles",
+  "Australia/Sydney",
+];
+
+const dtfCache = new Map();
+function zoneFormatter(tz) {
+  let f = dtfCache.get(tz);
+  if (!f) {
+    f = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    dtfCache.set(tz, f);
+  }
+  return f;
+}
+
+function zoneParts(ms, tz) {
+  const p = {};
+  for (const part of zoneFormatter(tz).formatToParts(new Date(ms))) {
+    if (part.type !== "literal") p[part.type] = part.value;
+  }
+  return p;
+}
+
+// "2024-02-29 12:30:45" wall clock as shown in `tz` at instant ms.
+export function wallInZone(ms, tz) {
+  const p = zoneParts(ms, tz);
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+}
+
+// Zone offset in ms: (wall clock in tz, read as UTC) - instant.
+export function tzOffsetMsAt(ms, tz) {
+  const p = zoneParts(ms, tz);
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - ms;
+}
+
+export function tzOffsetLabelAt(ms, tz) {
+  const off = Math.round(tzOffsetMsAt(ms, tz) / 60000);
+  const sign = off >= 0 ? "+" : "-";
+  const a = Math.abs(off);
+  return `UTC${sign}${String(Math.floor(a / 60)).padStart(2, "0")}:${String(a % 60).padStart(2, "0")}`;
+}
+
+// Wall-clock string interpreted in `tz` -> UTC instant. Converges in ≤2
+// iterations; the second pass lands on the correct side of DST transitions.
+export function zonedToUtc(wall, tz) {
+  const m = String(wall)
+    .trim()
+    .match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (!m) return null;
+  let guess = Date.UTC(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+  for (let i = 0; i < 3; i++) {
+    const off = tzOffsetMsAt(guess, tz);
+    const fixed = guess - off;
+    if (off === tzOffsetMsAt(fixed, tz)) return fixed;
+    guess = fixed;
+  }
+  return guess;
+}
+
+export function isTimeZone(tz) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Accepts IANA names plus whole-hour offsets — "+8", "-5", "UTC+8", "GMT-05"
+// — mapped to Etc/GMT∓N (IANA's fixed-offset zones invert the sign).
+export function resolveTimeZone(text) {
+  const tz = String(text || "").trim();
+  if (!tz) return null;
+  if (isTimeZone(tz)) return tz;
+  const m = tz.match(/^(?:(?:utc|gmt)\s*)?([+-])(\d{1,2})(?::?(\d{2}))?$/i);
+  if (!m) return null;
+  const h = +m[2];
+  const min = +(m[3] || 0);
+  if (h > 14 || min > 59) return null;
+  if (min !== 0) {
+    // ICU accepts zero-padded "+HH:MM" offsets directly — normalize to that.
+    const norm = `${m[1]}${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+    return isTimeZone(norm) ? norm : null;
+  }
+  if (h === 0) return "UTC";
+  return `Etc/GMT${m[1] === "-" ? "+" : "-"}${h}`;
+}
+
 // Largest-unit relative time ("3 days ago"); Intl handles the localization.
 export function relativeString(ms, now, locale) {
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });

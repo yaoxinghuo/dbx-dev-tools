@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网、仅 1 项本地权限（`host.storage`，本地 UI 状态存储）——更轻更安全**。40+ 款开发工具仅 ~120KB：密码生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳与 Cron、IP 子网、文本 Diff、颜色对比度、Unicode 检查、乱码修复、正则测试等一应俱全。纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网、仅 1 项本地权限（`host.storage`，本地 UI 状态存储）——更轻更安全**。42 款开发工具仅 ~150KB：密码生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳/时区与 Cron、HTTP 工具、CSS 生成器、IP 子网、文本 Diff、颜色与配色、Unicode 检查、乱码修复、正则测试等一应俱全。纯前端实现、universal 包、无原生 Sidecar。
 
-![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![40 个工具](https://img.shields.io/badge/工具-40-orange) ![安装包 约120KB](https://img.shields.io/badge/安装包-约120KB-brightgreen) ![权限 host.storage](https://img.shields.io/badge/权限-host.storage-blueviolet)
+![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![42 个工具](https://img.shields.io/badge/工具-42-orange) ![安装包 约150KB](https://img.shields.io/badge/安装包-约150KB-brightgreen) ![权限 host.storage](https://img.shields.io/badge/权限-host.storage-blueviolet)
 
 <img width="2232" height="1524" alt="image" src="https://github.com/user-attachments/assets/77be2ad2-bced-4afb-883b-5536e086d691" />
 
@@ -14,26 +14,28 @@
 - **二维码生成器**：基于 `qrcode-generator`，容错级别/模块大小/静区可调，支持中心 Logo（自动建议 H 级容错），导出 SVG / PNG
 - **条码生成器**：手写 CODE-128（自动 A/B/C 字符集切换）、CODE-39、EAN-13/8、UPC-A、ITF/ITF-14、Codabar 编码器；自动补/校验校验位，条宽/高度/文字可调，导出 SVG / PNG
 - **Hash 生成器**：文本**与文件**的 MD5 + SHA-1/256/384/512 + CRC32 摘要（Web Crypto）；填写密钥后切换为 HMAC-SHA 摘要
-- **ID 生成器**：UUID v4、NanoID、ULID 批量生成；UUID 支持大写/连字符选项
+- **ID 生成器**：UUID v4、NanoID、ULID 批量生成，另支持基于命名空间的确定性 UUID v5/v3；UUID 支持大写/连字符选项
 - **Base64 / Base32 / Base58 / Hex**：UTF-8 安全的多字母表编解码，支持 URL-safe 变体
 - **JWT 解析 / 生成**：解码 header/payload、声明表格（exp/nbf 时效状态）、HS256/384/512 签名校验，并支持签名生成（payload JSON + 密钥 → token）
 - **人民币大写**：数字金额转中文大写（零规则折叠、负值、兆级上限）
 - **URL 编解码**：encodeURIComponent/encodeURI 两档、表单 `+` 空格切换、URL 查询参数拆解
 - **图片 ⇄ Base64**：图片转 Base64（拖拽/粘贴/选文件，可选 data URI 前缀，显示体积膨胀率）；Base64 转图片（魔数嗅探 PNG/JPEG/GIF/WebP/BMP/ICO/SVG，预览 + 导出）
-- **时间戳 ⇄ 日期**：秒/毫秒/微秒/纳秒自动识别（小数按秒处理），日期字符串双向解析；展示 Unix 秒/毫秒、本地与 UTC、ISO 8601、星期、年内第几天、ISO 周、闰年、时区偏移、相对时间；时长 ⇄ 毫秒换算
+- **时间与日期转换**：秒/毫秒/微秒/纳秒自动识别（小数按秒处理），日期字符串双向解析；展示 Unix 秒/毫秒、本地与 UTC、ISO 8601、星期、年内第几天、ISO 周、闰年、时区偏移、相对时间；时长 ⇄ 毫秒换算；全 IANA 时区互转，支持 `+8` 这类偏移量写法与反查
 - **文件大小转换**：裸字节数或 `"1.5 GB"`/`"2 GiB"`/`"10M"` 形式输入解析为字节；最佳单位 + SI（1000 进制）与 IEC（1024 进制）双表
 - **字数统计**：词数（拉丁词元 + 逐中文字）、字符（含/不含空白）、字母、数字、标点、空白、行数、段落、句子、UTF-8 字节大小、预计阅读时长
 - **转义 / 反转义**：HTML/XML 实体、JavaScript 字符串转义、正则元字符、CSV 字段引用、POSIX shell 单引号
 - **占位文本生成**：按精确长度生成测试文本（输入边界测试用），支持字符数或 UTF-8 字节数，Lorem ipsum / 循环模式 / 随机字母数字 / 随机中文，含常用长度预设
 - **JSON 格式化**：校验并精确定位错误行列与上下文（自写解析器，因 JSC 报错不带位置），2/4/Tab 美化或压缩，键名排序，深度/键数/元素数统计，可导出 .json
+- **HTTP 工具**：原始请求头 ⇄ JSON 互转（容忍请求行/状态行，重名头保留为数组），附状态码与常用请求头双语速查
 - **URL 解析**：URL 工具同时把可解析的 URL 拆成协议/凭据/主机/端口/源/路径/查询/片段，各字段单独复制
 - **文本对比**：基于 LCS 的两段文本差异对比，行级/字符级粒度，+/- 统计，可复制的统一补丁格式
-- **大小写转换**：camelCase / PascalCase / snake_case / kebab-case / CONSTANT_CASE / Title Case / dot.case 等一次全出
+- **大小写与 Slug 转换**：camelCase / PascalCase / snake_case / kebab-case / CONSTANT_CASE / Title Case / dot.case 与 URL slug（去音符、保留中日韩字符）等一次全出
 - **进制转换**：BigInt 驱动的二/八/十/十六进制互转（`0x`/`0o`/`0b` 自动识别），附 ASCII 解释
 - **乱码修复**：修复错误编码导致的乱码（UTF-8 被误判为 Windows-1252/GBK/Big5/Shift_JIS），候选结果按置信度排序
 - **不可见字符**：可视化零宽字符、BOM、NBSP、双向控制符等，附码点/数量汇总与一键清理
 - **日期计算**：两日期之差（天/周/月/年、工作日、时分秒）与日期加减 N 天/周/月
-- **颜色转换与对比度**：HEX/RGB/HSL/HSV/CMYK 互转，色板 + 取色器 + 屏幕取色，白底/黑底/自定义背景的 WCAG 对比度（AA/AAA 徽章）
+- **颜色转换与对比度**：HEX/RGB/HSL/HSV/CMYK 互转，色板 + 取色器 + 屏幕取色，配色方案（互补/类似/三角/分裂互补/四角/同色系明暗）点击复制，白底/黑底/自定义背景的 WCAG 对比度（AA/AAA 徽章）
+- **CSS 生成器**：可视化渐变（linear/radial/conic、多色标）与盒阴影生成，实时预览、一键复制 CSS
 - **文本行处理**：修剪、去空行、去重、A→Z/Z→A 排序、加行号、倒序——按固定流水线组合生效
 - **AES 加解密**：PBKDF2（10 万次，SHA-256）→ AES-256-GCM；输出 `base64(salt|iv|密文)`，GCM 标签可拒绝错误密码
 - **chmod 计算器**：所有者/用户组/其他 rwx 勾选 ⇄ 八进制，实时符号表示（`rwxr-xr-x`），常用预设

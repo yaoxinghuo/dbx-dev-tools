@@ -1,7 +1,8 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
-  import { parseColor, describe, contrast } from "../lib/color.js";
+  import { parseColor, describe, contrast, harmonies, toHex, luminance } from "../lib/color.js";
+  import { copyText } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
 
@@ -50,6 +51,16 @@
   }
 
   const cmyk = $derived(color ? rgbToCmyk(color.r, color.g, color.b) : "");
+  const schemes = $derived(color ? harmonies({ ...color, a: 1 }) : []);
+  const SCHEME_LABELS = $derived({ complementary: c.schemeComp, analogous: c.schemeAnalog, triadic: c.schemeTriad, split: c.schemeSplit, tetradic: c.schemeTetra, shades: c.schemeShades });
+  let copiedHex = $state("");
+  let copyTimer;
+  function copySwatch(hex) {
+    copyText(hex);
+    copiedHex = hex;
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => (copiedHex = ""), 1200);
+  }
   const eyedropperSupported = $state(typeof window !== "undefined" && "EyeDropper" in window);
 
   async function pickFromScreen() {
@@ -119,6 +130,29 @@
         </tbody>
       </table>
     </div>
+
+    <div class="dbx-card table-card">
+      <h2 class="dbx-section-title">{c.palette}</h2>
+      {#each schemes as scheme}
+        <div class="scheme">
+          <span class="scheme-name">{SCHEME_LABELS[scheme.key]}</span>
+          <div class="swatches">
+            {#each scheme.colors as col}
+              {@const hex = toHex(col)}
+              <button
+                type="button"
+                class="pal"
+                style="background:{hex};color:{luminance(col) > 0.35 ? 'rgba(0,0,0,.72)' : 'rgba(255,255,255,.92)'}"
+                onclick={() => copySwatch(hex)}
+                title={copiedHex === hex ? s.copied : hex}
+              >
+                <span class="hex">{copiedHex === hex ? s.copied : hex}</span>
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/each}
+    </div>
   {/if}
 </ToolShell>
 
@@ -139,4 +173,9 @@
   .badge.warn { background: rgba(217, 119, 6, .15); color: #d97706; }
   .badge.bad { background: rgba(220, 38, 38, .15); color: var(--color-destructive, #dc2626); }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }
+  .scheme { display: flex; align-items: center; gap: 12px; }
+  .scheme-name { width: 130px; flex: none; font-size: 12px; font-weight: 600; color: var(--color-muted-foreground, #64748b); }
+  .swatches { display: flex; flex: 1; border-radius: 8px; overflow: hidden; border: 1px solid var(--color-border, #e2e8f0); }
+  .pal { flex: 1; height: 44px; border: none; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 4px; }
+  .pal .hex { font-size: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; opacity: .85; }
 </style>

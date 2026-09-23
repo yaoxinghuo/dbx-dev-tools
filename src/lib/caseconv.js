@@ -27,9 +27,23 @@ export const CASES = [
   "dot",
 ];
 
+// URL slug: strip diacritics (é→e), keep CJK and other letters, fold the rest
+// into single hyphens. Independent of splitWords so pure-CJK titles still work.
+export function slugify(text) {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
 export function convert(text) {
   const words = splitWords(text);
-  if (!words.length) return [];
+  const slug = slugify(text);
+  if (!words.length) return slug ? [{ key: "slug", value: slug }] : [];
   const lower = words.map(low);
   const titled = words.map(cap);
   return [
@@ -46,5 +60,6 @@ export function convert(text) {
       value: lower[0][0].toUpperCase() + lower[0].slice(1) + (lower.length > 1 ? " " + lower.slice(1).join(" ") : ""),
     },
     { key: "dot", value: lower.join(".") },
+    ...(slug ? [{ key: "slug", value: slug }] : []),
   ];
 }

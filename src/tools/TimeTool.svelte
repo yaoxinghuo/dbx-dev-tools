@@ -1,25 +1,50 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
+  import TzPicker from "../components/TzPicker.svelte";
   import { t, lang, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
-  import { parseTimeInput, dayOfYear, isoWeek, isLeapYear, utcOffsetString, relativeString } from "../lib/time.js";
+  import {
+    parseTimeInput,
+    dayOfYear,
+    isoWeek,
+    isLeapYear,
+    utcOffsetString,
+    relativeString,
+    wallInZone,
+    tzOffsetLabelAt,
+    tzOffsetMsAt,
+    zonedToUtc,
+    resolveTimeZone,
+  } from "../lib/time.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
   const tool = $derived(s.tools.time);
   const u = $derived(s.time);
 
-  let input = $state("");
+  // Each mode keeps its own input so switching modes never cross-contaminates
+  // (e.g. duration text briefly parsed as a timestamp flashes an error).
+  let inputTs = $state("");
+  let inputDur = $state("");
+  let inputTz = $state("");
   let error = $state("");
   let rows = $state([]);
-  let mode = $state("timestamp"); // timestamp | duration
+  let mode = $state("timestamp"); // timestamp | timezone | duration
+  const localTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  let fromTz = $state(localTz());
+  let toTz = $state("UTC");
 
   const WEEKDAYS_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const WEEKDAYS_ZH = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 
   function setNow() {
-    input = String(Date.now());
+    if (mode === "timezone") inputTz = wallInZone(Date.now(), resolveTimeZone(fromTz) || "UTC");
+    else inputTs = String(Date.now());
+  }
+
+  function swapZones() {
+    [fromTz, toTz] = [toTz, fromTz];
   }
 
   // Duration input: "90" (seconds), "3600000ms", "1h30m", "2d4h" …
@@ -74,7 +99,7 @@
   $effect(() => {
     error = "";
     rows = [];
-    const text = input;
+    const text = mode === "duration" ? inputDur : mode === "timezone" ? inputTz : inputTs;
     if (!text.trim()) return;
     if (mode === "duration") {
       const parsed = parseDuration(text);
@@ -83,6 +108,38 @@
         return;
       }
       rows = durationRows(parsed.ms);
+      return;
+    }
+    if (mode === "timezone") {
+      // IANA names or bare offsets like "+8" — resolveTimeZone normalizes both.
+      const from = resolveTimeZone(fromTz);
+      const to = resolveTimeZone(toTz);
+      if (!from || !to) {
+        error = u.invalidTz;
+        return;
+      }
+      // Bare numbers are absolute instants; anything else is wall clock read
+      // in the FROM zone — that's the convention users expect for tz math.
+      const isNumeric = /^[+-]?\d+(\.\d+)?$/.test(text.trim());
+      const ms = isNumeric ? parseTimeInput(text)?.ms : zonedToUtc(text, from);
+      if (ms == null) {
+        error = u.invalid;
+        return;
+      }
+      const d = new Date(ms);
+      const offFrom = tzOffsetLabelAt(ms, from);
+      const offTo = tzOffsetLabelAt(ms, to);
+      const diffH = (tzOffsetMsAt(ms, to) - tzOffsetMsAt(ms, from)) / 3600000;
+      rows = [
+        [u.detected, isNumeric ? `${text.trim()} → ${u.tzInstant}` : `${text.trim()} @ ${fromTz}`],
+        [`${fromTz} (${offFrom})`, wallInZone(ms, from)],
+        [`${toTz} (${offTo})`, wallInZone(ms, to)],
+        [u.utc, d.toUTCString()],
+        [u.iso, d.toISOString()],
+        [u.unixSeconds, String(Math.floor(ms / 1000))],
+        [u.unixMillis, String(ms)],
+        [u.tzDiff, `${diffH >= 0 ? "+" : ""}${diffH} h`],
+      ];
       return;
     }
     const parsed = parseTimeInput(text);
@@ -115,10 +172,14 @@
     ];
   });
   persistState("time", {
-    get: () => ({ input, mode }),
+    get: () => ({ inputTs, inputDur, inputTz, mode, fromTz, toTz }),
     set: (v) => {
-      input = v.input ?? input;
+      inputTs = v.inputTs ?? v.input ?? inputTs;
+      inputDur = v.inputDur ?? inputDur;
+      inputTz = v.inputTz ?? inputTz;
       mode = v.mode ?? mode;
+      fromTz = v.fromTz ?? fromTz;
+      toTz = v.toTz ?? toTz;
     },
   });
 </script>
@@ -127,10 +188,30 @@
   <div class="dbx-card">
     <div class="opts">
       <label class="check"><input type="radio" bind:group={mode} value="timestamp" /> {u.tsMode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="timezone" /> {u.tzMode}</label>
       <label class="check"><input type="radio" bind:group={mode} value="duration" /> {u.durMode}</label>
-      {#if mode === "timestamp"}<button type="button" class="dbx-btn" onclick={setNow}>{u.now}</button>{/if}
+      {#if mode !== "duration"}<button type="button" class="dbx-btn" onclick={setNow}>{u.now}</button>{/if}
     </div>
-    <input class="dbx-input mono" bind:value={input} placeholder={mode === "timestamp" ? u.placeholder : u.durPlaceholder} />
+    {#if mode === "duration"}
+      <input class="dbx-input mono" bind:value={inputDur} placeholder={u.durPlaceholder} />
+    {:else if mode === "timezone"}
+      <input class="dbx-input mono" bind:value={inputTz} placeholder={u.tzPlaceholder} />
+      <div class="opts tzrow">
+        <label class="tzfield">
+          <span class="dbx-label">{u.tzFrom}
+            <button type="button" class="tzlocal" onclick={() => (fromTz = localTz())}>{u.tzLocal}</button>
+          </span>
+          <TzPicker bind:value={fromTz} />
+        </label>
+        <button type="button" class="dbx-btn swap" onclick={swapZones} title={u.tzSwap}>⇄</button>
+        <label class="tzfield">
+          <span class="dbx-label">{u.tzTo}</span>
+          <TzPicker bind:value={toTz} />
+        </label>
+      </div>
+    {:else}
+      <input class="dbx-input mono" bind:value={inputTs} placeholder={u.placeholder} />
+    {/if}
     {#if error}<p class="err">{error}</p>{/if}
   </div>
 
@@ -155,6 +236,20 @@
 <style>
   .dbx-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
   .opts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .tzrow { align-items: flex-end; }
+  .tzfield { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+  .swap { margin-bottom: 1px; }
+  .tzlocal {
+    margin-left: 6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-primary, #0d9488);
+    cursor: pointer;
+  }
+  .tzlocal:hover { text-decoration: underline; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
   .k { white-space: nowrap; font-weight: 600; width: 160px; }
   .v code { overflow-wrap: anywhere; }

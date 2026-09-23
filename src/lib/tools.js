@@ -39,6 +39,8 @@ import SqlInTool from "../tools/SqlInTool.svelte";
 import UnicodeTool from "../tools/UnicodeTool.svelte";
 import TotpTool from "../tools/TotpTool.svelte";
 import PlaceholderTool from "../tools/PlaceholderTool.svelte";
+import HttpTool from "../tools/HttpTool.svelte";
+import CssGenTool from "../tools/CssGenTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -68,9 +70,10 @@ export const TOOLS = [
   { key: "cert", contributionId: "terry.devtools.cert", component: CertTool, tags: ["security", "parser", "certificate", "x509", "pem"] },
   { key: "totp", contributionId: "terry.devtools.totp", component: TotpTool, tags: ["security", "totp", "otp", "2fa"] },
   { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
+  { key: "http", contributionId: "terry.devtools.http", component: HttpTool, tags: ["converter", "http", "api", "headers", "json"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff"] },
   { key: "regex", contributionId: "terry.devtools.regex", component: RegexTool, tags: ["text", "regex", "test"] },
-  { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter"] },
+  { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter", "slug", "url"] },
   { key: "lines", contributionId: "terry.devtools.lines", component: LinesTool, tags: ["text"] },
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
   { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
@@ -84,6 +87,7 @@ export const TOOLS = [
   { key: "semver", contributionId: "terry.devtools.semver", component: SemverTool, tags: ["calc", "version", "semver", "compare", "sort"] },
   { key: "ipcalc", contributionId: "terry.devtools.ipcalc", component: IpTool, tags: ["calc", "network", "ip", "ipv4", "ipv6", "subnet", "cidr"] },
   { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter", "hex", "rgb", "hsl", "hsv", "contrast", "wcag", "picker"] },
+  { key: "cssgen", contributionId: "terry.devtools.cssgen", component: CssGenTool, tags: ["css", "generator", "gradient", "shadow", "color"] },
   { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security", "calc"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
 ];

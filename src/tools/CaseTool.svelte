@@ -15,7 +15,7 @@
   const LABELS = {
     lower: "lower case", upper: "UPPER CASE", camel: "camelCase", pascal: "PascalCase",
     snake: "snake_case", kebab: "kebab-case", constant: "CONSTANT_CASE", title: "Title Case",
-    sentence: "Sentence case", dot: "dot.case",
+    sentence: "Sentence case", dot: "dot.case", slug: "slug (URL)",
   };
 
   const results = $derived(convert(input));
