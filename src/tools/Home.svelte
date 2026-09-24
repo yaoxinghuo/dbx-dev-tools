@@ -416,12 +416,12 @@
     transition: border-color 0.15s, color 0.15s;
   }
   .fxpill:hover { border-color: var(--color-primary); }
-  .fxpill.on { color: #215c58; border-color: #215c58; }
+  .fxpill.on { color: var(--color-primary); border-color: var(--color-primary); }
   .fxdot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-muted-foreground); flex-shrink: 0; }
-  .fxpill.on .fxdot { background: #215c58; animation: fxbreath 2.4s ease-in-out infinite; }
+  .fxpill.on .fxdot { background: var(--color-primary); animation: fxbreath 2.4s ease-in-out infinite; }
   @keyframes fxbreath {
     0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.85; }
+    50% { opacity: 0.95; }
   }
   @media (prefers-reduced-motion: reduce) {
     .fxpill.on .fxdot { animation: none; }
