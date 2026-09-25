@@ -2,7 +2,7 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **sandboxed, fully offline, one minimal permission (`host.storage`, local UI-state storage only)**. 42 tools in ~150KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/timezone/cron, HTTP headers, CSS gradient & shadow, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more. Pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs offline in a sandbox with zero network calls and just a single local permission (`host.storage`, local UI-state storage only)**. 42 developer utilities in ~150KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs. Pure frontend, universal package, no native sidecar.
 
 ![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![42 tools](https://img.shields.io/badge/tools-42-orange) ![package ~150KB](https://img.shields.io/badge/package-~150KB-brightgreen) ![permissions: host.storage](https://img.shields.io/badge/permissions-host.storage-blueviolet)
 
