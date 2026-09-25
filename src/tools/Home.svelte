@@ -8,6 +8,7 @@
   import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled, isTypingFx, toggleTypingFx } from "../lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "../lib/favdnd.svelte.js";
   import { t, onLangChange, allMessages } from "../lib/i18n.js";
+  import manifest from "../../manifest.json";
 
   let { onPick } = $props();
   let s = $state(t());
@@ -176,7 +177,7 @@
 
 </script>
 
-<ToolShell title={s.homeTitle} desc={s.homeSubtitle}>
+<ToolShell title={s.homeTitle} desc={s.homeSubtitle} version={manifest.version}>
   <div class="controls">
     <div class="searchwrap">
       <Icon name="search" size={15} />

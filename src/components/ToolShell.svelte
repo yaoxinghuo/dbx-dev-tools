@@ -5,7 +5,7 @@
   import { t, onLangChange } from "../lib/i18n.js";
   import Icon from "./Icon.svelte";
 
-  let { title = "", desc = "", children } = $props();
+  let { title = "", desc = "", version = "", children } = $props();
   // App provides the current tool entry; null on the home page means no star.
   const currentTool = getContext("currentTool");
   let s = $state(t());
@@ -16,6 +16,7 @@
   <header>
     <h1>
       {title}
+      {#if version}<span class="ver">v{version}</span>{/if}
       {#if currentTool?.()}
         {@const key = currentTool().key}
         <button
@@ -57,6 +58,16 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+  /* Version tag sits inside the h1 so bug-report screenshots always carry it. */
+  .ver {
+    font-size: 11px;
+    font-weight: 400;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--color-muted-foreground);
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    padding: 2px 7px;
   }
   .fav {
     border: 0;
