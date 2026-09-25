@@ -5,10 +5,10 @@
   "name": "Dev Tools",
   "version": "0.6.1",
   "publisher": "terry",
-  "description": "Sandboxed, fully offline, one minimal permission (local UI storage only). 42 tools in ~150KB: password/QR/barcode/ID generators, hash & HMAC, AES encryption, JWT, TOTP, RSA keys, certificate decoder, Base64/32/58, timestamp/duration/timezone/cron, HTTP headers, CSS gradient & shadow, CIDR subnetting, text diff, color & contrast, regex tester, mojibake fixer and more.",
+  "description": "Runs offline in a sandbox with zero network calls and just a single local permission. 42 developer utilities in ~150KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs.",
   "icon": "assets/plugin.svg",
   "engines": {
-    "dbx": ">=0.5.68",
+    "dbx": ">=0.6.19",
     "host_api": "1"
   },
   "permissions": [
@@ -32,7 +32,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
-      "description": "沙箱离线运行，零联网、仅1项本地权限。42 款开发工具仅 ~150KB：密码生成、哈希/HMAC、AES、JWT/TOTP、RSA/证书、多进制编解码、时间戳/时区与 Cron、HTTP 工具、CSS 生成器、IP 子网、文本 Diff、颜色与配色、Unicode 检查、乱码修复、正则测试等一应俱全。",
+      "description": "沙箱离线运行，零联网、仅1项本地权限。42 款开发工具仅 ~150KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。",
       "contributions": {
         "terry.devtools.home": {
           "label": "Dev 工具集",
