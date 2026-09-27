@@ -20,7 +20,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "Two new tools (42 total, ~150KB): HTTP helper (raw headers ⇄ JSON + status code/header reference) and a CSS generator (gradients, box-shadow, live preview). Time tool gains timezone conversion with bare-offset input (+8, UTC+8) and a local-zone shortcut; color gains harmony palettes; case converter gains URL slugs; ID generator gains deterministic UUID v5/v3. UI: 23 consolidated category chips capped at two rows, collapsible all-tools grids, privacy switch for recents, favorites empty-state card, persisted typewriter toggle, ⌘K/Ctrl+K search focus.",
+  "releaseNotes": "Bug fix: JSON formatter, JWT inspector and header converter no longer corrupt integers beyond 2^53-1 (e.g. snowflake IDs) — number literals round-trip exactly as written. New: collapsed icon rail opens floating panels — favorites (drag-reorderable), recents, and an all-tools grid with its own search box (autofocus, Enter jumps to the first hit). Home header shows the plugin version badge; typewriter pill adopts the accent color; star hover colors now match between sidebar and home.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
