@@ -91,6 +91,95 @@
   // search/category filter active, hidden favorites would shift invisibly.
   const canSort = $derived(!query.trim() && !activeTag);
 
+  // Arrow-key navigation is spatial, not a flat index: the favorites block
+  // and the all-tools grid are two independent grids, and the fav block still
+  // renders non-matching favorites, so each match carries its rendered
+  // (section, row, col). ↑/↓ then land on the card visually below/above —
+  // same column, nearest column if that spot is empty.
+  let sel = $state(0);
+  $effect(() => {
+    query;
+    activeTag;
+    sel = 0;
+  });
+  // Column count mirrors .grid's auto-fill rule (≥220px tracks + 14px gaps).
+  const gridCols = $derived(gridW ? Math.max(1, Math.floor((gridW + 14) / 234)) : 3);
+  const navItems = $derived.by(() => {
+    const cols = gridCols;
+    const keys = new Set(visible.map((t) => t.key));
+    const items = [];
+    // Visual position counts every rendered favorite — including the ones
+    // that don't match — so a favorite's col is where it actually sits.
+    favOrdered.forEach((tool, vi) => {
+      if (keys.has(tool.key)) items.push({ tool, sec: 0, row: (vi / cols) | 0, col: vi % cols });
+    });
+    restOrdered.forEach((tool, i) => {
+      items.push({ tool, sec: 1, row: (i / cols) | 0, col: i % cols });
+    });
+    return items;
+  });
+  const selIndex = $derived(new Map(navItems.map((it, i) => [it.tool.key, i])));
+  const favLastRow = $derived(Math.max(0, Math.ceil(favOrdered.length / gridCols) - 1));
+  const gridLastRow = $derived(Math.max(0, Math.ceil(restOrdered.length / gridCols) - 1));
+
+  // Returns the navItems index to move to, or null to stay. Vertical moves
+  // cross the fav→grid boundary at the fav block's last row and grid's row 0;
+  // rows whose cards all fail the filter are skipped over.
+  function step(cur, dr, dc) {
+    if (dc) {
+      const i = navItems.indexOf(cur) + dc;
+      const t = navItems[i];
+      return t && t.sec === cur.sec && t.row === cur.row ? i : null;
+    }
+    let sec = cur.sec;
+    let row = cur.row + dr;
+    for (;;) {
+      if (row < 0) {
+        if (sec === 0) return null;
+        sec = 0;
+        row = favLastRow;
+      } else if (row > (sec === 0 ? favLastRow : gridLastRow)) {
+        if (sec === 1) return null;
+        sec = 1;
+        row = 0;
+      }
+      const rowItems = navItems.filter((it) => it.sec === sec && it.row === row);
+      if (rowItems.length) {
+        let best = rowItems[0];
+        for (const it of rowItems) if (Math.abs(it.col - cur.col) < Math.abs(best.col - cur.col)) best = it;
+        return navItems.indexOf(best);
+      }
+      row += dr;
+    }
+  }
+
+  function onKey(e) {
+    const n = canSort ? 0 : navItems.length; // keys only navigate while a filter is active
+    if (e.key === "Escape") {
+      if (query) query = "";
+      else if (activeTag) activeTag = null;
+      return;
+    }
+    if (!n) return;
+    const cur = navItems[Math.min(sel, n - 1)];
+    if (e.key === "Enter") {
+      onPick?.(cur.tool);
+      return;
+    }
+    if (!e.key.startsWith("Arrow")) return;
+    e.preventDefault();
+    const next =
+      e.key === "ArrowRight" ? step(cur, 0, 1)
+      : e.key === "ArrowLeft" ? step(cur, 0, -1)
+      : e.key === "ArrowDown" ? step(cur, 1, 0)
+      : step(cur, -1, 0);
+    if (next == null) return;
+    sel = next;
+    // The .sel class may not be flushed yet — locate the cell by key instead.
+    const key = navItems[sel].tool.key;
+    document.querySelector(`.cell[data-favkey="${key}"]`)?.scrollIntoView({ block: "nearest" });
+  }
+
   function favClick(tool) {
     // A pointer drag ends with a click on whatever card the pointer released
     // over — swallow it so a reorder doesn't also open a tool.
@@ -185,6 +274,7 @@
         class="dbx-input search"
         bind:this={searchEl}
         bind:value={query}
+        onkeydown={onKey}
         onfocus={() => (focused = true)}
         onblur={() => (focused = false)}
         placeholder={typing ? typed + "▏" : s.home.searchPlaceholder}
@@ -260,6 +350,7 @@
       class="cell"
       class:faved={canSort && isFavorite(tool.key)}
       class:dragging={dnd.key === tool.key}
+      class:sel={!canSort && selIndex.get(tool.key) === sel}
       data-favkey={tool.key}
     >
       <button
@@ -542,6 +633,12 @@
   .card:hover {
     border-color: var(--color-primary);
     transform: translateY(-1px);
+  }
+  /* Keyboard selection must stand out from hover (same border color) — a
+     solid 1px ring makes the caret-visible card unmistakable. */
+  .cell.sel .card {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
   }
   .name { font-weight: 600; font-size: 14px; padding-right: 22px; }
   /* faved cards reserve a right gutter for the centered grip + star, so the
