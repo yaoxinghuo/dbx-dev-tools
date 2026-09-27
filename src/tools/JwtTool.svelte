@@ -3,6 +3,9 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
+  // Lossless JSON: claims like userId carry snowflake IDs beyond 2^53-1 —
+  // JSON.parse would silently rewrite them in both display and signed bytes.
+  import { parseJsonRaw, stringifyJson, jsonNodeText, jsonNum, isJsonNum } from "../lib/json.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -46,10 +49,8 @@
   async function generate() {
     genError = "";
     genToken = "";
-    let payload;
-    try {
-      payload = JSON.parse(genPayload);
-    } catch {
+    const pr = parseJsonRaw(genPayload);
+    if (!pr.ok) {
       genError = j.badJson;
       return;
     }
@@ -57,7 +58,7 @@
     try {
       const te = new TextEncoder();
       const head = b64urlEncode(te.encode(JSON.stringify({ alg: genAlg, typ: "JWT" })));
-      const body = b64urlEncode(te.encode(JSON.stringify(payload)));
+      const body = b64urlEncode(te.encode(stringifyJson(pr.value)));
       const si = `${head}.${body}`;
       const key = await crypto.subtle.importKey(
         "raw",
@@ -83,24 +84,31 @@
     try {
       const parts = token.split(".");
       if (parts.length !== 3) throw new Error("bad parts");
-      const header = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[0])));
-      const payload = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[1])));
-      alg = header.alg || "";
-      headerJson = JSON.stringify(header, null, 2);
-      payloadJson = JSON.stringify(payload, null, 2);
+      const hr = parseJsonRaw(new TextDecoder().decode(b64urlBytes(parts[0])));
+      const pr = parseJsonRaw(new TextDecoder().decode(b64urlBytes(parts[1])));
+      if (!hr.ok || !pr.ok) throw new Error("bad json");
+      const header = hr.value;
+      const payload = pr.value;
+      alg = typeof header.alg === "string" ? header.alg : "";
+      headerJson = stringifyJson(header, 2);
+      payloadJson = stringifyJson(payload, 2);
       signatureB64 = parts[2];
       signingInput = `${parts[0]}.${parts[1]}`;
       const now = Date.now() / 1000;
-      claims = Object.entries(payload).map(([key, value]) => {
-        let display = typeof value === "object" ? JSON.stringify(value) : String(value);
+      claims =
+        payload && typeof payload === "object" && !isJsonNum(payload)
+          ? Object.entries(payload).map(([key, value]) => {
+        let display = jsonNodeText(value);
         let status = "";
-        if (TIME_CLAIMS.has(key) && typeof value === "number" && Number.isFinite(value)) {
-          display = `${value} · ${new Date(value * 1000).toLocaleString()}`;
-          if (key === "exp") status = value < now ? "expired" : "valid";
-          else if (key === "nbf") status = value > now ? "notyet" : "valid";
+        const n = jsonNum(value);
+        if (TIME_CLAIMS.has(key) && Number.isFinite(n)) {
+          display = `${display} · ${new Date(n * 1000).toLocaleString()}`;
+          if (key === "exp") status = n < now ? "expired" : "valid";
+          else if (key === "nbf") status = n > now ? "notyet" : "valid";
         }
         return { key, display, status };
-      });
+            })
+          : [];
     } catch {
       error = j.invalid;
     }

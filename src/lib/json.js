@@ -184,6 +184,37 @@ function emitJson(v, indent) {
   return walk(v, 0);
 }
 
+// Lossless parse/emit entries for tools that consume JSON values (JWT, HTTP
+// headers): numbers stay wrapped in RawNum so their literal round-trips —
+// render via jsonNodeText / stringifyJson below rather than JSON.stringify.
+export function parseJsonRaw(text) {
+  const r = parseJson(text);
+  return "msg" in r ? { ok: false, error: r.msg } : { ok: true, value: r.v };
+}
+
+export function stringifyJson(v, indent = "min") {
+  return emitJson(v, indent);
+}
+
+// Node → display text: raw number literal, compact JSON for containers, bare
+// text for strings — mirrors what String()/JSON.stringify() produced over the
+// native values JSON.parse used to return.
+export function jsonNodeText(v) {
+  if (v instanceof RawNum) return v.raw;
+  if (v && typeof v === "object") return emitJson(v, "min");
+  return String(v);
+}
+
+export function isJsonNum(v) {
+  return v instanceof RawNum;
+}
+
+// Numeric value for UI annotations (JWT exp → date, etc.) where precision
+// loss is harmless; NaN for non-numbers so Number.isFinite filters them out.
+export function jsonNum(v) {
+  return v instanceof RawNum ? Number(v.raw) : NaN;
+}
+
 // indent: 2 | 4 | "tab" | "min"
 export function formatJson(text, { indent = 2, sortKeys = false } = {}) {
   const r = parseJson(text);

@@ -1,4 +1,5 @@
 // HTTP header text ⇄ structured data. Pure functions.
+import { parseJsonRaw, jsonNodeText } from "./json.js";
 
 // Parses raw header text (as pasted from DevTools / curl -v / Postman) into
 // [name, value] pairs. Tolerates the request/status line, comments and
@@ -40,8 +41,12 @@ export function headersToJson(headers) {
 }
 
 // JSON object -> raw header lines. Arrays expand to repeated lines.
+// Numbers are parsed losslessly — JSON.parse would silently corrupt header
+// values like {"X-Id": 1968549762545291267} beyond the 2^53-1 range.
 export function jsonToHeaders(text) {
-  const obj = JSON.parse(text);
+  const r = parseJsonRaw(text);
+  if (!r.ok) throw new Error(r.error);
+  const obj = r.value;
   if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
     throw new Error("top-level JSON object expected");
   }
@@ -49,7 +54,7 @@ export function jsonToHeaders(text) {
   for (const [name, value] of Object.entries(obj)) {
     if (!/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(name)) throw new Error(`invalid header name: ${name}`);
     for (const v of Array.isArray(value) ? value : [value]) {
-      lines.push(`${name}: ${typeof v === "object" && v !== null ? JSON.stringify(v) : v}`);
+      lines.push(`${name}: ${jsonNodeText(v)}`);
     }
   }
   return lines.join("\n");
