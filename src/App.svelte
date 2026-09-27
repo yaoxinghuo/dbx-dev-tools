@@ -95,13 +95,41 @@
 
   // Esc clears the query first (and stops there); on an empty query it falls
   // through to the window handler which closes the panel — two-step dismiss.
+  // Arrows move the highlight: ←/→ clamp at row edges, ↑/↓ jump by column.
+  let flySel = $state(0);
+  let flyGridEl = $state();
+  $effect(() => {
+    flyQuery;
+    flySel = 0;
+  });
+  function flyCols() {
+    if (!flyGridEl) return 1;
+    return Math.max(1, getComputedStyle(flyGridEl).gridTemplateColumns.split(" ").length);
+  }
   function onFlyKey(e) {
-    if (e.key === "Escape" && flyQuery) {
-      flyQuery = "";
-      e.stopPropagation();
-    } else if (e.key === "Enter" && flyResults.length) {
-      pick(flyResults[0]);
+    const n = flyResults.length;
+    if (e.key === "Escape") {
+      if (flyQuery) {
+        flyQuery = "";
+        e.stopPropagation();
+      }
+      return;
     }
+    if (!n) return;
+    if (e.key === "Enter") {
+      pick(flyResults[Math.min(flySel, n - 1)]);
+      return;
+    }
+    if (!e.key.startsWith("Arrow")) return;
+    e.preventDefault();
+    const cols = flyCols();
+    const i = flySel;
+    if (e.key === "ArrowRight" && i % cols !== cols - 1) flySel = Math.min(i + 1, n - 1);
+    else if (e.key === "ArrowLeft" && i % cols !== 0) flySel = i - 1;
+    else if (e.key === "ArrowDown") flySel = Math.min(i + cols, n - 1);
+    else if (e.key === "ArrowUp") flySel = Math.max(i - cols, 0);
+    else return;
+    flyGridEl?.children[flySel]?.scrollIntoView({ block: "nearest" });
   }
   function pick(tool) {
     active = tool;
@@ -135,13 +163,28 @@
   const NAV_ALL_PREVIEW = 5;
   let navAllOpen = $state(false);
 
+  // Arrow-key selection over search results: ↓/↑ wrap around, Enter opens
+  // the highlighted row, and the highlight scrolls into view automatically.
+  let navSel = $state(0);
+  $effect(() => {
+    navQuery;
+    navSel = 0;
+  });
   function onNavKey(e) {
+    const n = navResults?.length ?? 0;
     if (e.key === "Escape") {
       navQuery = "";
       e.currentTarget.blur();
-    } else if (e.key === "Enter" && navResults?.length) {
-      pick(navResults[0]);
-    }
+    } else if (e.key === "Enter" && n) {
+      pick(navResults[Math.min(navSel, n - 1)]);
+    } else if (e.key === "ArrowDown" && n) {
+      e.preventDefault();
+      navSel = (navSel + 1) % n;
+    } else if (e.key === "ArrowUp" && n) {
+      e.preventDefault();
+      navSel = (navSel - 1 + n) % n;
+    } else return;
+    document.querySelectorAll(".navscroll .toolitem")[navSel]?.scrollIntoView({ block: "nearest" });
   }
 
   function favClick(tool) {
@@ -203,8 +246,8 @@
 
 {#if booted}
   <div class="layout">
-    {#snippet toolRow(tool)}
-      <div class="toolitem" class:active={active?.key === tool.key}>
+    {#snippet toolRow(tool, sel = false)}
+      <div class="toolitem" class:active={active?.key === tool.key} class:sel>
         <button type="button" class="toolpick" onclick={() => pick(tool)}>
           {s.tools[tool.key].name}
         </button>
@@ -265,8 +308,8 @@
       </div>
       <div class="navscroll">
       {#if navResults}
-        {#each navResults as tool}
-          {@render toolRow(tool)}
+        {#each navResults as tool, i}
+          {@render toolRow(tool, i === navSel)}
         {:else}
           <div class="empty dbx-hint">{s.home.noResults}</div>
         {/each}
@@ -417,9 +460,9 @@
             />
           </div>
           {#if flyResults.length}
-            <div class="flygrid">
-              {#each flyResults as tool}
-                {@render toolRow(tool)}
+            <div class="flygrid" bind:this={flyGridEl}>
+              {#each flyResults as tool, i}
+                {@render toolRow(tool, i === flySel)}
               {/each}
             </div>
           {:else}
@@ -789,6 +832,9 @@
   .fav-ghost :global(.grip) { color: var(--color-muted-foreground); flex-shrink: 0; }
   /* all-tools rows: name button + a quick-fav star on the right */
   .toolitem { display: flex; align-items: center; border-radius: var(--radius-md); }
+  /* Keyboard selection: muted bg + primary edge so it reads apart from both
+     plain hover and the filled "current tool" highlight. */
+  .toolitem.sel { background: var(--color-muted); box-shadow: inset 2px 0 0 var(--color-primary); }
   .toolitem:hover { background: var(--color-muted); }
   .toolitem.active { background: var(--color-primary); }
   .toolpick {
