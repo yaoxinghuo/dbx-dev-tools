@@ -59,7 +59,7 @@
 
   // Icon-rail shortcuts: section icons expand the sidebar (and, for search,
   // focus the input); the grid icon also un-collapses the 全部工具 group.
-  let navSearchEl;
+  let navSearchEl = $state();
   async function railSearch() {
     setNavCollapsed(false);
     await tick();
