@@ -53,22 +53,82 @@
     navQuery = "";
   });
 
-  function pick(tool) {
-    active = tool;
-  }
-
-  // Icon-rail shortcuts: section icons expand the sidebar (and, for search,
-  // focus the input); the grid icon also un-collapses the 全部工具 group.
+  // Icon-rail shortcuts: home/search still expand or navigate, but the three
+  // list sections (favs / recents / all) open a flyout panel next to the rail
+  // instead — expanding the whole sidebar for a quick pick is heavy-handed.
   let navSearchEl = $state();
   async function railSearch() {
+    flyout = null;
     setNavCollapsed(false);
     await tick();
     navSearchEl?.focus();
   }
-  function railAllTools() {
-    setNavCollapsed(false);
-    if (isAllCollapsed()) toggleAllCollapsed();
+
+  // Flyout anchored to the clicked rail button. flyY clamps so a tall panel
+  // (all tools) never slides under the viewport bottom.
+  let flyout = $state(null); // "favs" | "recent" | "all" | null
+  let flyY = $state(8);
+  let flyEl = $state();
+  let flyQuery = $state("");
+  let flySearchEl = $state();
+  async function toggleFly(kind, e) {
+    if (flyout === kind) {
+      flyout = null;
+      return;
+    }
+    const r = (e.target.closest(".railbtn") || e.target).getBoundingClientRect();
+    flyY = Math.max(8, Math.min(r.top - 4, window.innerHeight - 120));
+    flyout = kind;
+    flyQuery = "";
+    if (kind === "all") {
+      await tick();
+      flySearchEl?.focus();
+    }
   }
+
+  // The all-tools flyout reuses the sidebar's language-aware search index.
+  const flyResults = $derived.by(() => {
+    const q = flyQuery.trim().toLowerCase();
+    if (!q) return TOOLS;
+    return TOOLS.filter((tool) => (navIndex.get(tool.key) || "").includes(q));
+  });
+
+  // Esc clears the query first (and stops there); on an empty query it falls
+  // through to the window handler which closes the panel — two-step dismiss.
+  function onFlyKey(e) {
+    if (e.key === "Escape" && flyQuery) {
+      flyQuery = "";
+      e.stopPropagation();
+    } else if (e.key === "Enter" && flyResults.length) {
+      pick(flyResults[0]);
+    }
+  }
+  function pick(tool) {
+    active = tool;
+    flyout = null;
+  }
+
+  // Dismiss on outside press / Escape, and whenever the sidebar expands.
+  $effect(() => {
+    if (!isNavCollapsed()) flyout = null;
+  });
+  $effect(() => {
+    if (!flyout) return;
+    const down = (e) => {
+      if (flyEl?.contains(e.target)) return;
+      if (e.target.closest?.(".railbtn")) return; // the button's own click toggles
+      flyout = null;
+    };
+    const key = (e) => {
+      if (e.key === "Escape") flyout = null;
+    };
+    window.addEventListener("pointerdown", down, true);
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("keydown", key);
+    };
+  });
 
   // Sidebar all-tools list shows a short preview by default — 42 rows of
   // scrolling is heavy when favorites/search already cover quick access.
@@ -143,26 +203,38 @@
 
 {#if booted}
   <div class="layout">
+    {#snippet toolRow(tool)}
+      <div class="toolitem" class:active={active?.key === tool.key}>
+        <button type="button" class="toolpick" onclick={() => pick(tool)}>
+          {s.tools[tool.key].name}
+        </button>
+        <button
+          type="button"
+          class="favicon"
+          class:faved={isFavorite(tool.key)}
+          title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
+          onclick={() => toggleFavorite(tool.key)}
+        ><Icon name="star" size={12} filled={isFavorite(tool.key)} /></button>
+      </div>
+    {/snippet}
     <nav class:collapsed={isNavCollapsed()}>
       {#if isNavCollapsed()}
         <button type="button" class="railbtn" title={s.home.expandNav} onclick={() => setNavCollapsed(false)}>
           <Icon name="chevrons-right" size={15} />
         </button>
-        <button type="button" class="railbtn" class:active={!active} title={s.home.back} onclick={() => (active = null)}>
+        <button type="button" class="railbtn" class:active={!active && !flyout} title={s.home.back} onclick={() => { active = null; flyout = null; }}>
           <Icon name="home" size={16} />
         </button>
         <button type="button" class="railbtn" title={s.home.searchNav} onclick={railSearch}>
           <Icon name="search" size={15} />
         </button>
-        {#if favTools.length}
-          <button type="button" class="railbtn" title={s.home.favs} onclick={() => setNavCollapsed(false)}>
-            <Icon name="star" size={15} />
-          </button>
-        {/if}
-        <button type="button" class="railbtn" title={s.home.recent} onclick={() => { setNavCollapsed(false); setRecentCollapsed(false); }}>
+        <button type="button" class="railbtn" class:active={flyout === "favs"} title={s.home.favs} onclick={(e) => toggleFly("favs", e)}>
+          <Icon name="star" size={15} />
+        </button>
+        <button type="button" class="railbtn" class:active={flyout === "recent"} title={s.home.recent} onclick={(e) => toggleFly("recent", e)}>
           <Icon name="clock" size={15} />
         </button>
-        <button type="button" class="railbtn" title={s.home.allTools} onclick={railAllTools}>
+        <button type="button" class="railbtn" class:active={flyout === "all"} title={s.home.allTools} onclick={(e) => toggleFly("all", e)}>
           <Icon name="grid" size={15} />
         </button>
       {:else}
@@ -192,20 +264,6 @@
         {/if}
       </div>
       <div class="navscroll">
-      {#snippet toolRow(tool)}
-        <div class="toolitem" class:active={active?.key === tool.key}>
-          <button type="button" class="toolpick" onclick={() => pick(tool)}>
-            {s.tools[tool.key].name}
-          </button>
-          <button
-            type="button"
-            class="favicon"
-            class:faved={isFavorite(tool.key)}
-            title={isFavorite(tool.key) ? s.home.unfav : s.home.fav}
-            onclick={() => toggleFavorite(tool.key)}
-          ><Icon name="star" size={12} filled={isFavorite(tool.key)} /></button>
-        </div>
-      {/snippet}
       {#if navResults}
         {#each navResults as tool}
           {@render toolRow(tool)}
@@ -308,6 +366,73 @@
         </div>
       {/if}
     </nav>
+    <!-- Collapsed-rail flyout lives outside <nav>: WKWebView treats fixed
+         descendants of an overflow:auto container differently, so keeping
+         the panel at layout level avoids any clipping/containing-block traps. -->
+    {#if isNavCollapsed() && flyout}
+      <div
+        class="flyout"
+        class:wide={flyout === "all"}
+        bind:this={flyEl}
+        style="top:{flyY}px;max-height:calc(100vh - {flyY}px - 12px)"
+      >
+        {#if flyout === "favs"}
+          <div class="flyhead dbx-hint"><Icon name="star" size={11} filled />{s.home.favs}{#if favTools.length}<span class="count">{favTools.length}</span>{/if}</div>
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          {#each favTools as tool (tool.key)}
+            <button
+              type="button"
+              class="item flyrow fav-item"
+              class:active={active?.key === tool.key}
+              class:dragging={dnd.key === tool.key}
+              data-favkey={tool.key}
+              title={s.home.dragReorder}
+              onpointerdown={(e) => favPointerDown(e, tool.key, "fly")}
+              onclick={() => favClick(tool)}
+            ><span class="label">{s.tools[tool.key].name}</span><GripIcon /></button>
+          {:else}
+            <div class="empty dbx-hint">{s.home.favEmpty}</div>
+          {/each}
+        {:else if flyout === "recent"}
+          <div class="flyhead dbx-hint"><Icon name="clock" size={11} />{s.home.recent}{#if recentTools.length}<span class="count">{recentTools.length}</span>{/if}</div>
+          {#if isRecentEnabled()}
+            {#each recentTools as tool}
+              <button type="button" class="item flyrow" class:active={active?.key === tool.key} onclick={() => pick(tool)}>{s.tools[tool.key].name}</button>
+            {:else}
+              <div class="empty dbx-hint">{s.home.recentEmpty}</div>
+            {/each}
+          {:else}
+            <div class="empty dbx-hint">{s.home.recentOffNote}</div>
+          {/if}
+        {:else}
+          <div class="flyhead dbx-hint"><Icon name="grid" size={11} />{s.home.allTools}<span class="count">{flyResults.length}</span></div>
+          <div class="searchwrap flysearch">
+            <Icon name="search" size={13} />
+            <input
+              class="navsearch dbx-input"
+              bind:this={flySearchEl}
+              bind:value={flyQuery}
+              placeholder={s.home.searchPlaceholder}
+              onkeydown={onFlyKey}
+            />
+          </div>
+          {#if flyResults.length}
+            <div class="flygrid">
+              {#each flyResults as tool}
+                {@render toolRow(tool)}
+              {/each}
+            </div>
+          {:else}
+            <div class="empty dbx-hint">{s.home.noResults}</div>
+          {/if}
+        {/if}
+      </div>
+    {/if}
+    {#if dnd.origin === "fly" && dnd.key}
+      <div class="fav-ghost" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;height:{dnd.h}px">
+        <GripIcon /><span class="label">{s.tools[dnd.key]?.name}</span>
+      </div>
+    {/if}
     <main>
       <div class="ambient" aria-hidden="true">
         <span class="layer" style:transform="translate3d({par.x * 0.9}px, {par.y * 0.7}px, 0)"><span class="blob mint"></span></span>
@@ -404,6 +529,46 @@
   .railbtn:hover { background: var(--color-muted); }
   .railbtn.active { background: var(--color-primary); color: var(--color-primary-foreground); }
   .collapser { color: var(--color-muted-foreground); }
+  /* Collapsed-rail flyout: popover anchored to the clicked icon, max-height
+     is set inline so the panel hugs the viewport bottom. */
+  .flyout {
+    position: fixed;
+    left: 52px;
+    z-index: 110;
+    width: 190px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    background: var(--color-popover, var(--color-card));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 10px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  }
+  .flyout.wide { width: 420px; }
+  .flyhead {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+  .flyhead .count { margin-left: auto; font-weight: 500; }
+  .flyrow { padding: 6px 10px; }
+  /* Fav/recent rows in the flyout use the same text accent as the sidebar —
+     the filled highlight stays reserved for the all-tools list. */
+  .flyout .flyrow.active { background: none; color: var(--color-primary); font-weight: 600; }
+  .flygrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 2px; }
+  .flysearch { margin: 0 0 4px; }
+  /* fav rows in the flyout get the grip affordance just like the sidebar */
+  .flyout .fav-item { cursor: grab; }
+  .flyout .fav-item .label { flex: 1; min-width: 0; }
+  .flyout .fav-item :global(.grip) { color: var(--color-input); flex-shrink: 0; }
+  .flyout .fav-item:hover :global(.grip) { color: var(--color-muted-foreground); }
+  .flyout .fav-item.dragging { opacity: 0.45; cursor: grabbing; }
   .miniact {
     border: 0;
     background: none;
