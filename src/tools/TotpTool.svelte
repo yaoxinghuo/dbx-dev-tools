@@ -38,7 +38,6 @@
   }
 
   async function tick() {
-    importOtpauth();
     const s = secret.trim();
     if (!s) { code = ""; return; }
     try {
@@ -77,7 +76,7 @@
     <label class="dbx-label" for="totp-secret">{v.secret}</label>
     <input id="totp-secret" class="dbx-input mono" bind:value={secret} placeholder="JBSWY3DPEHPK3PXP" spellcheck="false" />
     <label class="dbx-label" for="totp-uri">{v.otpauth}</label>
-    <input id="totp-uri" class="dbx-input mono" bind:value={otpauth} placeholder="otpauth://totp/…" spellcheck="false" />
+    <input id="totp-uri" class="dbx-input mono" bind:value={otpauth} oninput={importOtpauth} placeholder="otpauth://totp/…" spellcheck="false" />
     <div class="opts">
       <div class="opt">
         <label class="dbx-label" for="totp-digits">{v.digits}</label>

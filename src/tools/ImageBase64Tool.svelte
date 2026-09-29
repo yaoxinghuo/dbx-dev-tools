@@ -116,7 +116,6 @@
 
   $effect(() => {
     decError = "";
-    revoke(decUrl);
     decUrl = "";
     decMeta = null;
     decBytes = null;
@@ -126,13 +125,17 @@
     const comma = text.indexOf(",");
     if (text.startsWith("data:") && comma > 0) text = text.slice(comma + 1);
     text = text.replace(/\s+/g, "");
+    // The object URL is revoked via effect teardown — never read decUrl
+    // inside this effect, otherwise writing it re-triggers the effect
+    // forever (each blob URL is unique → effect_update_depth_exceeded).
+    let url;
     try {
       const rem = text.length % 4;
       if (rem) text += "=".repeat(4 - rem);
       const bytes = Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
       if (!bytes.length) return;
       const mime = sniffMime(bytes);
-      const url = URL.createObjectURL(new Blob([bytes], { type: mime }));
+      url = URL.createObjectURL(new Blob([bytes], { type: mime }));
       decBytes = bytes;
       decMime = mime;
       decUrl = url;
@@ -142,6 +145,7 @@
     } catch {
       decError = u.invalid;
     }
+    return () => revoke(url);
   });
 
   function download() {

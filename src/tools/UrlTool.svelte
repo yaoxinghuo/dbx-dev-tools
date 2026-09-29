@@ -50,16 +50,23 @@
 
   $effect(() => {
     error = "";
-    output = "";
     urlInfo = null;
     const text = input;
-    if (!text.trim()) return;
+    if (!text.trim()) {
+      output = "";
+      return;
+    }
+    // `output` must not be read inside this effect — it is written here, so
+    // reading it would make the effect its own dependency and loop forever
+    // (effect_update_depth_exceeded froze the whole app in decode mode).
+    let next = "";
     try {
-      output = mode === "encode" ? encode(text) : decode(text);
+      next = mode === "encode" ? encode(text) : decode(text);
     } catch {
       error = u.invalid;
     }
-    urlInfo = parseUrl(mode === "encode" ? text : output || text);
+    output = next;
+    urlInfo = parseUrl(mode === "encode" ? text : next || text);
   });
   persistState("url", {
     get: () => ({ input, mode, scope, plusSpace }),
