@@ -26,6 +26,10 @@
 
   async function generate() {
     error = "";
+    // Sample format options before the await — reads after it would not be
+    // tracked, so toggling case/hyphens in named mode would silently stale.
+    const upper = uppercase;
+    const hyph = hyphens;
     if (named) {
       if (!nameInput.trim()) {
         ids = [];
@@ -38,19 +42,19 @@
         return;
       }
       const id = await uuidNamed(type === "uuidv5" ? 5 : 3, ns, nameInput.trim());
-      ids = id ? [format(id)] : [];
+      ids = id ? [format(id, upper, hyph)] : [];
       return;
     }
     const n = Math.min(Math.max(1, count | 0), 500);
-    ids = generateIds(type, n).map(format);
+    ids = generateIds(type, n).map((id) => format(id, upper, hyph));
   }
 
   // hyphens/uppercase only apply to UUID — NanoID casing is meaningful,
   // ULID is uppercase by spec.
-  function format(id) {
+  function format(id, upper, hyph) {
     if (!type.startsWith("uuid")) return id;
-    let v = hyphens ? id : id.replaceAll("-", "");
-    return uppercase ? v.toUpperCase() : v;
+    let v = hyph ? id : id.replaceAll("-", "");
+    return upper ? v.toUpperCase() : v;
   }
 
   $effect(generate);

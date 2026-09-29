@@ -26,10 +26,15 @@
   const tokens = $derived(result?.ok ? tokenizeJson(result.output) : []);
 
   // Multi-KB pastes re-run parse+stringify per keystroke; debounce a bit.
+  // indent/sortKeys are sampled in the sync section — reads inside the
+  // timer callback are not tracked, so toggling them alone must still
+  // invalidate this effect.
   $effect(() => {
     const text = input;
+    const ind = indent;
+    const sort = sortKeys;
     const timer = setTimeout(() => {
-      result = text.trim() ? formatJson(text, { indent, sortKeys }) : null;
+      result = text.trim() ? formatJson(text, { indent: ind, sortKeys: sort }) : null;
     }, 150);
     return () => clearTimeout(timer);
   });
