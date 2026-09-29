@@ -1,7 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
-  import { diffLines, diffChars, diffStats } from "../lib/diff.js";
+  import { diffLines, diffChars, diffWords, diffStats } from "../lib/diff.js";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
 
@@ -10,12 +10,22 @@
   const tool = $derived(s.tools.diff);
   const d = $derived(s.diff);
 
-  let mode = $state("lines"); // "lines" | "chars"
+  let mode = $state("lines"); // "lines" | "words" | "chars"
   let a = $state("");
   let b = $state("");
 
-  const ops = $derived(mode === "lines" ? diffLines(a, b) : diffChars(a, b));
-  const stats = $derived(diffStats(ops, mode === "lines" ? "\n" : ""));
+  const ops = $derived(mode === "lines" ? diffLines(a, b) : mode === "words" ? diffWords(a, b) : diffChars(a, b));
+  // Word mode counts words, not chars — "+red" should read +1, not +3.
+  const stats = $derived.by(() => {
+    if (mode !== "words") return diffStats(ops, mode === "lines" ? "\n" : "");
+    let ins = 0, del = 0;
+    for (const o of ops) {
+      const n = (o.text.match(/\S+/g) || []).length;
+      if (o.op === "ins") ins += n;
+      else if (o.op === "del") del += n;
+    }
+    return { ins, del };
+  });
   const empty = $derived(!a && !b);
 
   const patchText = $derived(
@@ -56,6 +66,7 @@
   <div class="toolbar">
     <div class="seg">
       <button type="button" class="seg-btn" class:active={mode === "lines"} onclick={() => (mode = "lines")}>{d.lines}</button>
+      <button type="button" class="seg-btn" class:active={mode === "words"} onclick={() => (mode = "words")}>{d.words}</button>
       <button type="button" class="seg-btn" class:active={mode === "chars"} onclick={() => (mode = "chars")}>{d.chars}</button>
     </div>
     {#if !empty}

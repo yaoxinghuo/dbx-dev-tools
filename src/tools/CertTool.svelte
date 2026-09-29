@@ -1,7 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
-  import { toDer, parseCertificate } from "../lib/cert.js";
+  import { toDer, parseCertificate, isSshPubKey, sshFingerprint } from "../lib/cert.js";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
 
@@ -13,6 +13,7 @@
   let pem = $state("");
   let fileName = $state("");
   let cert = $state(null);
+  let ssh = $state(null); // {type, comment, sha256, md5}
   let error = $state("");
   let busy = $state(false);
 
@@ -24,8 +25,13 @@
     busy = true;
     error = "";
     cert = null;
+    ssh = null;
     try {
-      cert = await parseCertificate(toDer(input));
+      if (typeof input === "string" && isSshPubKey(input)) {
+        ssh = await sshFingerprint(input);
+      } else {
+        cert = await parseCertificate(toDer(input));
+      }
       fileName = name;
     } catch (e) {
       error = e.message === "noPem" ? c.noPem : c.notCert;
@@ -35,7 +41,7 @@
   }
 
   $effect(() => {
-    if (!pem.trim()) { cert = null; error = ""; return; }
+    if (!pem.trim()) { cert = null; ssh = null; error = ""; return; }
     const v = pem;
     const timer = setTimeout(() => inspect(v), 300); // debounce paste typing
     return () => clearTimeout(timer);
@@ -59,11 +65,27 @@
     <textarea id="cert-in" class="dbx-textarea mono" rows="8" bind:value={pem}
       placeholder="-----BEGIN CERTIFICATE-----&#10;…" spellcheck="false"></textarea>
     <div class="row">
-      <input type="file" accept=".pem,.crt,.cer,.der" onchange={pick} class="dbx-input" />
+      <input type="file" accept=".pem,.crt,.cer,.der,.pub" onchange={pick} class="dbx-input" />
     </div>
     {#if error}<p class="err">{error}</p>{/if}
     {#if busy}<p class="dim">{c.parsing}</p>{/if}
   </div>
+
+  {#if ssh}
+    <div class="dbx-card table-card">
+      <h2 class="dbx-section-title">{c.sshTitle}</h2>
+      <table class="dbx-table">
+        <tbody>
+          <tr><td class="k">{c.sshType}</td><td class="v"><code>{ssh.type}</code></td><td></td></tr>
+          {#if ssh.comment}
+            <tr><td class="k">{c.sshComment}</td><td class="v"><code>{ssh.comment}</code></td><td></td></tr>
+          {/if}
+          <tr><td class="k">SHA256</td><td class="v"><code>{ssh.sha256}</code></td><td class="act"><CopyButton text={ssh.sha256} small /></td></tr>
+          <tr><td class="k">MD5</td><td class="v"><code>{ssh.md5}</code></td><td class="act"><CopyButton text={ssh.md5} small /></td></tr>
+        </tbody>
+      </table>
+    </div>
+  {/if}
 
   {#if cert}
     <div class="dbx-card table-card">

@@ -41,6 +41,8 @@ import TotpTool from "../tools/TotpTool.svelte";
 import PlaceholderTool from "../tools/PlaceholderTool.svelte";
 import HttpTool from "../tools/HttpTool.svelte";
 import CssGenTool from "../tools/CssGenTool.svelte";
+import DataConvTool from "../tools/DataConvTool.svelte";
+import SpecialCharsTool from "../tools/SpecialCharsTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -78,6 +80,7 @@ export const TOOLS = [
   { key: "counter", contributionId: "terry.devtools.counter", component: CounterTool, tags: ["text", "counter"] },
   { key: "invisible", contributionId: "terry.devtools.invisible", component: InvisTool, tags: ["text", "debug"] },
   { key: "unicode", contributionId: "terry.devtools.unicode", component: UnicodeTool, tags: ["text", "debug", "unicode"] },
+  { key: "chars", contributionId: "terry.devtools.chars", component: SpecialCharsTool, tags: ["text", "unicode", "symbol"] },
   { key: "mojibake", contributionId: "terry.devtools.mojibake", component: MojibakeTool, tags: ["codec", "chinese", "text", "debug", "unicode"] },
   { key: "time", contributionId: "terry.devtools.time", component: TimeTool, tags: ["converter", "time", "date", "timezone"] },
   { key: "datecalc", contributionId: "terry.devtools.datecalc", component: DateCalcTool, tags: ["time", "date", "calc"] },
@@ -88,6 +91,7 @@ export const TOOLS = [
   { key: "ipcalc", contributionId: "terry.devtools.ipcalc", component: IpTool, tags: ["calc", "network", "ip", "ipv4", "ipv6", "subnet", "cidr"] },
   { key: "color", contributionId: "terry.devtools.color", component: ColorTool, tags: ["color", "converter", "hex", "rgb", "hsl", "hsv", "contrast", "wcag", "picker", "palette"] },
   { key: "cssgen", contributionId: "terry.devtools.cssgen", component: CssGenTool, tags: ["css", "generator", "gradient", "shadow", "color"] },
+  { key: "dataconv", contributionId: "terry.devtools.dataconv", component: DataConvTool, tags: ["converter", "json", "csv", "xml", "yaml"] },
   { key: "chmod", contributionId: "terry.devtools.chmod", component: ChmodTool, tags: ["unix", "security", "calc"] },
   { key: "rmb", contributionId: "terry.devtools.rmb", component: RmbTool, tags: ["converter", "chinese", "number"] },
 ];

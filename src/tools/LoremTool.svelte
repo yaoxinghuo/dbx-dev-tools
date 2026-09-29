@@ -16,7 +16,7 @@
   let pattern = $state("0123456789");
   let result = $state(null);
 
-  const MODES = ["lorem", "pattern", "alpha", "cjk"];
+  const MODES = ["lorem", "repeat", "pattern", "alpha", "cjk"];
   const PRESETS = [255, 256, 500, 1000, 5000, 65535];
 
   $effect(() => {
@@ -37,27 +37,31 @@
   <div class="dbx-card">
     <div class="opts">
       <label class="field">
-        <span>{u.length}</span>
+        <span>{mode === "repeat" ? u.times : u.length}</span>
         <input class="dbx-input mono num" type="number" min="1" max="1000000" bind:value={length} />
       </label>
-      <select class="dbx-select" bind:value={unit}>
-        <option value="chars">{u.unitChars}</option>
-        <option value="bytes">{u.unitBytes}</option>
-      </select>
+      {#if mode !== "repeat"}
+        <select class="dbx-select" bind:value={unit}>
+          <option value="chars">{u.unitChars}</option>
+          <option value="bytes">{u.unitBytes}</option>
+        </select>
+      {/if}
       <select class="dbx-select" bind:value={mode}>
         {#each MODES as m}
           <option value={m}>{u.modes[m]}</option>
         {/each}
       </select>
-      {#if mode === "pattern"}
-        <input class="dbx-input mono pat" bind:value={pattern} placeholder={u.patternPlaceholder} />
+      {#if mode === "pattern" || mode === "repeat"}
+        <input class="dbx-input mono pat" bind:value={pattern} placeholder={mode === "repeat" ? u.repeatPlaceholder : u.patternPlaceholder} />
       {/if}
     </div>
-    <div class="presets">
-      {#each PRESETS as p}
-        <button type="button" class="chip dbx-btn" onclick={() => (length = p)}>{p}</button>
-      {/each}
-    </div>
+    {#if mode !== "repeat"}
+      <div class="presets">
+        {#each PRESETS as p}
+          <button type="button" class="chip dbx-btn" onclick={() => (length = p)}>{p}</button>
+        {/each}
+      </div>
+    {/if}
   </div>
 
   {#if result && result.text}

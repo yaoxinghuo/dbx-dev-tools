@@ -391,7 +391,7 @@
     <div class="fav-empty">
       <span class="fe-ic"><Icon name="star" size={15} /></span>
       <span class="fe-text">
-        <span class="fe-title">{s.home.favEmptyTitle}</span>
+        <span class="fe-title">{s.home.favEmpty}</span>
         <span class="fe-hint dbx-hint">{s.home.favEmptyHint}</span>
       </span>
       <span class="fe-act dbx-hint">{s.home.favEmptyAction}</span>

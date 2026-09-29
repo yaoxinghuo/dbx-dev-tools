@@ -74,6 +74,12 @@ export function diffChars(textA, textB) {
   return diffUnits([...textA], [...textB]);
 }
 
+// Word diff: split on word/space boundaries so separators diff naturally.
+export function diffWords(textA, textB) {
+  const split = (t) => t.match(/\S+|\s+/g) || [];
+  return diffUnits(split(textA), split(textB));
+}
+
 export function diffStats(ops, sep = "") {
   let ins = 0;
   let del = 0;

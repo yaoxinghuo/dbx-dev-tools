@@ -10,9 +10,20 @@
   const q = $derived(s.qp);
 
   let mode = $state("encode");
-  let input = $state("");
+  // Encode and decode keep separate input buffers — flipping modes should
+  // not overwrite what the user pasted into the other box.
+  let encInput = $state("");
+  let decInput = $state("");
   let output = $state("");
   let error = $state("");
+
+  // Round-trip convenience: after switching modes, an empty target buffer
+  // gets seeded with the output just produced.
+  function swapSeed(m) {
+    if (!output) return;
+    if (m === "encode" && !encInput) encInput = output;
+    else if (m === "decode" && !decInput) decInput = output;
+  }
 
   // RFC 2045 quoted-printable. Encoding is UTF-8 aware and soft-breaks lines
   // at 75 chars; decoding reverses both =XX and soft line breaks.
@@ -43,18 +54,20 @@
   $effect(() => {
     error = "";
     output = "";
-    if (!input) return;
+    const text = mode === "encode" ? encInput : decInput;
+    if (!text) return;
     try {
-      output = mode === "encode" ? qpEncode(input) : qpDecode(input);
+      output = mode === "encode" ? qpEncode(text) : qpDecode(text);
     } catch {
       error = q.invalid;
     }
   });
   persistState("qp", {
-    get: () => ({ mode, input }),
+    get: () => ({ mode, encInput, decInput }),
     set: (v) => {
       mode = v.mode ?? mode;
-      input = v.input ?? input;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
     },
   });
 </script>
@@ -62,12 +75,15 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card controls">
     <div class="modes">
-      <label class="check"><input type="radio" bind:group={mode} value="encode" /> {q.encode}</label>
-      <label class="check"><input type="radio" bind:group={mode} value="decode" /> {q.decode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="encode" onchange={() => swapSeed("encode")} /> {q.encode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="decode" onchange={() => swapSeed("decode")} /> {q.decode}</label>
     </div>
     <label class="dbx-label" for="qp-in">{s.input}</label>
-    <textarea id="qp-in" class="dbx-textarea mono" rows="5" bind:value={input} spellcheck="false"
-      placeholder={mode === "encode" ? q.encodePlaceholder : q.decodePlaceholder}></textarea>
+    {#if mode === "encode"}
+      <textarea id="qp-in" class="dbx-textarea mono" rows="5" bind:value={encInput} spellcheck="false" placeholder={q.encodePlaceholder}></textarea>
+    {:else}
+      <textarea id="qp-in" class="dbx-textarea mono" rows="5" bind:value={decInput} spellcheck="false" placeholder={q.decodePlaceholder}></textarea>
+    {/if}
     {#if error}<p class="err">{error}</p>{/if}
     <div class="out-head">
       <label class="dbx-label" for="qp-out">{s.output}</label>

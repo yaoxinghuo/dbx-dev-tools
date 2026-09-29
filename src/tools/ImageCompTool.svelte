@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from "svelte";
   import ToolShell from "../components/ToolShell.svelte";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { saveFile } from "../lib/bridge.js";
@@ -16,6 +17,10 @@
   let out = $state(null); // { blob, url, size, ext }
   let busy = $state(false);
   let error = $state("");
+  // Mirror of out.url in a plain (non-reactive) variable — the encode path
+  // revokes the previous URL without reading `out` inside the effect, so the
+  // effect never risks becoming its own dependency.
+  let liveUrl = "";
 
   // Transform state (all optional; defaults are no-ops).
   let rotate = $state(0); // 0 | 90 | 180 | 270
@@ -36,7 +41,10 @@
     if (!f.type.startsWith("image/")) { error = ic.notImage; return; }
     error = "";
     if (file?.url) URL.revokeObjectURL(file.url);
-    if (out?.url) URL.revokeObjectURL(out.url);
+    if (liveUrl) {
+      URL.revokeObjectURL(liveUrl);
+      liveUrl = "";
+    }
     out = null;
     const url = URL.createObjectURL(f);
     try {
@@ -90,7 +98,14 @@
   $effect(() => {
     // Re-encode whenever inputs change; debounce via microtask batching.
     file; format; quality; rotate; flip; cropEnabled; crop.x; crop.y; crop.w; crop.h; watermark; wmCorner; wmSize;
-    if (!file) { out = null; return; }
+    if (!file) {
+      if (liveUrl) {
+        URL.revokeObjectURL(liveUrl);
+        liveUrl = "";
+      }
+      out = null;
+      return;
+    }
     let cancelled = false;
     (async () => {
       busy = true;
@@ -101,14 +116,24 @@
         const mime = format === "original" ? file.type : MIMES[format];
         const blob = await new Promise((res) => canvas.toBlob(res, mime, quality));
         if (cancelled || !blob) return;
-        if (out?.url) URL.revokeObjectURL(out.url);
+        const url = URL.createObjectURL(blob);
+        const prev = liveUrl;
+        liveUrl = url;
+        if (prev) URL.revokeObjectURL(prev);
         const ext = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png", "image/gif": "gif", "image/avif": "avif" }[blob.type] || "img";
-        out = { blob, url: URL.createObjectURL(blob), size: blob.size, ext, type: blob.type, w: canvas.width, h: canvas.height };
+        out = { blob, url, size: blob.size, ext, type: blob.type, w: canvas.width, h: canvas.height };
       } finally {
         if (!cancelled) busy = false;
       }
     })();
     return () => (cancelled = true);
+  });
+
+  // The last produced URL outlives the component otherwise — switching
+  // tools unmounts this file and the object URL would leak.
+  onDestroy(() => {
+    if (liveUrl) URL.revokeObjectURL(liveUrl);
+    if (file?.url) URL.revokeObjectURL(file.url);
   });
 
   const ratio = $derived(file && out ? (1 - out.size / file.size) * 100 : null);

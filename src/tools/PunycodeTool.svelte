@@ -11,25 +11,38 @@
   const p = $derived(s.punycode);
 
   let mode = $state("toAscii");
-  let input = $state("日本.jp");
+  // The two directions keep separate inputs — an internationalized domain
+  // and its punycode form are different content, not one shared buffer.
+  let encInput = $state("日本.jp");
+  let decInput = $state("");
   let output = $state("");
   let error = $state("");
+
+  // Round-trip convenience: after switching modes, an empty target input
+  // gets seeded with the output just produced.
+  function swapSeed(m) {
+    if (!output) return;
+    if (m === "toAscii" && !encInput) encInput = output;
+    else if (m === "toUnicode" && !decInput) decInput = output;
+  }
 
   $effect(() => {
     error = "";
     output = "";
-    if (!input.trim()) return;
+    const text = mode === "toAscii" ? encInput : decInput;
+    if (!text.trim()) return;
     try {
-      output = mode === "toAscii" ? domainToAscii(input.trim()) : domainToUnicode(input.trim());
+      output = mode === "toAscii" ? domainToAscii(text.trim()) : domainToUnicode(text.trim());
     } catch {
       error = p.invalid;
     }
   });
   persistState("punycode", {
-    get: () => ({ mode, input }),
+    get: () => ({ mode, encInput, decInput }),
     set: (v) => {
       mode = v.mode ?? mode;
-      input = v.input ?? input;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
     },
   });
 </script>
@@ -37,12 +50,15 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card controls">
     <div class="modes">
-      <label class="check"><input type="radio" bind:group={mode} value="toAscii" /> {p.toAscii}</label>
-      <label class="check"><input type="radio" bind:group={mode} value="toUnicode" /> {p.toUnicode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="toAscii" onchange={() => swapSeed("toAscii")} /> {p.toAscii}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="toUnicode" onchange={() => swapSeed("toUnicode")} /> {p.toUnicode}</label>
     </div>
     <label class="dbx-label" for="pny-in">{s.input}</label>
-    <input id="pny-in" class="dbx-input mono" bind:value={input} spellcheck="false"
-      placeholder={mode === "toAscii" ? "日本.jp" : "xn--wgv71a.jp"} />
+    {#if mode === "toAscii"}
+      <input id="pny-in" class="dbx-input mono" bind:value={encInput} spellcheck="false" placeholder="日本.jp" />
+    {:else}
+      <input id="pny-in" class="dbx-input mono" bind:value={decInput} spellcheck="false" placeholder="xn--wgv71a.jp" />
+    {/if}
     {#if error}<p class="err">{error}</p>{/if}
     <div class="out-head">
       <label class="dbx-label" for="pny-out">{s.output}</label>

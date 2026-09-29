@@ -12,8 +12,17 @@
   const tool = $derived(s.tools.jwt);
   const j = $derived(s.jwt);
 
+  import { importRsaKey } from "../lib/rsa.js";
+
   const TIME_CLAIMS = new Set(["exp", "iat", "nbf", "auth_time"]);
   const ALG_HASH = { HS256: "SHA-256", HS384: "SHA-384", HS512: "SHA-512" };
+  // JWA RSA algs: RS* = RSASSA-PKCS1-v1_5, PS* = RSA-PSS (salt = hash length)
+  const RSA_JWT = {
+    RS256: ["RSASSA-PKCS1-v1_5", "SHA-256"], RS384: ["RSASSA-PKCS1-v1_5", "SHA-384"], RS512: ["RSASSA-PKCS1-v1_5", "SHA-512"],
+    PS256: ["RSA-PSS", "SHA-256"], PS384: ["RSA-PSS", "SHA-384"], PS512: ["RSA-PSS", "SHA-512"],
+  };
+  const ALL_ALGS = [...Object.keys(ALG_HASH), ...Object.keys(RSA_JWT)];
+  const isRsa = (a) => a in RSA_JWT;
 
   let mode = $state("parse"); // "parse" | "generate"
   let input = $state("");
@@ -60,14 +69,22 @@
       const head = b64urlEncode(te.encode(JSON.stringify({ alg: genAlg, typ: "JWT" })));
       const body = b64urlEncode(te.encode(stringifyJson(pr.value)));
       const si = `${head}.${body}`;
-      const key = await crypto.subtle.importKey(
-        "raw",
-        te.encode(genSecret),
-        { name: "HMAC", hash: { name: ALG_HASH[genAlg] } },
-        false,
-        ["sign"],
-      );
-      const sig = await crypto.subtle.sign("HMAC", key, te.encode(si));
+      let sig;
+      if (isRsa(genAlg)) {
+        const [name, hash] = RSA_JWT[genAlg];
+        const { key } = await importRsaKey(genSecret, { alg: name, hash, usage: "sign", need: "private" });
+        const params = name === "RSA-PSS" ? { name, saltLength: Number(hash.slice(4)) / 8 } : { name };
+        sig = await crypto.subtle.sign(params, key, te.encode(si));
+      } else {
+        const key = await crypto.subtle.importKey(
+          "raw",
+          te.encode(genSecret),
+          { name: "HMAC", hash: { name: ALG_HASH[genAlg] } },
+          false,
+          ["sign"],
+        );
+        sig = await crypto.subtle.sign("HMAC", key, te.encode(si));
+      }
       genToken = `${si}.${b64urlEncode(new Uint8Array(sig))}`;
     } catch {
       genError = j.genFailed;
@@ -115,25 +132,28 @@
   });
 
   async function verify() {
-    const hash = ALG_HASH[alg];
-    if (!hash) {
-      verifyState = "unsupported";
-      return;
-    }
     try {
-      const key = await crypto.subtle.importKey(
-        "raw",
-        new TextEncoder().encode(secret),
-        { name: "HMAC", hash: { name: hash } },
-        false,
-        ["verify"],
-      );
-      const ok = await crypto.subtle.verify(
-        "HMAC",
-        key,
-        b64urlBytes(signatureB64),
-        new TextEncoder().encode(signingInput),
-      );
+      let ok;
+      if (isRsa(alg)) {
+        const [name, hash] = RSA_JWT[alg];
+        const { key } = await importRsaKey(secret, { alg: name, hash, usage: "verify", need: "public" });
+        const params = name === "RSA-PSS" ? { name, saltLength: Number(hash.slice(4)) / 8 } : { name };
+        ok = await crypto.subtle.verify(params, key, b64urlBytes(signatureB64), new TextEncoder().encode(signingInput));
+      } else {
+        const hash = ALG_HASH[alg];
+        if (!hash) {
+          verifyState = "unsupported";
+          return;
+        }
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new TextEncoder().encode(secret),
+          { name: "HMAC", hash: { name: hash } },
+          false,
+          ["verify"],
+        );
+        ok = await crypto.subtle.verify("HMAC", key, b64urlBytes(signatureB64), new TextEncoder().encode(signingInput));
+      }
       verifyState = ok ? "valid" : "invalid";
     } catch {
       verifyState = "invalid";
@@ -168,11 +188,16 @@
       <textarea id="jwt-payload" class="dbx-textarea mono" rows="6" bind:value={genPayload}></textarea>
       <div class="gen-row">
         <select class="dbx-input narrow" bind:value={genAlg}>
-          {#each Object.keys(ALG_HASH) as a}<option value={a}>{a}</option>{/each}
+          {#each ALL_ALGS as a}<option value={a}>{a}</option>{/each}
         </select>
-        <input class="dbx-input" bind:value={genSecret} placeholder={j.secret} />
+        {#if !isRsa(genAlg)}
+          <input class="dbx-input" bind:value={genSecret} placeholder={j.secret} />
+        {/if}
         <button type="button" class="dbx-btn dbx-btn--primary" onclick={generate} disabled={!genSecret}>{j.generate}</button>
       </div>
+      {#if isRsa(genAlg)}
+        <textarea class="dbx-textarea mono" rows="4" bind:value={genSecret} placeholder={j.privKey}></textarea>
+      {/if}
       {#if genError}<p class="err">{genError}</p>{/if}
       {#if genToken}
         <div class="card-head">
@@ -222,7 +247,11 @@
       </div>
       <code class="mono sig">{signatureB64}</code>
       <div class="verify">
-        <input class="dbx-input" bind:value={secret} placeholder={j.secret} />
+        {#if isRsa(alg)}
+          <textarea class="dbx-textarea mono" rows="4" bind:value={secret} placeholder={j.pubKey}></textarea>
+        {:else}
+          <input class="dbx-input" bind:value={secret} placeholder={j.secret} />
+        {/if}
         <button type="button" class="dbx-btn" onclick={verify} disabled={!secret}>{j.verify}</button>
         {#if verifyState === "valid"}<span class="badge ok">{j.valid}</span>
         {:else if verifyState === "invalid"}<span class="badge bad">{j.badSig}</span>

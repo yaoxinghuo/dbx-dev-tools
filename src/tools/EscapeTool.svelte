@@ -10,7 +10,10 @@
   const tool = $derived(s.tools.escape);
   const u = $derived(s.escape);
 
-  let input = $state("");
+  // Escape and unescape keep separate input buffers — flipping modes should
+  // not overwrite what the user pasted into the other box.
+  let encInput = $state("");
+  let decInput = $state("");
   let mode = $state("escape");
   let format = $state("html");
   let output = $state("");
@@ -18,10 +21,20 @@
 
   const FORMAT_KEYS = ["html", "xml", "js", "json", "regex", "csv", "shell"];
 
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m;
+    // Round-trip convenience: an empty target buffer gets seeded with the
+    // output we just produced.
+    if (!output) return;
+    if (m === "escape" && !encInput) encInput = output;
+    else if (m === "unescape" && !decInput) decInput = output;
+  }
+
   $effect(() => {
     error = "";
     output = "";
-    const text = input;
+    const text = mode === "escape" ? encInput : decInput;
     if (!text) return;
     const f = ESCAPE_FORMATS[format];
     if (!f) {
@@ -35,9 +48,10 @@
     }
   });
   persistState("escape", {
-    get: () => ({ input, mode, format }),
+    get: () => ({ encInput, decInput, mode, format }),
     set: (v) => {
-      input = v.input ?? input;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
       mode = v.mode ?? mode;
       format = v.format ?? format;
     },
@@ -48,8 +62,8 @@
   <div class="dbx-card">
     <div class="opts">
       <div class="seg">
-        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "escape"} onclick={() => (mode = "escape")}>{u.escape}</button>
-        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "unescape"} onclick={() => (mode = "unescape")}>{u.unescape}</button>
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "escape"} onclick={() => setMode("escape")}>{u.escape}</button>
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "unescape"} onclick={() => setMode("unescape")}>{u.unescape}</button>
       </div>
       <select class="dbx-select" bind:value={format}>
         {#each FORMAT_KEYS as key}
@@ -57,7 +71,11 @@
         {/each}
       </select>
     </div>
-    <textarea class="dbx-textarea mono" rows="6" bind:value={input} placeholder={mode === "escape" ? u.escapePlaceholder : u.unescapePlaceholder}></textarea>
+    {#if mode === "escape"}
+      <textarea class="dbx-textarea mono" rows="6" bind:value={encInput} placeholder={u.escapePlaceholder}></textarea>
+    {:else}
+      <textarea class="dbx-textarea mono" rows="6" bind:value={decInput} placeholder={u.unescapePlaceholder}></textarea>
+    {/if}
     {#if error}<p class="err">{error}</p>{/if}
     <p class="dbx-hint">{u.hints[format]}</p>
   </div>

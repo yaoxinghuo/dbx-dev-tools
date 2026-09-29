@@ -13,11 +13,14 @@
   let width = $state(400);
   let height = $state(300);
   let format = $state("png");
+  let targetKb = $state(""); // "" = no target
   let text = $state("");
   let bg = $state("#94a3b8");
   let fg = $state("#ffffff");
   let out = $state(null); // { blob, url, ext, type }
   let busy = $state(false);
+
+  const targetBytes = $derived(Math.round(parseFloat(targetKb) * 1024) || 0);
 
   const MIMES = { png: "image/png", jpeg: "image/jpeg", webp: "image/webp" };
 
@@ -40,7 +43,22 @@
       if (MIMES[format] === "image/jpeg") {
         // JPEG has no alpha — fg text on bg is fine, no flattening needed.
       }
-      const blob = await new Promise((res) => canvas.toBlob(res, MIMES[format], 0.9));
+      const toBlob = (q) => new Promise((res) => canvas.toBlob(res, MIMES[format], q));
+      let blob;
+      if (targetBytes && format !== "png") {
+        // Bisect quality for the largest blob still ≤ the target size.
+        let lo = 0.02, hi = 1, best = null;
+        for (let i = 0; i < 8; i++) {
+          const q = (lo + hi) / 2;
+          const b = await toBlob(q);
+          if (!b) break;
+          if (b.size <= targetBytes) { best = b; lo = q; }
+          else hi = q;
+        }
+        blob = best ?? (await toBlob(0.02));
+      } else {
+        blob = await toBlob(0.9);
+      }
       if (out?.url) URL.revokeObjectURL(out.url);
       out = blob ? { blob, url: URL.createObjectURL(blob), ext: format, type: blob.type } : null;
     } finally {
@@ -53,11 +71,12 @@
     await saveFile({ fileName: `placeholder-${width}x${height}.${out.ext}`, contentType: out.type }, new Uint8Array(await out.blob.arrayBuffer()));
   }
   persistState("placeholder", {
-    get: () => ({ width, height, format, text, bg, fg }),
+    get: () => ({ width, height, format, targetKb, text, bg, fg }),
     set: (v) => {
       width = v.width ?? width;
       height = v.height ?? height;
       format = v.format ?? format;
+      targetKb = v.targetKb ?? targetKb;
       text = v.text ?? text;
       bg = v.bg ?? bg;
       fg = v.fg ?? fg;
@@ -91,7 +110,14 @@
         <label class="dbx-label" for="ph-fg">{p.fg}</label>
         <input id="ph-fg" type="color" class="picker" bind:value={fg} />
       </div>
+      <div class="opt">
+        <label class="dbx-label" for="ph-size">{p.targetSize}</label>
+        <input id="ph-size" type="number" min="1" class="dbx-input narrow" bind:value={targetKb} placeholder="KB" />
+      </div>
     </div>
+    {#if targetBytes && format === "png"}
+      <p class="hint">{p.pngNoTarget}</p>
+    {/if}
     <label class="dbx-label" for="ph-text">{p.text}</label>
     <input id="ph-text" class="dbx-input" bind:value={text} placeholder="400×300" spellcheck="false" />
     <button type="button" class="dbx-btn primary" onclick={render} disabled={busy}>{p.generate}</button>

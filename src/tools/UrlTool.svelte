@@ -9,13 +9,26 @@
   const tool = $derived(s.tools.url);
   const u = $derived(s.url);
 
-  let input = $state("");
+  // Encode and decode keep separate input buffers — flipping modes should not
+  // overwrite what the user pasted into the other box.
+  let encInput = $state("");
+  let decInput = $state("");
   let mode = $state("encode");
   let scope = $state("component");
   let plusSpace = $state(false);
   let output = $state("");
   let error = $state("");
   let urlInfo = $state(null);
+
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m;
+    // Round-trip convenience: an empty target buffer gets seeded with the
+    // output we just produced (encode result → decode box, and vice versa).
+    if (!output) return;
+    if (m === "encode" && !encInput) encInput = output;
+    else if (m === "decode" && !decInput) decInput = output;
+  }
 
   function encode(text) {
     const encoded = scope === "component" ? encodeURIComponent(text) : encodeURI(text);
@@ -51,7 +64,7 @@
   $effect(() => {
     error = "";
     urlInfo = null;
-    const text = input;
+    const text = mode === "encode" ? encInput : decInput;
     if (!text.trim()) {
       output = "";
       return;
@@ -69,9 +82,10 @@
     urlInfo = parseUrl(mode === "encode" ? text : next || text);
   });
   persistState("url", {
-    get: () => ({ input, mode, scope, plusSpace }),
+    get: () => ({ encInput, decInput, mode, scope, plusSpace }),
     set: (v) => {
-      input = v.input ?? input;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
       mode = v.mode ?? mode;
       scope = v.scope ?? scope;
       plusSpace = v.plusSpace ?? plusSpace;
@@ -83,8 +97,8 @@
   <div class="dbx-card">
     <div class="opts">
       <div class="seg">
-        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "encode"} onclick={() => (mode = "encode")}>{u.encode}</button>
-        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "decode"} onclick={() => (mode = "decode")}>{u.decode}</button>
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "encode"} onclick={() => setMode("encode")}>{u.encode}</button>
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "decode"} onclick={() => setMode("decode")}>{u.decode}</button>
       </div>
       <select class="dbx-select" bind:value={scope}>
         <option value="component">{u.component}</option>
@@ -95,7 +109,11 @@
         <span>{u.plusSpace}</span>
       </label>
     </div>
-    <textarea class="dbx-textarea mono" rows="5" bind:value={input} placeholder={u.inputPlaceholder}></textarea>
+    {#if mode === "encode"}
+      <textarea class="dbx-textarea mono" rows="5" bind:value={encInput} placeholder={u.inputPlaceholder}></textarea>
+    {:else}
+      <textarea class="dbx-textarea mono" rows="5" bind:value={decInput} placeholder={u.inputPlaceholder}></textarea>
+    {/if}
     {#if error}<p class="err">{error}</p>{/if}
   </div>
 

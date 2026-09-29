@@ -1,6 +1,6 @@
 {
   "name": "Dev Tools",
-  "description": "Runs offline in a sandbox with zero network calls and just a single local permission. 42 developer utilities in ~150KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs.",
+  "description": "Runs offline in a sandbox with zero network calls and just a single local permission. 44 developer utilities in under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets — built for everyday development needs.",
   "icon": "assets/plugin.svg",
   "tags": [
     "devtools",
@@ -24,7 +24,7 @@
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
-      "description": "沙箱离线运行，零联网、仅1项本地权限。42 款开发工具仅 ~150KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。"
+      "description": "沙箱离线运行，零联网、仅1项本地权限。44 款开发工具小于 200KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。"
     }
   }
 }

@@ -13,16 +13,28 @@
   let mode = $state("encode");
   let codec = $state("base64");
   let urlSafe = $state(false);
-  let input = $state("");
+  // Encode and decode keep separate input buffers — flipping modes should
+  // not overwrite what the user pasted into the other box.
+  let encInput = $state("");
+  let decInput = $state("");
   let output = $state("");
   let error = $state("");
+
+  // Round-trip convenience: after switching modes, an empty target buffer
+  // gets seeded with the output just produced.
+  function swapSeed(m) {
+    if (!output) return;
+    if (m === "encode" && !encInput) encInput = output;
+    else if (m === "decode" && !decInput) decInput = output;
+  }
 
   $effect(() => {
     error = "";
     output = "";
-    if (!input) return;
+    const text = mode === "encode" ? encInput : decInput;
+    if (!text) return;
     try {
-      output = mode === "encode" ? encode(input) : decode(input);
+      output = mode === "encode" ? encode(text) : decode(text);
     } catch {
       error = b.invalid;
     }
@@ -62,12 +74,13 @@
     return new TextDecoder().decode(bytes);
   }
   persistState("base64", {
-    get: () => ({ mode, codec, urlSafe, input }),
+    get: () => ({ mode, codec, urlSafe, encInput, decInput }),
     set: (v) => {
       mode = v.mode ?? mode;
       codec = v.codec ?? codec;
       urlSafe = v.urlSafe ?? urlSafe;
-      input = v.input ?? input;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
     },
   });
 </script>
@@ -75,8 +88,8 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card controls">
     <div class="modes">
-      <label class="check"><input type="radio" bind:group={mode} value="encode" /> {b.encode}</label>
-      <label class="check"><input type="radio" bind:group={mode} value="decode" /> {b.decode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="encode" onchange={() => swapSeed("encode")} /> {b.encode}</label>
+      <label class="check"><input type="radio" bind:group={mode} value="decode" onchange={() => swapSeed("decode")} /> {b.decode}</label>
       <label class="check"><input type="checkbox" bind:checked={urlSafe} disabled={codec !== "base64"} /> {b.urlSafe}</label>
     </div>
     <div class="modes">
@@ -85,8 +98,11 @@
       {/each}
     </div>
     <label class="dbx-label" for="b64-in">{s.input}</label>
-    <textarea id="b64-in" class="dbx-textarea" rows="5" bind:value={input}
-      placeholder={mode === "encode" ? b.encodePlaceholder : b.decodePlaceholder}></textarea>
+    {#if mode === "encode"}
+      <textarea id="b64-in" class="dbx-textarea" rows="5" bind:value={encInput} placeholder={b.encodePlaceholder}></textarea>
+    {:else}
+      <textarea id="b64-in" class="dbx-textarea" rows="5" bind:value={decInput} placeholder={b.decodePlaceholder}></textarea>
+    {/if}
     <div class="out-head">
       <label class="dbx-label" for="b64-out">{s.output}</label>
       <CopyButton text={output} small />

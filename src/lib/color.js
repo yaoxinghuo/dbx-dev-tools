@@ -70,6 +70,29 @@ export function rgbToHsv({ r, g, b }) {
   return { h: h * 60, s: d / max, v: max };
 }
 
+export function hsvToRgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - c;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x]
+    : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return { r: Math.round((r + m) * 255), g: Math.round((g + m) * 255), b: Math.round((b + m) * 255) };
+}
+
+// c/m/y/k as 0-1 fractions — kept numeric so tool UIs can edit channels directly.
+export function rgbToCmyk({ r, g, b }) {
+  if (r === 0 && g === 0 && b === 0) return { c: 0, m: 0, y: 0, k: 1 };
+  const rr = 1 - r / 255, gg = 1 - g / 255, bb = 1 - b / 255;
+  const k = Math.min(rr, gg, bb);
+  return { c: (rr - k) / (1 - k), m: (gg - k) / (1 - k), y: (bb - k) / (1 - k), k };
+}
+
+export function cmykToRgb({ c, m, y, k }) {
+  const f = (x) => Math.round(255 * (1 - x) * (1 - k));
+  return { r: f(c), g: f(m), b: f(y) };
+}
+
 const hex2 = (v) => v.toString(16).padStart(2, "0");
 
 export function toHex({ r, g, b, a }) {

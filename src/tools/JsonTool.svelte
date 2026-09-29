@@ -4,7 +4,8 @@
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
-  import { formatJson, tokenizeJson } from "../lib/json.js";
+  import { formatJson, tokenizeJson, parseJsonRaw, stringifyJson } from "../lib/json.js";
+  import { jsonPath, jsonToTs } from "../lib/dataconv.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -15,6 +16,20 @@
   let indent = $state(2);
   let sortKeys = $state(false);
   let result = $state(null);
+  let path = $state("");
+  let showTs = $state(false);
+
+  // Re-parse the formatted output for path queries / TS export so the values
+  // seen here always match what's displayed (lossless numbers preserved).
+  const parsed = $derived(result?.ok ? parseJsonRaw(result.output).value : undefined);
+  const pathResult = $derived.by(() => {
+    const p = path.trim();
+    if (!p || parsed === undefined) return null;
+    const r = jsonPath(parsed, p);
+    if (r.error) return { error: true };
+    return { values: r.values };
+  });
+  const tsOut = $derived(showTs && parsed !== undefined ? jsonToTs(parsed) : "");
 
   const INDENTS = [
     { value: 2, label: "2 spaces" },
@@ -81,7 +96,31 @@
           </div>
         </div>
         <pre class="hl mono">{#each tokens as tok}<span class={tok.t}>{tok.v}</span>{/each}</pre>
+        <div class="path-row">
+          <input class="dbx-input mono" bind:value={path} placeholder={u.pathPlaceholder} spellcheck="false" />
+          <button type="button" class="dbx-btn small" onclick={() => (showTs = !showTs)}>{u.toTs}</button>
+        </div>
+        {#if pathResult?.error}
+          <p class="err">{u.pathBad}</p>
+        {:else if pathResult}
+          <div class="path-res">
+            <span class="dim">{u.pathCount} {pathResult.values.length}</span>
+            {#each pathResult.values.slice(0, 20) as v}
+              <pre class="mono pval">{stringifyJson(v, 2)}</pre>
+            {/each}
+            {#if pathResult.values.length > 20}<p class="dim">…{pathResult.values.length - 20} more</p>{/if}
+          </div>
+        {/if}
       </div>
+      {#if tsOut}
+        <div class="dbx-card">
+          <div class="card-head">
+            <h2 class="dbx-section-title">TypeScript</h2>
+            <CopyButton text={tsOut} small />
+          </div>
+          <pre class="hl mono">{tsOut}</pre>
+        </div>
+      {/if}
     {:else}
       <div class="dbx-card">
         <h2 class="dbx-section-title err">{u.invalid}</h2>
@@ -107,6 +146,11 @@
   .k { white-space: nowrap; font-weight: 600; width: 120px; }
   .v code { overflow-wrap: anywhere; }
   .snip { white-space: pre-wrap; }
+  .path-row { display: flex; gap: 8px; }
+  .path-row .dbx-input { flex: 1; }
+  .path-res { display: flex; flex-direction: column; gap: 6px; }
+  .pval { margin: 0; padding: 6px 10px; border: 1px solid var(--color-input); border-radius: var(--radius-md); background: var(--color-background); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .dim { color: var(--color-text-secondary, #64748b); font-size: 12px; }
   .ok { color: var(--color-primary); }
   .err { color: var(--color-destructive, #dc2626); }
   .hl {

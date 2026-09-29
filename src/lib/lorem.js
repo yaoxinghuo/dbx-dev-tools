@@ -58,9 +58,16 @@ function fitBytes(text, nBytes) {
 }
 
 // unit "chars" counts code points; unit "bytes" targets exact UTF-8 length.
+// In "repeat" mode `length` is a repeat count instead, and `#` inside
+// `pattern` is replaced by the 1-based index (user_# → user_1, user_2, …).
 export function generate({ length = 0, unit = "chars", mode = "lorem", pattern = "" }) {
   const n = Math.min(Math.max(Math.floor(Number(length)) || 0, 0), MAX);
   if (!n) return { text: "", chars: 0, bytes: 0 };
+  if (mode === "repeat") {
+    const tpl = pattern || "Lorem ipsum";
+    const text = Array.from({ length: n }, (_, i) => tpl.replaceAll("#", String(i + 1))).join("\n");
+    return { text, chars: [...text].length, bytes: byteLength(text) };
+  }
   // n code points always carry at least n UTF-8 bytes, so n chars of raw
   // material is enough regardless of mode.
   let raw;

@@ -1,3 +1,5 @@
+import md5 from "md5";
+
 // Minimal X.509 certificate decoder — hand-rolled ASN.1 DER parser.
 // Covers the standard fields: version, serial, signature alg, issuer/subject
 // RDNs, validity, SPKI (RSA/EC/Ed25519), SAN, basic constraints, key usage,
@@ -299,4 +301,27 @@ export async function parseCertificate(buf) {
   out.fingerprintSha1 = hex(new Uint8Array(sha1));
   out.fingerprintSha256 = hex(new Uint8Array(sha256));
   return out;
+}
+
+// --- OpenSSH public key fingerprints ---
+// `ssh-ed25519|ssh-rsa|ecdsa-sha2-* AAAA… [comment]` — fingerprint is over
+// the decoded blob (RFC 4253 wire format), same as `ssh-keygen -lf`.
+
+export function isSshPubKey(text) {
+  return /^(ssh-(?:rsa|dss|ed25519)|ecdsa-sha2-[a-z0-9-]+)\s+[A-Za-z0-9+/=]{16,}/.test(String(text).trim());
+}
+
+export async function sshFingerprint(line) {
+  const parts = String(line).trim().split(/\s+/);
+  const blob = Uint8Array.from(atob(parts[1]), (c) => c.charCodeAt(0));
+  const sha256 = await crypto.subtle.digest("SHA-256", blob);
+  const md5hex = md5(blob);
+  return {
+    type: parts[0],
+    comment: parts.slice(2).join(" "),
+    blobBytes: blob.length,
+    // OpenSSH prints SHA256 as unpadded base64, MD5 as colon-hex
+    sha256: "SHA256:" + btoa(String.fromCharCode(...new Uint8Array(sha256))).replace(/=+$/, ""),
+    md5: "MD5:" + md5hex.match(/../g).join(":"),
+  };
 }
