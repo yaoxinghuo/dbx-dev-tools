@@ -47,7 +47,7 @@
 
 <style>
   .shell {
-    max-width: 860px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 20px 24px 40px;
   }
