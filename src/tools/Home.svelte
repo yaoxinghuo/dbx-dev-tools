@@ -547,7 +547,9 @@
   .cat.more:hover { color: var(--color-foreground); }
   .cat.more :global(.ic) { transform: rotate(-90deg); }
   .cnt { font-size: 12px; color: var(--color-muted-foreground); }
-  .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
+  /* One row only: items that wrap past the 26px line are clipped whole —
+     no partial chips, no scrollbar, regardless of chip count/width. */
+  .recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; max-height: 26px; overflow: hidden; }
   .recent-label { font-size: 12px; margin-right: 2px; display: inline-flex; align-items: center; gap: 5px; }
   .recent-chip { height: 26px; padding: 0 12px; font-size: 12px; border-radius: 13px; display: inline-flex; align-items: center; gap: 6px; }
   .recent-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
