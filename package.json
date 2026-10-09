@@ -14,5 +14,6 @@
   "dependencies": {
     "md5": "^2.3.0",
     "qrcode-generator": "^1.4.4"
-  }
+  },
+  "version": "0.6.4"
 }
