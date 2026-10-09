@@ -154,11 +154,12 @@
   }
   // File-derived payloads (base64, previews) are not persisted — they can be large.
   persistState("imagebase64", {
-    get: () => ({ mode, includePrefix, decInput }),
+    // decInput deliberately not persisted — it's a pasted image blob, not a
+    // preference, and can be MBs (state blobs share one 256KiB host key).
+    get: () => ({ mode, includePrefix }),
     set: (v) => {
       mode = v.mode ?? mode;
       includePrefix = v.includePrefix ?? includePrefix;
-      decInput = v.decInput ?? decInput;
     },
   });
 </script>

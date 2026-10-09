@@ -89,10 +89,11 @@
     if (mode === "text") output = textUri;
   });
   persistState("datauri", {
-    get: () => ({ mode, text, mime }),
+    // `text` deliberately not persisted — in parse mode it can hold an entire
+    // pasted data: URI (MBs); state shares one 256KiB host key.
+    get: () => ({ mode, mime }),
     set: (v) => {
       if (v.mode !== "parse") mode = v.mode ?? mode;
-      text = v.text ?? text;
       mime = v.mime ?? mime;
     },
   });

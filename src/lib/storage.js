@@ -83,6 +83,25 @@ export function storageSet(key, value) {
   pending.set(key, entry);
 }
 
+export async function storageRemove(key) {
+  try {
+    const mode = await backend();
+    if (mode === "bridge") {
+      const s = window.dbxPlugin.storage;
+      if (typeof s.delete === "function") return await s.delete(PREFIX + key);
+      if (typeof s.remove === "function") return await s.remove(PREFIX + key);
+      // Bridge without delete(): a null tombstone is the best we can do —
+      // the key stays listed but carries no payload.
+      return await s.set(PREFIX + key, null);
+    }
+    if (mode === "local") {
+      localStorage.removeItem(PREFIX + key);
+      return;
+    }
+  } catch {}
+  memory.delete(PREFIX + key);
+}
+
 // Closing the workbench/DBX inside the 300ms debounce window would drop the
 // pending writes — flush them while the iframe can still postMessage.
 if (typeof window !== "undefined") {
