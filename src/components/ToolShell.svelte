@@ -5,7 +5,7 @@
   import { t, onLangChange } from "../lib/i18n.js";
   import Icon from "./Icon.svelte";
 
-  let { title = "", desc = "", version = "", children } = $props();
+  let { title = "", desc = "", version = "", children, titleSuffix } = $props();
   // App provides the current tool entry; null on the home page means no star.
   const currentTool = getContext("currentTool");
   let s = $state(t());
@@ -17,6 +17,7 @@
     <h1>
       {title}
       {#if version}<span class="ver">v{version}</span>{/if}
+      {@render titleSuffix?.()}
       {#if currentTool?.()}
         {@const key = currentTool().key}
         <button

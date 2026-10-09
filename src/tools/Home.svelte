@@ -7,12 +7,26 @@
   import { buildSearchIndex } from "../lib/toolsearch.js";
   import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled, isTypingFx, toggleTypingFx } from "../lib/prefs.svelte.js";
   import { favPointerDown, dnd } from "../lib/favdnd.svelte.js";
+  import { copyText } from "../lib/bridge.js";
   import { t, onLangChange, allMessages } from "../lib/i18n.js";
   import manifest from "../../manifest.json";
 
   let { onPick } = $props();
   let s = $state(t());
   onLangChange(() => (s = t()));
+
+  const REPO_URL = "https://github.com/yaoxinghuo/dbx-dev-tools";
+  let ghCopied = $state(false);
+  // Sandboxed plugin hosts block window.open / target=_blank — when the popup
+  // can't open, copy the repo URL instead so the click never feels dead.
+  async function openRepo() {
+    try {
+      if (window.open(REPO_URL, "_blank", "noopener")) return;
+    } catch {}
+    await copyText(REPO_URL);
+    ghCopied = true;
+    setTimeout(() => (ghCopied = false), 1600);
+  }
 
   let query = $state("");
   let activeTag = $state(null);
@@ -267,6 +281,15 @@
 </script>
 
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle} version={manifest.version}>
+  {#snippet titleSuffix()}
+    <button
+      type="button"
+      class="ghbtn"
+      class:done={ghCopied}
+      title={ghCopied ? s.home.repoCopied : "github.com/yaoxinghuo/dbx-dev-tools"}
+      onclick={openRepo}
+    ><Icon name={ghCopied ? "check" : "github"} size={15} filled={!ghCopied} /></button>
+  {/snippet}
   <div class="controls">
     <div class="searchwrap">
       <Icon name="search" size={15} />
@@ -682,6 +705,19 @@
   .fe-act { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; flex-shrink: 0; }
   .fe-act :global(.ic) { color: #f0b429; }
   .empty { font-size: 14px; }
+
+  .ghbtn {
+    border: 0;
+    background: none;
+    padding: 3px 4px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--color-muted-foreground);
+    display: inline-flex;
+    align-items: center;
+  }
+  .ghbtn:hover { color: var(--color-foreground); background: var(--color-muted); }
+  .ghbtn.done { color: var(--color-primary); }
 
   @keyframes ringflow {
     0%, 100% { background-position: 0% 50%; }
