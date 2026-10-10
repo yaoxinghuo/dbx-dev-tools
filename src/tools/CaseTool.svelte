@@ -28,7 +28,7 @@
 <ToolShell title={tool.name} desc={tool.desc}>
   <div class="dbx-card">
     <label class="dbx-label" for="case-in">{s.input}</label>
-    <input id="case-in" class="dbx-input mono" bind:value={input} placeholder={c.placeholder} />
+    <textarea id="case-in" class="dbx-textarea mono" rows="3" bind:value={input} placeholder={c.placeholder}></textarea>
   </div>
 
   {#if results.length}
