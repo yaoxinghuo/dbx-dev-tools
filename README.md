@@ -107,6 +107,12 @@ Open `http://127.0.0.1:5190/`. `npm run build:watch` pairs with the dev host's a
 Package an unsigned candidate: `dbx-plugin package .` → `dist/*.dbxp`.
 `package` only zips what's already in `ui/` — after editing code **or the version in `manifest.json`**, run `npm run build` first or the bundle keeps the stale build (the version shown in-app is inlined at build time).
 
+For a quick local test install — build + package in one line, then install the `.dbxp` via **Plugin Center → install from file** in DBX:
+
+```bash
+npm run build && npx dbx-plugin package
+```
+
 ## Publishing
 
 Tag + GitHub Release in this repo — `.github/workflows/plugin-release.yml` builds the candidate automatically. Then open a candidate PR against [`t8y2/dbx-store`](https://github.com/t8y2/dbx-store) and wait for review/signing. See the [plugin development docs](https://github.com/t8y2/dbx/blob/main/docs/content/docs/plugin-development.cn.mdx).

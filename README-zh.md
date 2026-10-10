@@ -107,6 +107,12 @@ dbx-plugin dev --path . --port 5190
 打包未签名候选包：`dbx-plugin package .` → `dist/*.dbxp`。
 `package` 只打包 `ui/` 里已有的产物——改过代码**或 manifest.json 里的版本号**后必须先 `npm run build`，否则包里仍是旧构建（界面显示的版本号是构建时烙进 bundle 的）。
 
+本机实测一键搞定——构建+打包一条命令，产物拿去 DBX **插件中心 → 从文件安装**：
+
+```bash
+npm run build && npx dbx-plugin package
+```
+
 ## 发布
 
 在本仓库打 tag + GitHub Release，`.github/workflows/plugin-release.yml` 自动构建候选包。然后向 [`t8y2/dbx-store`](https://github.com/t8y2/dbx-store) 提候选 PR 等待审核签名，详见[插件开发文档](https://github.com/t8y2/dbx/blob/main/docs/content/docs/plugin-development.cn.mdx)。
