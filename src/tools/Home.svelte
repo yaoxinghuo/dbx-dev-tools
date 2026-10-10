@@ -1,3 +1,17 @@
+<script module>
+  // Module-scope $state survives the component unmount when the user opens a
+  // tool and comes back — an expanded grid stays expanded for the session.
+  let catsOpen = $state(false);
+  let toolsOpen = $state(false);
+  // Scroll offset too: unmounting Home shrinks the document and the browser
+  // clamps scrollTop to ~0, so it must be saved and restored manually.
+  let homeScroll = 0;
+  // Fallback anchor for hosts where the plugin document doesn't own the
+  // scrollbar (auto-height iframes, host-level scroll): aim at the card the
+  // user opened instead of a pixel offset.
+  let lastPickedKey = null;
+</script>
+
 <script>
   import { onMount } from "svelte";
   import ToolShell from "../components/ToolShell.svelte";
@@ -28,6 +42,11 @@
     setTimeout(() => (ghCopied = false), 1600);
   }
 
+  // Hide until the scroll restore has settled — the first ResizeObserver
+  // notification lands after the first paint, so without this the page
+  // flashes at the top before jumping to position.
+  let restored = $state(!(homeScroll || lastPickedKey));
+
   let query = $state("");
   let activeTag = $state(null);
   const isMac = /Mac|iP/.test(navigator.platform || navigator.userAgent);
@@ -51,7 +70,6 @@
   // auto-fill rule (≥120px tracks + 8px gaps), so we measure the container.
   let catsEl;
   let catsW = $state(0);
-  let catsOpen = $state(false);
   const catCap = $derived(catsW ? Math.max(1, Math.floor((catsW + 8) / 128)) * 2 : categories.length + 1);
   const catsFits = $derived(categories.length + 1 <= catCap);
   const shownCats = $derived(catsOpen || catsFits ? categories : categories.slice(0, catCap - 2));
@@ -61,7 +79,6 @@
   // user asked for a specific list, so filtered results never collapse.
   let gridEl;
   let gridW = $state(0);
-  let toolsOpen = $state(false);
   const gridCap = $derived(gridW ? Math.max(1, Math.floor((gridW + 14) / 234)) * 2 : restOrdered.length);
   const toolsFit = $derived(restOrdered.length <= gridCap);
   const shownTools = $derived(!canSort || toolsOpen || toolsFit ? restOrdered : restOrdered.slice(0, gridCap));
@@ -177,7 +194,7 @@
     if (!n) return;
     const cur = navItems[Math.min(sel, n - 1)];
     if (e.key === "Enter") {
-      onPick?.(cur.tool);
+      openTool(cur.tool);
       return;
     }
     if (!e.key.startsWith("Arrow")) return;
@@ -194,11 +211,16 @@
     document.querySelector(`.cell[data-favkey="${key}"]`)?.scrollIntoView({ block: "nearest" });
   }
 
+  function openTool(tool) {
+    lastPickedKey = tool?.key ?? lastPickedKey;
+    onPick?.(tool);
+  }
+
   function favClick(tool) {
     // A pointer drag ends with a click on whatever card the pointer released
     // over — swallow it so a reorder doesn't also open a tool.
     if (dnd.moved) return;
-    onPick?.(tool);
+    openTool(tool);
   }
 
   // Typewriter placeholder: erase the static hint once, then cycle through
@@ -275,11 +297,61 @@
     });
     ro.observe(catsEl);
     if (gridEl) ro.observe(gridEl);
-    return () => { ro.disconnect(); window.removeEventListener("dbx-focus-home-search", focusReq); };
+    // Track continuously — at unmount the browser has already clamped
+    // scrollTop back to ~0, so reading it in cleanup is too late.
+    const scroller = document.scrollingElement;
+    const onScroll = () => { homeScroll = scroller.scrollTop; };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Sections populated from storage (recents, favorites) mount after the
+    // first frame; restoring once would clamp to a too-short document, so
+    // re-apply on every height change — until the user takes the wheel.
+    let userScrolled = false;
+    let revealT;
+    const markUser = () => { userScrolled = true; };
+    for (const ev of ["wheel", "touchstart", "keydown"])
+      window.addEventListener(ev, markUser, { passive: true });
+    const reapply = () => {
+      if (userScrolled) { restored = true; return; }
+      if (homeScroll > 0) {
+        scroller.scrollTop = homeScroll;
+      } else if (lastPickedKey) {
+        // homeScroll stayed 0: this document isn't the scroller (some hosts
+        // scroll the outer page around an auto-height iframe). scrollIntoView
+        // climbs ancestor scrollers, so it reaches the host scrollbar too.
+        // "center" rather than "nearest": the card is almost always below the
+        // viewport after the remount, so "nearest" parks it at the bottom
+        // edge — centering keeps it plainly in view.
+        document
+          .querySelector(`.cell[data-favkey="${lastPickedKey}"]`)
+          ?.scrollIntoView({ block: "center" });
+      }
+      // Reveal once scrolling stays put for a beat; the visibility:hidden
+      // phase keeps layout alive so offsets are measurable all along.
+      clearTimeout(revealT);
+      revealT = setTimeout(() => (restored = true), 120);
+    };
+    const cro = new ResizeObserver(reapply);
+    cro.observe(document.body);
+    reapply();
+    const croTimer = setTimeout(() => cro.disconnect(), 1200);
+    // Never leave the page hidden even if a host swallows every notification.
+    const failSafe = setTimeout(() => (restored = true), 900);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      for (const ev of ["wheel", "touchstart", "keydown"])
+        window.removeEventListener(ev, markUser);
+      clearTimeout(croTimer);
+      clearTimeout(failSafe);
+      clearTimeout(revealT);
+      cro.disconnect();
+      ro.disconnect();
+      window.removeEventListener("dbx-focus-home-search", focusReq);
+    };
   });
 
 </script>
 
+<div class:pre={!restored}>
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle} version={manifest.version}>
   {#snippet titleSuffix()}
     <button
@@ -331,7 +403,7 @@
         </button>
       </span>
       {#each recentTools as tool}
-        <button type="button" class="recent-chip dbx-btn" onclick={() => onPick?.(tool)}>
+        <button type="button" class="recent-chip dbx-btn" onclick={() => openTool(tool)}>
           <span class="dot" style:background={dotColor(tool.key)}></span>{s.tools[tool.key].name}
         </button>
       {/each}
@@ -446,6 +518,7 @@
     </div>
   {/if}
 </ToolShell>
+</div>
 
 <style>
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
@@ -725,6 +798,10 @@
   }
   :global(:root[data-dbx-theme="dark"]) .searchwrap::before { opacity: 0.22; }
   :global(:root[data-dbx-theme="dark"]) .searchwrap:focus-within::before { opacity: 0.85; }
+  /* Held off-screen while the scroll position settles — visibility keeps
+     layout measurable (unlike display:none) so restore math still works. */
+  .pre { visibility: hidden; }
+
   @media (prefers-reduced-motion: reduce) {
     .searchwrap::before { animation: none; }
   }
