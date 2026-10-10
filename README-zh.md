@@ -105,6 +105,7 @@ dbx-plugin dev --path . --port 5190
 浏览器打开 `http://127.0.0.1:5190/`。`npm run build:watch` 配合 dev host 的自动重载。
 
 打包未签名候选包：`dbx-plugin package .` → `dist/*.dbxp`。
+`package` 只打包 `ui/` 里已有的产物——改过代码**或 manifest.json 里的版本号**后必须先 `npm run build`，否则包里仍是旧构建（界面显示的版本号是构建时烙进 bundle 的）。
 
 ## 发布
 

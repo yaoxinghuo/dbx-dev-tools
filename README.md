@@ -105,6 +105,7 @@ dbx-plugin dev --path . --port 5190
 Open `http://127.0.0.1:5190/`. `npm run build:watch` pairs with the dev host's auto reload.
 
 Package an unsigned candidate: `dbx-plugin package .` → `dist/*.dbxp`.
+`package` only zips what's already in `ui/` — after editing code **or the version in `manifest.json`**, run `npm run build` first or the bundle keeps the stale build (the version shown in-app is inlined at build time).
 
 ## Publishing
 
