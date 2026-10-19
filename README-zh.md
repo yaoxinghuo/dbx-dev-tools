@@ -2,7 +2,7 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网、仅 2 项本地权限（`host.storage` 界面状态、`host.workbench` 标签页标题）**。44 款开发工具仅 <200KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网**。44 款开发工具仅 <200KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。纯前端实现、universal 包、无原生 Sidecar。
 
 ![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 个工具](https://img.shields.io/badge/工具-44-orange) ![安装包 <200KB](https://img.shields.io/badge/安装包-<200KB-brightgreen) ![权限 host.storage, host.workbench](https://img.shields.io/badge/权限-host.storage%20%2B%20host.workbench-blueviolet)
 
