@@ -242,6 +242,23 @@
       if (next) active = next;
     });
   });
+
+  // Tab title follows the open tool (DBX ≥0.6.48; requires host.workbench).
+  // capabilities.workbenchTitle arrives with init, so detection must be
+  // event-driven — a one-shot read at mount sees {} on real hosts.
+  let canTitle = $state(false);
+  const detectTitle = () => {
+    const p = window.dbxPlugin;
+    canTitle = !!(p?.capabilities?.workbenchTitle && typeof p.setTitle === "function");
+  };
+  ready().then(detectTitle);
+  onInit(detectTitle);
+  $effect(() => {
+    if (!canTitle) return;
+    const name = active ? s.tools[active.key]?.name : null;
+    // null resets to the tab's default title on the home page.
+    try { void window.dbxPlugin.setTitle(name ?? null); } catch {}
+  });
 </script>
 
 {#if booted}
