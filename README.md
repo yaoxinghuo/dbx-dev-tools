@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs offline in a sandbox with zero network calls**. 44 developer utilities under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs. Pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs offline in a sandbox with zero network calls**. 45 developer utilities in under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs. Pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 tools](https://img.shields.io/badge/tools-44-orange) ![package <200KB](https://img.shields.io/badge/package-<200KB-brightgreen) ![permissions: host.storage, host.workbench](https://img.shields.io/badge/permissions-host.storage%20%2B%20host.workbench-blueviolet)
+![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 tools](https://img.shields.io/badge/tools-45-orange) ![package <200KB](https://img.shields.io/badge/package-<200KB-brightgreen) ![permissions: host.storage, host.workbench](https://img.shields.io/badge/permissions-host.storage%20%2B%20host.workbench-blueviolet)
 
 <img width="2086" height="1404" alt="image" src="https://github.com/user-attachments/assets/704901ab-eb26-4794-a62d-366b41360609" />
 

@@ -43,6 +43,7 @@ import HttpTool from "../tools/HttpTool.svelte";
 import CssGenTool from "../tools/CssGenTool.svelte";
 import DataConvTool from "../tools/DataConvTool.svelte";
 import SpecialCharsTool from "../tools/SpecialCharsTool.svelte";
+import CnIdTool from "../tools/CnIdTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -52,6 +53,7 @@ import SpecialCharsTool from "../tools/SpecialCharsTool.svelte";
 export const TOOLS = [
   { key: "password", contributionId: "terry.devtools.password", component: PasswordTool, tags: ["security", "generator", "random", "password"] },
   { key: "uuid", contributionId: "terry.devtools.uuid", component: UuidTool, tags: ["generator", "random", "identifier"] },
+  { key: "cnid", contributionId: "terry.devtools.cnid", component: CnIdTool, tags: ["generator", "identifier", "chinese", "test"] },
   { key: "lorem", contributionId: "terry.devtools.lorem", component: LoremTool, tags: ["generator", "text", "test"] },
   { key: "qrcode", contributionId: "terry.devtools.qrcode", component: QrTool, tags: ["generator", "image", "qrcode"] },
   { key: "barcode", contributionId: "terry.devtools.barcode", component: BarcodeTool, tags: ["generator", "barcode"] },
