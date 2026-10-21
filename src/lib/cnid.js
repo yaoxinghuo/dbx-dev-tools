@@ -98,9 +98,11 @@ export function generateIds(opts) {
   for (let i = 0; i < n; i++) {
     const { code } = pickRegionCode(opts.region ?? -1);
     let dt;
-    if (opts.birth === "date" && opts.date) {
-      dt = new Date(opts.date + "T00:00:00");
-      if (Number.isNaN(dt.getTime())) return [];
+    if (opts.birth === "date") {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(opts.date || "");
+      if (!m || !isRealDate(+m[1], +m[2], +m[3])) return null;
+      dt = new Date(+m[1], +m[2] - 1, +m[3]);
+      if (dt > new Date()) return null;
     } else {
       const age = opts.birth === "age" ? Math.min(Math.max(0, opts.age | 0), 120) : 18 + rand(43);
       dt = randomDateForAge(age);

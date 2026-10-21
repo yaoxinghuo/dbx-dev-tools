@@ -24,10 +24,13 @@
   let ids = $state([]);
 
   let vInput = $state("");
+  let genErr = $state("");
   const result = $derived(vInput.trim() ? validateId(vInput) : null);
 
   function generate() {
-    ids = generateIds({ region, birth, age, date, gender: gender === "any" ? null : gender, count });
+    const res = generateIds({ region, birth, age, date, gender: gender === "any" ? null : gender, count });
+    genErr = res === null ? u.badDateInput : "";
+    ids = res || [];
   }
 
   $effect(() => {
@@ -35,12 +38,13 @@
   });
 
   persistState("cnid", {
-    get: () => ({ mode, region, birth, age, gender }),
+    get: () => ({ mode, region, birth, age, date, gender }),
     set: (v) => {
       mode = v.mode ?? mode;
       region = v.region ?? region;
       birth = v.birth ?? birth;
       age = v.age ?? age;
+      date = v.date ?? date;
       gender = v.gender ?? gender;
     },
   });
@@ -74,7 +78,7 @@
       {#if birth === "age"}
         <input class="dbx-input narrow" type="number" min="0" max="120" bind:value={age} />
       {:else if birth === "date"}
-        <input class="dbx-input" type="date" bind:value={date} />
+        <input class="dbx-input mono datein" bind:value={date} placeholder="YYYY-MM-DD" />
       {/if}
       <label>
         <span class="dbx-label">{u.gender}</span>
@@ -93,6 +97,7 @@
         <CopyButton text={ids.join("\n")} />
       </div>
     </div>
+    {#if genErr}<p class="err">{genErr}</p>{/if}
     <p class="hint">{u.disclaimer}</p>
     <div class="list">
       {#each ids as id}
@@ -137,6 +142,8 @@
   .controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
   .controls > label { display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
   .narrow { width: 80px; }
+  .datein { width: 130px; }
+  .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0 0 8px; }
   .actions { display: flex; gap: 8px; margin-left: auto; }
   .hint { color: var(--color-text-secondary, #64748b); font-size: 12px; margin: 0 0 12px; }
   .list { display: flex; flex-direction: column; gap: 8px; }
