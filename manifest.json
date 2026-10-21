@@ -3,7 +3,7 @@
   "manifest_version": 1,
   "id": "terry.devtools",
   "name": "Dev Tools",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "publisher": "terry",
   "description": "Runs offline in a sandbox. 45 developer utilities in under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets — built for everyday development needs.",
   "icon": "assets/plugin.svg",
