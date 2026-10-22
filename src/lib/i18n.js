@@ -3,7 +3,7 @@ import { locale, onEnvChange, onInit } from "./bridge.js";
 const messages = {
   en: {
     homeTitle: "Dev Tools",
-    homeSubtitle: "45 everyday dev tools · sandboxed & offline.",
+    homeSubtitle: "46 everyday dev tools · sandboxed & offline.",
     copy: "Copy",
     copied: "Copied",
     copyAll: "Copy all",
@@ -20,6 +20,7 @@ const messages = {
       hash: { name: "Hash Generator", desc: "MD5/SHA digests plus CRC32 for text and files, optional HMAC." },
       uuid: { name: "ID Generator", desc: "UUID v4 plus name-based v5/v3, NanoID and ULID." },
       cnid: { name: "CN ID Card", desc: "Generate valid-format Chinese ID numbers by region, age and gender; validate and parse existing numbers." },
+      nginx: { name: "Nginx Formatter", desc: "Beautify nginx configs: normalize whitespace, re-indent by braces, highlight directives, strings and variables." },
       base64: { name: "Base64 Encoder / Decoder", desc: "UTF-8 safe Base64/Base32/Base58/Hex encode and decode." },
       jwt: { name: "JWT Parser / Generator", desc: "Decode, verify and sign JWTs — HS256/384/512 and RS/PS256/384/512." },
       rmb: { name: "RMB Uppercase", desc: "Numeric amount to Chinese RMB uppercase." },
@@ -282,6 +283,13 @@ const messages = {
       errFormat: "Not a 15- or 18-digit ID (last digit may be X)",
       errDate: "Birth date is not a real date or is in the future",
       errChecksum: "Checksum digit mismatch",
+    },
+    nginx: {
+      placeholder: "Paste an nginx config…",
+      indent: "Indent",
+      spaces: "spaces",
+      joinBrackets: "Join { to previous line",
+      align: "Align directive values",
     },
     base64: {
       encode: "Encode",
@@ -936,7 +944,7 @@ const messages = {
   },
   zh: {
     homeTitle: "Dev 工具集",
-    homeSubtitle: "45 个日常开发工具 · 沙箱离线运行。",
+    homeSubtitle: "46 个日常开发工具 · 沙箱离线运行。",
     copy: "复制",
     copied: "已复制",
     copyAll: "全部复制",
@@ -953,6 +961,7 @@ const messages = {
       hash: { name: "Hash 生成器", desc: "文本与文件的 MD5/SHA 摘要及 CRC32，支持 HMAC。" },
       uuid: { name: "ID 生成器", desc: "批量生成 UUID v4、NanoID、ULID，支持命名空间 UUID v5/v3。" },
       cnid: { name: "身份证号工具", desc: "按省份、年龄、性别生成符合校验规则的身份证号，也可校验并解析已有号码。" },
+      nginx: { name: "Nginx 格式化", desc: "美化 Nginx 配置：规范空白、按花括号重新缩进，并高亮指令、字符串与变量。" },
       base64: { name: "Base64 编解码", desc: "支持 UTF-8 的 Base64/Base32/Base58/Hex 编解码。" },
       jwt: { name: "JWT 解析 / 生成", desc: "解码、校验并签发 JWT——HS256/384/512 及 RS/PS256/384/512。" },
       rmb: { name: "人民币大写", desc: "数字金额转人民币大写。" },
@@ -1215,6 +1224,13 @@ const messages = {
       errFormat: "不是 15/18 位身份证号（末位可为 X）",
       errDate: "出生日期不是有效日期或晚于今天",
       errChecksum: "校验位不匹配",
+    },
+    nginx: {
+      placeholder: "粘贴一段 Nginx 配置…",
+      indent: "缩进",
+      spaces: "空格",
+      joinBrackets: "{ 并到上一行",
+      align: "对齐指令值",
     },
     base64: {
       encode: "编码",

@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网**。45 款开发工具仅 <200KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。纯前端实现、universal 包、无原生 Sidecar。
+日常开发工具集合的 [DBX](https://github.com/t8y2/dbx) 插件——**沙箱离线运行，零联网**。46 款开发工具仅 <200KB：集安全加解密、编解码与转义、文本与正则排版、时间与 Cron 计算、网络与系统运维、前端图像与标识生成等全场景工具于一体，满足日常开发高频需求。纯前端实现、universal 包、无原生 Sidecar。
 
-![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 个工具](https://img.shields.io/badge/工具-45-orange) ![安装包 <200KB](https://img.shields.io/badge/安装包-<200KB-brightgreen) ![权限 host.storage, host.workbench](https://img.shields.io/badge/权限-host.storage%20%2B%20host.workbench-blueviolet)
+![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 个工具](https://img.shields.io/badge/工具-46-orange) ![安装包 <200KB](https://img.shields.io/badge/安装包-<200KB-brightgreen) ![权限 host.storage, host.workbench](https://img.shields.io/badge/权限-host.storage%20%2B%20host.workbench-blueviolet)
 
 <img width="2090" height="1412" alt="image" src="https://github.com/user-attachments/assets/7b43078d-d781-4e52-8449-9094872aba1e" />
 
@@ -15,6 +15,8 @@
 - **条码生成器**：手写 CODE-128（自动 A/B/C 字符集切换）、CODE-39、EAN-13/8、UPC-A、ITF/ITF-14、Codabar 编码器；自动补/校验校验位，条宽/高度/文字可调，导出 SVG / PNG
 - **Hash 生成器**：文本**与文件**的 MD5 + SHA-1/256/384/512 + CRC32 摘要（Web Crypto）；填写密钥后切换为 HMAC-SHA 摘要
 - **ID 生成器**：UUID v4、NanoID、ULID 批量生成，另支持基于命名空间的确定性 UUID v5/v3；UUID 支持大写/连字符选项
+- **身份证号工具**：按省份/年龄/性别生成符合校验规则的身份证号，支持校验并解析已有号码（含 15 位旧证升级 18 位）
+- **Nginx 格式化**：规范空白、按花括号重新缩进（移植自 `nginxfmt`），并高亮指令、字符串与变量
 - **Base64 / Base32 / Base58 / Hex**：UTF-8 安全的多字母表编解码，支持 URL-safe 变体
 - **JWT 解析 / 生成**：解码 header/payload、声明表格（exp/nbf 时效状态）、HS256/384/512 签名校验，并支持签名生成（payload JSON + 密钥 → token）
 - **人民币大写**：数字金额转中文大写（零规则折叠、负值、兆级上限）
