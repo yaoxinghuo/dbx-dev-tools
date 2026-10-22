@@ -45,6 +45,8 @@ import DataConvTool from "../tools/DataConvTool.svelte";
 import SpecialCharsTool from "../tools/SpecialCharsTool.svelte";
 import CnIdTool from "../tools/CnIdTool.svelte";
 import NginxTool from "../tools/NginxTool.svelte";
+import XmlFmtTool from "../tools/XmlFmtTool.svelte";
+import YamlFmtTool from "../tools/YamlFmtTool.svelte";
 
 // contributionId -> tool component. `key` indexes i18n strings (t().tools[key]).
 // `tags` holds language-independent canonical keys; display names live in
@@ -77,6 +79,8 @@ export const TOOLS = [
   { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "formatter", "text", "json"] },
   { key: "http", contributionId: "terry.devtools.http", component: HttpTool, tags: ["converter", "http", "api", "headers", "json"] },
   { key: "nginx", contributionId: "terry.devtools.nginx", component: NginxTool, tags: ["formatter", "text", "nginx", "config"] },
+  { key: "xmlfmt", contributionId: "terry.devtools.xmlfmt", component: XmlFmtTool, tags: ["formatter", "text", "xml", "config"] },
+  { key: "yamlfmt", contributionId: "terry.devtools.yamlfmt", component: YamlFmtTool, tags: ["formatter", "text", "yaml", "config"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff", "compare"] },
   { key: "regex", contributionId: "terry.devtools.regex", component: RegexTool, tags: ["text", "regex", "test"] },
   { key: "case", contributionId: "terry.devtools.case", component: CaseTool, tags: ["text", "converter", "slug", "url"] },

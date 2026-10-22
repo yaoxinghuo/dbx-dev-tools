@@ -2,9 +2,9 @@
 
 [English](./README.md) | [中文](./README-zh.md)
 
-A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs offline in a sandbox with zero network calls**. 46 developer utilities in under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs. Pure frontend, universal package, no native sidecar.
+A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/dbx) plugin — **runs offline in a sandbox with zero network calls**. 48 developer utilities in under 200KB: an all-in-one toolkit covering crypto & security, encoding, text & regex, time & Cron, network & DevOps, and frontend assets—built for everyday development needs. Pure frontend, universal package, no native sidecar.
 
-![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 tools](https://img.shields.io/badge/tools-46-orange) ![package <200KB](https://img.shields.io/badge/package-<200KB-brightgreen) ![permissions: host.storage, host.workbench](https://img.shields.io/badge/permissions-host.storage%20%2B%20host.workbench-blueviolet)
+![DBX >=0.6.19](https://img.shields.io/badge/DBX-%3E%3D0.6.19-blue) ![Platform universal](https://img.shields.io/badge/platform-universal-green) ![44 tools](https://img.shields.io/badge/tools-48-orange) ![package <200KB](https://img.shields.io/badge/package-<200KB-brightgreen) ![permissions: host.storage, host.workbench](https://img.shields.io/badge/permissions-host.storage%20%2B%20host.workbench-blueviolet)
 
 <img width="2086" height="1404" alt="image" src="https://github.com/user-attachments/assets/704901ab-eb26-4794-a62d-366b41360609" />
 
@@ -17,6 +17,8 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **ID Generator** — UUID v4, NanoID and ULID in bulk, plus deterministic name-based UUID v5/v3 with predefined namespaces; uppercase / hyphen options for UUID
 - **CN ID Card** — generate valid-format Chinese ID numbers by region / age / gender, and validate & parse existing numbers (incl. 15-digit legacy → 18-digit upgrade)
 - **Nginx Formatter** — normalize whitespace, re-indent by braces (vendored `nginxfmt` port), plus syntax highlighting for directives, strings and variables
+- **XML Formatter** — pretty-print with DOMParser validation; comments, CDATA and DOCTYPE handled; syntax-highlighted
+- **YAML Formatter** — re-indent while preserving comments, block scalars and anchors verbatim; warns on tab indentation
 - **Base64 / Base32 / Base58 / Hex** — UTF-8 safe multi-alphabet encode/decode, URL-safe variant
 - **JWT Parser / Generator** — decodes header/payload, claims table with exp/nbf validity badges, HS256/384/512 signature verification, plus JWT signing (payload JSON + secret → token)
 - **RMB Uppercase** — numeric amount to Chinese RMB uppercase (correct 零 folding, negatives, up to 兆)
