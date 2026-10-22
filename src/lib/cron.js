@@ -54,6 +54,8 @@ function parsePart(part, def, quartz, isDow) {
   const val = (t) => (isDow ? dowValue(t, def, quartz) : parseValue(t, def));
   let values = new Set();
   if (body === "*" || body === "?") {
+    // "?" means unspecified — stepping it makes no sense.
+    if (step !== null && body === "?") return null;
     // quartz weekday numbering is 1-7 (Sun=1) — the whole range is 0-6 here.
     if (isDow && quartz) values = new Set([0, 1, 2, 3, 4, 5, 6]);
     else for (let v = def.min; v <= def.max; v++) values.add(def.wrap7 && v === 7 ? 0 : v);
@@ -66,7 +68,14 @@ function parsePart(part, def, quartz, isDow) {
   } else {
     const v = val(body);
     if (v === null) return null;
-    values.add(v);
+    if (step === null) values.add(v);
+    else {
+      // Cron's "N/step" means "from N to the field max every step" (N-max/S),
+      // so a lone atom expands to its implied range; the shared step filter
+      // below then picks every step-th entry.
+      const hi = isDow ? (quartz ? 6 : 7) : def.max;
+      for (let x = v; x <= hi; x++) values.add(def.wrap7 && x === 7 ? 0 : x);
+    }
   }
   if (step !== null) {
     const base = [...values];
@@ -286,8 +295,19 @@ export function describeCron(cron, lang = "en") {
     const [min, max] = ranges[name];
     if (set.size === max - min + 1) continue;
     const values = [...set].sort((a, b) => a - b);
+    // Compress arithmetic progressions back to step notation ("0/2", "9-17/2")
+    // instead of listing every value. Weekdays keep their names.
+    let stepped = null;
+    if (name !== "dow" && values.length > 2) {
+      const d = values[1] - values[0];
+      if (d > 1 && values.every((v, i) => i === 0 || v - values[i - 1] === d)) {
+        const last = values[values.length - 1];
+        // Reaching the field boundary (next step would overflow) reads as a/d.
+        stepped = last + d > max ? `${values[0]}/${d}` : `${values[0]}-${last}/${d}`;
+      }
+    }
     const shown = name === "dow" ? values.map((v) => WEEK[v]) : values;
-    parts.push(`${labels[name]}${shown.length === 1 ? "=" + shown[0] : ": " + shown.join(", ")}`);
+    parts.push(stepped ? `${labels[name]}=${stepped}` : `${labels[name]}${shown.length === 1 ? "=" + shown[0] : ": " + shown.join(", ")}`);
   }
   return parts.length ? parts.join("; ") : zh ? "每分钟" : "every minute";
 }
