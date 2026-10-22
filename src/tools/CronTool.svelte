@@ -13,6 +13,7 @@
   let input = $state("*/15 9-18 * * 1-5");
   let flavor = $state("auto"); // "auto" | "std" | "quartz"
   let now = $state(Date.now());
+  let count = $state(5);
 
   const PRESETS = [
     "*/5 * * * *",
@@ -26,7 +27,9 @@
 
   const cron = $derived(input.trim() ? parseCron(input, flavor) : undefined);
   const summary = $derived(cron ? describeCron(cron, lang() === "zh" ? "zh" : "en") : "");
-  const runs = $derived(cron ? nextRuns(cron, new Date(now), 5) : []);
+  // Clamp rather than reject: a stray 0/999 mid-typing shouldn't error out.
+  const runCount = $derived(Math.min(100, Math.max(1, Math.floor(count) || 5)));
+  const runs = $derived(cron ? nextRuns(cron, new Date(now), runCount) : []);
 
   function refresh() {
     now = Date.now();
@@ -44,10 +47,11 @@
   // expanded tokens align with visible columns (5-field input has no second/year)
   const expandedExpr = $derived(cron ? cron.expanded : null);
   persistState("cron", {
-    get: () => ({ input, flavor }),
+    get: () => ({ input, flavor, count }),
     set: (v) => {
       input = v.input ?? input;
       flavor = v.flavor ?? flavor;
+      count = v.count ?? count;
     },
   });
 </script>
@@ -82,7 +86,11 @@
     </div>
 
     <div class="dbx-card table-card">
-      <h2 class="dbx-section-title">{c.nextRuns}</h2>
+      <h2 class="dbx-section-title runs-head">
+        {c.nextRuns}
+        <input class="dbx-input count" type="number" min="1" max="100" bind:value={count} />
+        {c.runsUnit}
+      </h2>
       {#if runs.length}
         <table class="dbx-table">
           <tbody>
@@ -116,6 +124,8 @@
   .field-table td { text-align: center; }
   .k { font-weight: 600; }
   .desc { margin: 0; font-size: 13px; }
+  .runs-head { display: flex; align-items: center; gap: 8px; }
+  .count { width: 64px; text-align: center; padding: 2px 6px; font-size: 12px; }
   .dim { color: var(--color-text-secondary, #64748b); font-size: 12px; }
   .act { width: 60px; text-align: right; }
   .err { color: var(--color-destructive, #dc2626); font-size: 13px; margin: 0; }
