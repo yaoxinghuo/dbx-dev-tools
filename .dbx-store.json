@@ -21,7 +21,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "Bug fix: JSON formatter, JWT inspector and header converter no longer corrupt integers beyond 2^53-1 (e.g. snowflake IDs) — number literals round-trip exactly as written. New: collapsed icon rail opens floating panels — favorites (drag-reorderable), recents, and an all-tools grid with its own search box (autofocus, Enter jumps to the first hit). Home header shows the plugin version badge; typewriter pill adopts the accent color; star hover colors now match between sidebar and home.",
+  "releaseNotes": "新增：Nginx 配置格式化（vendored nginxfmt 移植，含指令/字符串/变量语法高亮）。修复：身份证工具「指定日期」改为定宽 YYYY-MM-DD 输入并内联校验。 | New: Nginx config formatter with syntax highlighting (vendored nginxfmt port). Fix: CN ID Card exact-date input is now a fixed-width YYYY-MM-DD field with inline validation.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
