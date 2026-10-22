@@ -296,12 +296,14 @@ const messages = {
       spaces: "spaces",
       joinBrackets: "Join { to previous line",
       align: "Align directive values",
+      download: "Save .conf",
     },
     xmlfmt: {
       placeholder: "Paste XML…",
       indent: "Indent",
       spaces: "spaces",
       invalid: "Invalid XML",
+      download: "Save .xml",
     },
     yamlfmt: {
       placeholder: "Paste YAML…",
@@ -309,6 +311,7 @@ const messages = {
       spaces: "spaces",
       hint: "Comments, block scalars and anchors are preserved as-is",
       tabWarning: "TAB characters found in indentation — replaced with spaces (YAML forbids tabs)",
+      download: "Save .yaml",
     },
     base64: {
       encode: "Encode",
@@ -1256,12 +1259,14 @@ const messages = {
       spaces: "空格",
       joinBrackets: "{ 并到上一行",
       align: "对齐指令值",
+      download: "保存 .conf",
     },
     xmlfmt: {
       placeholder: "粘贴 XML…",
       indent: "缩进",
       spaces: "空格",
       invalid: "XML 不合法",
+      download: "保存 .xml",
     },
     yamlfmt: {
       placeholder: "粘贴 YAML…",
@@ -1269,6 +1274,7 @@ const messages = {
       spaces: "空格",
       hint: "注释、块标量与锚点原样保留",
       tabWarning: "缩进中发现 TAB 字符——已替换为空格（YAML 规范禁止 Tab）",
+      download: "保存 .yaml",
     },
     base64: {
       encode: "编码",

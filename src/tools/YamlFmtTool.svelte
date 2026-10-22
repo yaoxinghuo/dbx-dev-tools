@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
+  import { saveFile } from "../lib/bridge.js";
   import { formatYaml } from "../lib/yamlfmt.js";
   import { highlightYaml } from "../lib/markuphl.js";
   import { t, onLangChange } from "../lib/i18n.js";
@@ -50,7 +51,10 @@
   {#if result.text}
     <div class="outhead">
       <h2 class="dbx-section-title">{s.output}</h2>
-      <CopyButton text={result.text} small />
+      <div class="acts">
+        <button type="button" class="dbx-btn small" onclick={() => saveFile({ fileName: "formatted.yaml", contentType: "application/yaml" }, result.text)}>{u.download}</button>
+        <CopyButton text={result.text} small />
+      </div>
     </div>
     <pre class="out mono dbx-card"><code>{@html result.html}</code></pre>
   {/if}
@@ -62,6 +66,7 @@
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   .warn { color: #d97706; font-size: 13px; margin: 10px 0 0; }
   .outhead { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px; }
+  .acts { display: flex; gap: 6px; }
   .out { margin: 0; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.55; white-space: pre; tab-size: 4; }
   .out :global(.nx-dir) { color: var(--color-primary, #3b82f6); }
   .out :global(.nx-str) { color: #16a34a; }
