@@ -74,7 +74,7 @@ export const TOOLS = [
   { key: "rsa", contributionId: "terry.devtools.rsa", component: RsaTool, tags: ["generator", "security", "crypto", "key"] },
   { key: "cert", contributionId: "terry.devtools.cert", component: CertTool, tags: ["security", "parser", "certificate", "x509", "pem"] },
   { key: "totp", contributionId: "terry.devtools.totp", component: TotpTool, tags: ["security", "totp", "otp", "2fa"] },
-  { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "text", "json"] },
+  { key: "json", contributionId: "terry.devtools.json", component: JsonTool, tags: ["parser", "formatter", "text", "json"] },
   { key: "http", contributionId: "terry.devtools.http", component: HttpTool, tags: ["converter", "http", "api", "headers", "json"] },
   { key: "nginx", contributionId: "terry.devtools.nginx", component: NginxTool, tags: ["formatter", "text", "nginx", "config"] },
   { key: "diff", contributionId: "terry.devtools.diff", component: DiffTool, tags: ["text", "diff", "compare"] },
