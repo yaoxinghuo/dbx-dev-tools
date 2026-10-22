@@ -10,6 +10,10 @@
   // scrollbar (auto-height iframes, host-level scroll): aim at the card the
   // user opened instead of a pixel offset.
   let lastPickedKey = null;
+  // Search text and active category filter too — coming back from a tool to
+  // an empty search box forces the user to retype what they just typed.
+  let query = $state("");
+  let activeTag = $state(null);
 </script>
 
 <script>
@@ -47,8 +51,6 @@
   // flashes at the top before jumping to position.
   let restored = $state(!(homeScroll || lastPickedKey));
 
-  let query = $state("");
-  let activeTag = $state(null);
   const isMac = /Mac|iP/.test(navigator.platform || navigator.userAgent);
 
   function tagName(key) {
