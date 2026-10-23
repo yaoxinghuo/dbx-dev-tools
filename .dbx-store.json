@@ -21,7 +21,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "新增：Nginx / XML / YAML 三个格式化工具（语法高亮、输出可另存为文件），首页「格式化」分类，搜索与分类筛选状态在返回首页后保留。修复：身份证工具「指定日期」改为定宽 YYYY-MM-DD 输入并内联校验。 | New: Nginx, XML and YAML formatters with syntax highlighting and save-to-file; a Formatter category; the home search query and category filter now persist when returning from a tool. Fix: CN ID Card exact-date input is a fixed-width YYYY-MM-DD field with inline validation.",
+  "releaseNotes": "修复：Cron 的 N/step 步长解析（如 0/2 不再退化为整点），非法 ?/N 会被拒绝。新增：下次执行条数可自定义并记忆；首页 GitHub 图标加入动画（空闲微摆 + 悬停变色），页脚新增开源反馈入口，复制链接改为跟随点击位置的浮层提示。 | Fix: cron N/step atoms (e.g. 0/2) no longer degrade to the bare start value, and invalid ?/N is rejected. New: configurable next-runs count (persisted); animated GitHub icon with idle tail-flick and brand-teal hover, plus a footer invite for issues/PRs/stars; copy confirmation is now a floating chip at the click point.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
