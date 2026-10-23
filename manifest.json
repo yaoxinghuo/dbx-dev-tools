@@ -5,7 +5,7 @@
   "name": "Dev Tools",
   "version": "0.6.8",
   "publisher": "terry",
-  "description": "A lightweight dev toolset under 200KB — instant to use. Sandboxed and offline with zero network access: high-frequency tools for crypto, encoding, text, data conversion, formatting, time, networking and image generation; inputs and options are remembered and sync seamlessly across devices via DBX.",
+  "description": "A lightweight dev toolset under 200KB — instant to use. Sandboxed and offline with zero network access. High-frequency tools for crypto, encoding, text, data conversion, formatting, time, networking and image generation; inputs and options are remembered and sync seamlessly across devices via DBX.",
   "icon": "assets/plugin.svg",
   "engines": {
     "dbx": ">=0.6.19",
