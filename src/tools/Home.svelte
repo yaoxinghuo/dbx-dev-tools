@@ -21,6 +21,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import GripIcon from "../components/GripIcon.svelte";
   import Icon from "../components/Icon.svelte";
+  import GhIcon from "../components/GhIcon.svelte";
   import { TOOLS, CATEGORY_TAGS, VISIBLE_TAGS } from "../lib/tools.js";
   import { buildSearchIndex } from "../lib/toolsearch.js";
   import { isFavorite, toggleFavorite, recentKeys, favoriteKeys, clearRecent, isRecentEnabled, isTypingFx, toggleTypingFx } from "../lib/prefs.svelte.js";
@@ -35,13 +36,19 @@
 
   const REPO_URL = "https://github.com/yaoxinghuo/dbx-dev-tools";
   let ghCopied = $state(false);
+  let ghTipPos = $state(null);
   // Sandboxed plugin hosts block window.open / target=_blank — when the popup
-  // can't open, copy the repo URL instead so the click never feels dead.
-  async function openRepo() {
+  // can't open, copy the repo URL instead so the click never feels dead. The
+  // confirmation floats under whichever control was clicked rather than
+  // morphing an icon the user may not be looking at.
+  async function openRepo(e) {
+    // currentTarget is cleared once the handler yields — grab the rect first.
+    const r = e.currentTarget.getBoundingClientRect();
     try {
       if (window.open(REPO_URL, "_blank", "noopener")) return;
     } catch {}
     await copyText(REPO_URL);
+    ghTipPos = { x: r.left + r.width / 2, y: r.bottom + 6 };
     ghCopied = true;
     setTimeout(() => (ghCopied = false), 1600);
   }
@@ -353,16 +360,15 @@
 
 </script>
 
-<div class:pre={!restored}>
+<div class="home" class:pre={!restored}>
 <ToolShell title={s.homeTitle} desc={s.homeSubtitle} version={manifest.version}>
   {#snippet titleSuffix()}
     <button
       type="button"
       class="ghbtn"
-      class:done={ghCopied}
-      title={ghCopied ? s.home.repoCopied : "github.com/yaoxinghuo/dbx-dev-tools"}
+      title={s.home.ghInvite}
       onclick={openRepo}
-    ><Icon name={ghCopied ? "check" : "github"} size={15} filled={!ghCopied} /></button>
+    ><GhIcon size={16} /></button>
   {/snippet}
   <div class="controls">
     <div class="searchwrap">
@@ -513,6 +519,7 @@
       </button>
     {/if}
   </div>
+
   {#if dnd.origin === "home" && dnd.key}
     <div class="card-ghost dbx-card" style="left:{dnd.x}px;top:{dnd.y}px;width:{dnd.w}px;min-height:{dnd.h}px">
       <span class="name">{s.tools[dnd.key]?.name}</span>
@@ -520,6 +527,17 @@
     </div>
   {/if}
 </ToolShell>
+
+  <button type="button" class="ghfoot" onclick={openRepo} title={s.home.ghInvite}>
+    <GhIcon size={13} />
+    <span>{s.home.ghInvite}</span>
+  </button>
+
+  {#if ghCopied && ghTipPos}
+    <div class="ghtoast" style="left:{ghTipPos.x}px;top:{ghTipPos.y}px">
+      <Icon name="check" size={12} />{s.home.repoCopied}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -792,7 +810,22 @@
     align-items: center;
   }
   .ghbtn:hover { color: var(--color-foreground); background: var(--color-muted); }
-  .ghbtn.done { color: var(--color-primary); }
+  .ghtoast {
+    position: fixed;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--color-foreground, #1f2937);
+    color: var(--color-background, #fff);
+    font-size: 12px;
+    z-index: 50;
+    pointer-events: none;
+    animation: ghfade 0.15s ease;
+  }
+  @keyframes ghfade { from { opacity: 0; transform: translate(-50%, -4px); } }
 
   @keyframes ringflow {
     0%, 100% { background-position: 0% 50%; }
@@ -803,6 +836,28 @@
   /* Held off-screen while the scroll position settles — visibility keeps
      layout measurable (unlike display:none) so restore math still works. */
   .pre { visibility: hidden; }
+
+  /* Home fills the viewport so the footer can pin to the bottom on short
+     pages (margin-top:auto eats the free space); on long pages it just
+     trails the grid with a 30px gap. The shell keeps block layout inside,
+     so in-flow spacing is untouched. */
+  .home { display: flex; flex-direction: column; min-height: 100vh; }
+  .home :global(.shell) { flex: 1; padding-bottom: 0; }
+  .ghfoot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin: auto 0 0;
+    padding: 30px 0 14px;
+    border: 0;
+    background: none;
+    font-size: 12px;
+    color: var(--color-muted-foreground);
+    cursor: pointer;
+  }
+  .ghfoot:hover { color: var(--color-foreground); }
 
   @media (prefers-reduced-motion: reduce) {
     .searchwrap::before { animation: none; }
