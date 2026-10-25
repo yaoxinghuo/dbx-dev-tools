@@ -59,19 +59,28 @@ export function onEnvChange(fn) {
 export async function copyText(text) {
   try {
     await window.dbxPlugin.copy(text);
-    return;
+    return true;
   } catch {}
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
+  // Sandboxed iframes expose navigator.clipboard but reject writeText with
+  // NotAllowedError — keep falling through instead of propagating.
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {}
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
   }
-  const area = document.createElement("textarea");
-  area.value = text;
-  area.style.cssText = "position:fixed;opacity:0";
-  document.body.appendChild(area);
-  area.select();
-  document.execCommand("copy");
-  area.remove();
 }
 
 export async function saveFile({ fileName, contentType }, data) {

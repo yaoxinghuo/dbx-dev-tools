@@ -35,7 +35,7 @@
   onLangChange(() => (s = t()));
 
   const REPO_URL = "https://github.com/yaoxinghuo/dbx-dev-tools";
-  let ghCopied = $state(false);
+  let ghCopied = $state(null);
   let ghTipPos = $state(null);
   // Sandboxed plugin hosts block window.open / target=_blank — when the popup
   // can't open, copy the repo URL instead so the click never feels dead. The
@@ -47,10 +47,14 @@
     try {
       if (window.open(REPO_URL, "_blank", "noopener")) return;
     } catch {}
-    await copyText(REPO_URL);
-    ghTipPos = { x: r.left + r.width / 2, y: r.bottom + 6 };
-    ghCopied = true;
-    setTimeout(() => (ghCopied = false), 1600);
+    const ok = await copyText(REPO_URL);
+    // The footer sits at the viewport bottom — a chip below it would render
+    // off-screen, so flip above the control when there's no room underneath.
+    const below = r.bottom + 6;
+    const above = below + 30 > innerHeight;
+    ghTipPos = { x: r.left + r.width / 2, y: above ? r.top - 6 : below, above };
+    ghCopied = ok ? s.home.repoCopied : REPO_URL;
+    setTimeout(() => (ghCopied = null), 1600);
   }
 
   // Hide until the scroll restore has settled — the first ResizeObserver
@@ -534,8 +538,8 @@
   </button>
 
   {#if ghCopied && ghTipPos}
-    <div class="ghtoast" style="left:{ghTipPos.x}px;top:{ghTipPos.y}px">
-      <Icon name="check" size={12} />{s.home.repoCopied}
+    <div class="ghtoast" class:above={ghTipPos.above} role="status" style="left:{ghTipPos.x}px;top:{ghTipPos.y}px">
+      <Icon name="check" size={12} />{ghCopied}
     </div>
   {/if}
 </div>
@@ -825,7 +829,9 @@
     pointer-events: none;
     animation: ghfade 0.15s ease;
   }
+  .ghtoast.above { transform: translate(-50%, -100%); animation-name: ghfade-above; }
   @keyframes ghfade { from { opacity: 0; transform: translate(-50%, -4px); } }
+  @keyframes ghfade-above { from { opacity: 0; transform: translate(-50%, calc(-100% + 4px)); } to { opacity: 1; transform: translate(-50%, -100%); } }
 
   @keyframes ringflow {
     0%, 100% { background-position: 0% 50%; }
@@ -842,7 +848,11 @@
      trails the grid with a 30px gap. The shell keeps block layout inside,
      so in-flow spacing is untouched. */
   .home { display: flex; flex-direction: column; min-height: 100vh; }
-  .home :global(.shell) { flex: 1; padding-bottom: 0; }
+  /* Auto margins on a flex item cancel align-items:stretch — .shell would
+     shrink to fit-content (≈2 grid columns) instead of filling the row.
+     An explicit width restores the stretch; margin:auto still centers it
+     past the 960px cap. */
+  .home :global(.shell) { flex: 1; width: 100%; padding-bottom: 0; }
   .ghfoot {
     display: flex;
     align-items: center;
