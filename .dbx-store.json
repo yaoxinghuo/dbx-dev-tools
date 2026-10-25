@@ -21,7 +21,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "修复：Cron 的 N/step 步长解析（如 0/2 不再退化为整点），非法 ?/N 会被拒绝。新增：下次执行条数可自定义并记忆；首页 GitHub 图标加入动画（空闲微摆 + 悬停变色），页脚新增开源反馈入口，复制链接改为跟随点击位置的浮层提示。 | Fix: cron N/step atoms (e.g. 0/2) no longer degrade to the bare start value, and invalid ?/N is rejected. New: configurable next-runs count (persisted); animated GitHub icon with idle tail-flick and brand-teal hover, plus a footer invite for issues/PRs/stars; copy confirmation is now a floating chip at the click point.",
+  "releaseNotes": "修复：部分机器首页工具网格只显示 2 列且右侧留白（布局回归问题）；页脚 GitHub 入口点击后没有复制提示——浮层在空间不足时改为显示在控件上方，沙箱内复制失败时直接展示链接。视觉：收藏星标与收藏空状态图标改用主题色。 | Fix: on some machines the home grid shrank to 2 columns with dead space on the right (layout regression); the footer GitHub link gave no copy feedback — the chip now flips above the control when space is tight and shows the URL itself when copying is unavailable in the sandbox. Visual: favorite stars and the favorites empty-state now use the theme color.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
