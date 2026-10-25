@@ -80,7 +80,7 @@
     display: inline-flex;
   }
   .fav:hover { color: var(--color-primary); background: var(--color-muted); }
-  .fav.faved { color: #f0b429; }
+  .fav.faved { color: var(--color-primary); }
   header {
     margin-bottom: 18px;
   }

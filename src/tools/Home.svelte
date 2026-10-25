@@ -714,7 +714,7 @@
     display: inline-flex;
   }
   .star:hover { color: var(--color-primary); }
-  .star.faved { color: #f0b429; }
+  .star.faved { color: var(--color-primary); }
   .gripbox {
     position: absolute;
     right: 8px;
@@ -789,14 +789,14 @@
     padding: 9px;
     border-radius: 10px;
     background: var(--color-muted);
-    color: #f0b429;
+    color: var(--color-primary);
     flex-shrink: 0;
   }
   .fe-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .fe-title { font-size: 13px; font-weight: 600; color: var(--color-foreground); }
   .fe-hint { font-size: 12px; }
   .fe-act { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; flex-shrink: 0; }
-  .fe-act :global(.ic) { color: #f0b429; }
+  .fe-act :global(.ic) { color: var(--color-primary); }
   .empty { font-size: 14px; }
 
   .ghbtn {

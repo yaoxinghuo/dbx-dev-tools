@@ -144,9 +144,9 @@
   }
   .cell:hover { border-color: var(--color-primary, #3b82f6); color: var(--color-primary, #3b82f6); }
   .cell:active { transform: scale(.92); }
-  .cell.fav { border-color: #d97706; box-shadow: inset 0 0 0 1px #f59e0b33; }
+  .cell.fav { border-color: var(--color-primary); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent); }
   .star { border: none; background: none; font-size: 20px; cursor: pointer; color: var(--color-text-secondary, #64748b); padding: 0 4px; }
-  .star.on { color: #f59e0b; }
+  .star.on { color: var(--color-primary); }
   .clear { border: none; background: none; font-size: 11px; cursor: pointer; color: var(--color-text-secondary, #64748b); padding: 0 4px; }
   .clear:hover { color: var(--color-destructive, #dc2626); }
   .shortcode { color: var(--color-primary, #3b82f6); }

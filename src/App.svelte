@@ -877,18 +877,20 @@
     flex-shrink: 0;
   }
   .toolitem:hover .favicon { color: var(--color-muted-foreground); }
-  /* A faved row keeps its gold star even on row-hover — the reveal-gray is
+  /* A faved row keeps its primary star even on row-hover — the reveal-gray is
      only for unfaved icons, dimming a real "faved" marker would misread. */
-  .toolitem:hover .favicon.faved { color: #f0b429; }
-  .favicon.faved { color: #f0b429; }
+  .toolitem:hover .favicon.faved { color: var(--color-primary); }
+  .favicon.faved { color: var(--color-primary); }
   .toolitem.active .favicon { color: var(--color-primary-foreground); }
-  .toolitem.active .favicon.faved { color: #f0b429; }
+  /* Active rows have a primary background — a primary star would vanish,
+     so the faved marker keeps the on-color contrast instead. */
+  .toolitem.active .favicon.faved { color: var(--color-primary-foreground); }
   /* Star-button hover mirrors the home cards: teal for "click to fav",
-     faved rows keep gold, active rows keep their on-color contrast. */
+     faved rows keep primary, active rows keep their on-color contrast. */
   .toolitem .favicon:hover { color: var(--color-primary); }
-  .toolitem .favicon.faved:hover { color: #f0b429; }
+  .toolitem .favicon.faved:hover { color: var(--color-primary); }
   .toolitem.active .favicon:hover { color: var(--color-primary-foreground); }
-  .toolitem.active .favicon.faved:hover { color: #f0b429; }
+  .toolitem.active .favicon.faved:hover { color: var(--color-primary-foreground); }
   /* Sidebar more/less row: same dashed affordance as the home toggles. */
   .moreitem {
     display: flex;
