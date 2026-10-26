@@ -3,6 +3,7 @@
   import CopyButton from "../components/CopyButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
+  import { UNICODE_FORMATS, unicodeEncode, unicodeDecode } from "../lib/escape.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -10,6 +11,30 @@
   const u = $derived(s.unicode);
 
   let input = $state("Aé漢😀‍");
+  let mode = $state("encode");
+  let fmt = $state("u4");
+  let skipAscii = $state(true);
+  let encInput = $state("");
+  let decInput = $state("");
+
+  const codecText = $derived(mode === "encode" ? encInput : decInput);
+  const codecOut = $derived.by(() => {
+    const text = codecText;
+    if (!text) return "";
+    try {
+      return mode === "encode" ? unicodeEncode(text, fmt, skipAscii) : unicodeDecode(text);
+    } catch {
+      return "";
+    }
+  });
+
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m;
+    // Seed the other buffer with the last output so flipping modes is fluent.
+    if (m === "encode" && !encInput) encInput = codecOut;
+    else if (m === "decode" && !decInput) decInput = codecOut;
+  }
 
   // Per code point: char, hex/dec, UTF-8 bytes, UTF-16 units, category hint.
   const rows = $derived.by(() => {
@@ -45,12 +70,53 @@
     return "Other";
   }
   persistState("unicode", {
-    get: () => ({ input }),
-    set: (v) => { input = v.input ?? input; },
+    get: () => ({ input, mode, fmt, skipAscii, encInput, decInput }),
+    set: (v) => {
+      input = v.input ?? input;
+      mode = v.mode ?? mode;
+      fmt = v.fmt ?? fmt;
+      skipAscii = v.skipAscii ?? skipAscii;
+      encInput = v.encInput ?? encInput;
+      decInput = v.decInput ?? decInput;
+    },
   });
 </script>
 
 <ToolShell title={tool.name} desc={tool.desc}>
+  <div class="dbx-card">
+    <div class="opts">
+      <div class="seg">
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "encode"} onclick={() => setMode("encode")}>{u.encode}</button>
+        <button type="button" class="dbx-btn" class:dbx-btn--primary={mode === "decode"} onclick={() => setMode("decode")}>{u.decode}</button>
+      </div>
+      {#if mode === "encode"}
+        <select class="dbx-select" bind:value={fmt}>
+          {#each UNICODE_FORMATS as f}
+            <option value={f}>{u.fmts[f]}</option>
+          {/each}
+        </select>
+        <label class="chk"><input type="checkbox" bind:checked={skipAscii} />{u.skipAscii}</label>
+      {:else}
+        <span class="dbx-hint dim-hint">{u.decodeHint}</span>
+      {/if}
+    </div>
+    {#if mode === "encode"}
+      <textarea class="dbx-textarea mono" rows="5" bind:value={encInput} placeholder={u.encodePlaceholder}></textarea>
+    {:else}
+      <textarea class="dbx-textarea mono" rows="5" bind:value={decInput} placeholder={u.decodePlaceholder}></textarea>
+    {/if}
+  </div>
+
+  {#if codecOut}
+    <div class="dbx-card">
+      <div class="card-head">
+        <h2 class="dbx-section-title">{u.output}</h2>
+        <CopyButton text={codecOut} small />
+      </div>
+      <textarea class="dbx-textarea mono" rows="5" readonly value={codecOut}></textarea>
+    </div>
+  {/if}
+
   <div class="dbx-card">
     <label class="dbx-label" for="uni-in">{u.input}</label>
     <input id="uni-in" class="dbx-input mono" bind:value={input} spellcheck="false" />
@@ -85,6 +151,13 @@
 
 <style>
   .dbx-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .card-head { display: flex; align-items: center; justify-content: space-between; }
+  .opts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .seg { display: flex; gap: 0; }
+  .seg .dbx-btn:first-child { border-radius: 6px 0 0 6px; }
+  .seg .dbx-btn:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+  .chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .dim-hint { font-size: 12px; }
   .table-card { padding: 8px 12px; max-height: 420px; overflow: auto; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   .ch { font-size: 16px; width: 40px; }

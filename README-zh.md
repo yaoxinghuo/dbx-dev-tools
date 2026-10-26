@@ -54,7 +54,7 @@
 - **Quoted-Printable**：RFC 2045 邮件正文编码的编解码
 - **Data URI 生成**：文本或文件 → `data:` URI 内联嵌入
 - **SQL IN 拼接**：按行列表 → 带引号的 `IN (...)` 值
-- **Unicode 检查**：逐码位分析十六进制、UTF-8/UTF-16 字节、所属区块
+- **Unicode 编解码**：\u、U+、HTML 实体互转（6 种格式、可忽略 ASCII），附逐码位分析
 - **TOTP 生成器**：用 base32 密钥或 `otpauth://` URI 生成 RFC 6238 动态口令
 - **占位图生成**：任意尺寸的 PNG/JPEG/WebP 占位图
 

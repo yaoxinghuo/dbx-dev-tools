@@ -103,3 +103,68 @@ export const ESCAPE_FORMATS = {
   csv: { escape: csvEscape, unescape: csvUnescape },
   shell: { escape: shellEscape, unescape: shellUnescape },
 };
+
+// ---- Unicode code-point encoding -------------------------------------
+// Six output styles mirroring Ctool's Unicode codec: \uXXXX (surrogate
+// pairs for astral chars), \uNNNNNN (4–6 digits), \u{NNNNNN} (ES6),
+// U+NNNN, &#NN; and &#xNN;. `skipAscii` passes printable ASCII through
+// unchanged, which is the common case when escaping mixed text.
+
+export const UNICODE_FORMATS = ["u4", "uvar", "ubrace", "uplus", "htmldec", "htmlhex"];
+
+export function unicodeEncode(text, format, skipAscii = true) {
+  let out = "";
+  for (const ch of text) {
+    const cp = ch.codePointAt(0);
+    if (skipAscii && cp < 0x80) {
+      out += ch;
+      continue;
+    }
+    const hex = cp.toString(16);
+    switch (format) {
+      case "u4":
+        // UTF-16 units, not code points — astral chars become surrogate pairs.
+        for (let i = 0; i < ch.length; i++) out += `\\u${ch.charCodeAt(i).toString(16).padStart(4, "0")}`;
+        break;
+      case "uvar":
+        out += `\\u${hex.padStart(4, "0")}`;
+        break;
+      case "ubrace":
+        out += `\\u{${hex}}`;
+        break;
+      case "uplus":
+        out += `U+${hex.toUpperCase().padStart(4, "0")}`;
+        break;
+      case "htmldec":
+        out += `&#${cp};`;
+        break;
+      case "htmlhex":
+        out += `&#x${hex.toUpperCase()};`;
+        break;
+    }
+  }
+  return out;
+}
+
+const fromCp = (cp, fallback) =>
+  Number.isFinite(cp) && cp >= 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : fallback;
+
+export function unicodeDecode(text) {
+  return text.replace(
+    /\\u\{([0-9a-f]{1,6})\}|\\u([0-9a-f]{5,6})|\\u([0-9a-f]{4})|u\+([0-9a-f]{4,6})|&#x([0-9a-f]{1,6});|&#([0-9]{1,7});/gi,
+    (whole, brace, wide, std, plus, xent, dent) => {
+      if (brace !== undefined) return fromCp(parseInt(brace, 16), whole);
+      if (wide !== undefined) {
+        const cp = parseInt(wide, 16);
+        // A bare \u with 5–6 digits only makes sense for astral code points;
+        // otherwise it is a standard \uXXXX followed by hex-looking text.
+        if (cp > 0xffff) return fromCp(cp, whole);
+        return String.fromCodePoint(parseInt(wide.slice(0, 4), 16)) + wide.slice(4);
+      }
+      if (std !== undefined) return String.fromCodePoint(parseInt(std, 16));
+      if (plus !== undefined) return fromCp(parseInt(plus, 16), whole);
+      if (xent !== undefined) return fromCp(parseInt(xent, 16), whole);
+      return fromCp(parseInt(dent, 10), whole);
+    }
+  );
+}

@@ -54,7 +54,7 @@ A collection of everyday developer utilities as a [DBX](https://github.com/t8y2/
 - **Quoted-Printable** — RFC 2045 quoted-printable encode/decode for email bodies
 - **Data URI Generator** — text or file → `data:` URI for inline embedding
 - **SQL IN Builder** — line-separated lists → quoted `IN (...)` values
-- **Unicode Inspector** — per-code-point breakdown: hex, UTF-8/UTF-16 bytes, block name
+- **Unicode Codec** — \u / U+ / HTML entity encode & decode (6 formats, optional ASCII passthrough) plus per-code-point inspection
 - **TOTP Generator** — RFC 6238 one-time codes from a base32 secret or `otpauth://` URI
 - **Placeholder Image** — PNG/JPEG/WebP placeholder images at any size
 
