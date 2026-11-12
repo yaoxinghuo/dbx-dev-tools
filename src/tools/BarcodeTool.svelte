@@ -2,6 +2,7 @@
   import ToolShell from "../components/ToolShell.svelte";
   import { barcodeSvg, svgToPngBytes, SYMBOLOGIES } from "../lib/barcode.js";
   import { saveFile } from "../lib/bridge.js";
+  import CopyImageButton from "../components/CopyImageButton.svelte";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
 
@@ -82,6 +83,7 @@
       <div class="actions">
         <button type="button" class="dbx-btn" onclick={downloadSvg}>{s.downloadSvg}</button>
         <button type="button" class="dbx-btn dbx-btn--primary" onclick={downloadPng}>{s.downloadPng}</button>
+        <CopyImageButton getBytes={() => svgToPngBytes(exportSvg(), 2)} />
       </div>
     {/if}
   </div>

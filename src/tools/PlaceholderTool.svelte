@@ -1,6 +1,8 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import { saveFile } from "../lib/bridge.js";
+  import CopyImageButton from "../components/CopyImageButton.svelte";
+  import { blobToPngBytes } from "../lib/imgutil.js";
   import { formatSize, IEC_UNITS } from "../lib/filesize.js";
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
@@ -127,7 +129,10 @@
     <div class="dbx-card">
       <div class="result-row">
         <span class="meta">{out.type.split("/")[1].toUpperCase()} · {formatSize(out.blob.size, IEC_UNITS)}</span>
-        <button type="button" class="dbx-btn primary" onclick={download}>{s.downloadPng}</button>
+        <div class="result-actions">
+          <button type="button" class="dbx-btn primary" onclick={download}>{s.downloadPng}</button>
+          <CopyImageButton getBytes={() => (out.type === "image/png" ? out.blob.arrayBuffer().then((b) => new Uint8Array(b)) : blobToPngBytes(out.blob))} />
+        </div>
       </div>
       <div class="preview-wrap"><img src={out.url} alt="placeholder" /></div>
     </div>
@@ -142,6 +147,7 @@
   .times { color: var(--color-text-secondary, #64748b); }
   .picker { width: 40px; height: 32px; padding: 0; border: 1px solid var(--color-border, #e2e8f0); border-radius: 6px; background: transparent; cursor: pointer; }
   .result-row { display: flex; justify-content: space-between; align-items: center; }
+  .result-actions { display: flex; gap: 8px; }
   .meta { font-size: 13px; color: var(--color-text-secondary, #64748b); }
   .preview-wrap { display: flex; justify-content: center; padding: 12px; border: 1px dashed var(--color-border, #e2e8f0); border-radius: 8px; max-height: 320px; }
   .preview-wrap img { max-width: 100%; max-height: 296px; }

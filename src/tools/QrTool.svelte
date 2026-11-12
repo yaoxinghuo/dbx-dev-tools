@@ -1,6 +1,7 @@
 <script>
   import ToolShell from "../components/ToolShell.svelte";
   import CopyButton from "../components/CopyButton.svelte";
+  import CopyImageButton from "../components/CopyImageButton.svelte";
   import { qrSvg, svgToPngBytes } from "../lib/qrcode.js";
   import { saveFile } from "../lib/bridge.js";
   import { t, onLangChange } from "../lib/i18n.js";
@@ -165,6 +166,7 @@
         <div class="actions">
           <button type="button" class="dbx-btn" onclick={downloadSvg}>{s.downloadSvg}</button>
           <button type="button" class="dbx-btn dbx-btn--primary" onclick={downloadPng}>{s.downloadPng}</button>
+          <CopyImageButton getBytes={() => svgToPngBytes(exportSvg(), 2)} />
         </div>
       {/if}
     </div>

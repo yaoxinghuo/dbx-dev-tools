@@ -4,6 +4,8 @@
   import { t, onLangChange } from "../lib/i18n.js";
   import { persistState } from "../lib/persist.svelte.js";
   import { saveFile } from "../lib/bridge.js";
+  import CopyImageButton from "../components/CopyImageButton.svelte";
+  import { blobToPngBytes } from "../lib/imgutil.js";
 
   let s = $state(t());
   onLangChange(() => (s = t()));
@@ -223,7 +225,10 @@
       <div class="dbx-card">
         <div class="card-head">
           <h2 class="dbx-section-title">{u.preview}</h2>
-          <button type="button" class="dbx-btn" onclick={download}>{u.download}</button>
+          <div class="card-actions">
+            <button type="button" class="dbx-btn" onclick={download}>{u.download}</button>
+            <CopyImageButton getBytes={() => (decMime === "image/png" ? decBytes : blobToPngBytes(new Blob([decBytes], { type: decMime })))} />
+          </div>
         </div>
         <div class="meta">
           <img class="thumb" src={decUrl} alt="" />
@@ -239,6 +244,7 @@
 <style>
   .dbx-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
   .card-head { display: flex; align-items: center; justify-content: space-between; }
+  .card-actions { display: flex; gap: 8px; }
   .seg { display: flex; }
   .seg .dbx-btn:first-child { border-radius: 6px 0 0 6px; }
   .seg .dbx-btn:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }

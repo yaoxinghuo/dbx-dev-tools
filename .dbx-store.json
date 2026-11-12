@@ -21,7 +21,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "新增：Unicode 编解码面板——支持 \\uXXXX、\\u{4-6位}、\\u{X}、U+XXXX、HTML 实体（十/十六进制）六种格式互转，编码可忽略 ASCII 字符，解码自动识别全部格式；原「Unicode 检查」更名为「Unicode 编解码」，保留逐码位分析。 | New: Unicode encode/decode panel — six formats (\\uNNNN surrogate pairs, \\uNNNNNN wide, \\u{NNNNNN}, U+NNNN, HTML entities dec/hex) with a skip-ASCII toggle and an auto-detecting decoder; the former Unicode Inspector is now Unicode Codec, keeping the per-code-point breakdown.",
+  "releaseNotes": "新增：图像工具一键复制图片到剪贴板（需 DBX ≥ 0.7.0）——二维码、条码生成器、占位图、图片转 Base64（解码侧）新增「复制图片」按钮，非 PNG 格式自动转码；旧版宿主自动隐藏按钮。 | New: one-click copy-to-clipboard in image tools (requires DBX ≥ 0.7.0) — QR code, barcode generator, placeholder image and Base64-to-image gain a Copy Image button, with automatic PNG re-encoding for other formats; the button is hidden on older hosts.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",

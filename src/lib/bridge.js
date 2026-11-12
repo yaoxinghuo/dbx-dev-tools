@@ -83,6 +83,26 @@ export async function copyText(text) {
   }
 }
 
+// `bytes` must be a PNG — the host bridge accepts nothing else.
+export async function copyImage(bytes) {
+  // Production host: the iframe has an opaque origin and no clipboard
+  // permission, so the dedicated bridge method is the only working path.
+  try {
+    if (typeof window.dbxPlugin?.copyImage === "function") {
+      await window.dbxPlugin.copyImage({ contentType: "image/png" }, bytes);
+      return true;
+    }
+  } catch {}
+  // Dev host / plain browser fallback.
+  try {
+    if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": new Blob([bytes], { type: "image/png" }) })]);
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
 export async function saveFile({ fileName, contentType }, data) {
   const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
   try {
