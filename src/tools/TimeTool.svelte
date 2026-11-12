@@ -16,6 +16,7 @@
     tzOffsetMsAt,
     zonedToUtc,
     resolveTimeZone,
+    zoneParts,
   } from "../lib/time.js";
 
   let s = $state(t());
@@ -34,6 +35,7 @@
   const localTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   let fromTz = $state(localTz());
   let toTz = $state("UTC");
+  let detailTz = $state(localTz()); // display zone for timestamp-mode details
 
   const WEEKDAYS_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const WEEKDAYS_ZH = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
@@ -153,26 +155,32 @@
       error = u.outOfRange;
       return;
     }
-    const week = isoWeek(d);
-    const weekday = (lang() === "zh" ? WEEKDAYS_ZH : WEEKDAYS_EN)[d.getDay()];
+    // Calendar fields (weekday, day-of-year, ISO week) depend on the zone —
+    // read them off a Date carrying the selected zone's wall clock.
+    const dz = resolveTimeZone(detailTz) || localTz();
+    const zp = zoneParts(ms, dz);
+    const zd = new Date(+zp.year, +zp.month - 1, +zp.day, +zp.hour, +zp.minute, +zp.second);
+    const week = isoWeek(zd);
+    const weekday = (lang() === "zh" ? WEEKDAYS_ZH : WEEKDAYS_EN)[zd.getDay()];
     const unitLabel = u[`unit_${parsed.unit}`] || parsed.unit;
     rows = [
       [u.detected, `${text.trim()} → ${unitLabel}`],
       [u.unixSeconds, String(Math.floor(ms / 1000))],
       [u.unixMillis, String(ms)],
+      [`${dz} (${tzOffsetLabelAt(ms, dz)})`, wallInZone(ms, dz)],
       [u.local, d.toString()],
       [u.utc, d.toUTCString()],
       [u.iso, d.toISOString()],
       [u.weekday, weekday],
-      [u.doy, `${dayOfYear(d)} / ${isLeapYear(d.getFullYear()) ? 366 : 365}`],
+      [u.doy, `${dayOfYear(zd)} / ${isLeapYear(zd.getFullYear()) ? 366 : 365}`],
       [u.isoWeek, `${week.year}-W${String(week.week).padStart(2, "0")}`],
-      [u.leap, isLeapYear(d.getFullYear()) ? u.yes : u.no],
+      [u.leap, isLeapYear(zd.getFullYear()) ? u.yes : u.no],
       [u.tz, utcOffsetString(d)],
       [u.relative, relativeString(ms, Date.now(), lang() === "zh" ? "zh" : "en")],
     ];
   });
   persistState("time", {
-    get: () => ({ inputTs, inputDur, inputTz, mode, fromTz, toTz }),
+    get: () => ({ inputTs, inputDur, inputTz, mode, fromTz, toTz, detailTz }),
     set: (v) => {
       inputTs = v.inputTs ?? v.input ?? inputTs;
       inputDur = v.inputDur ?? inputDur;
@@ -180,6 +188,7 @@
       mode = v.mode ?? mode;
       fromTz = v.fromTz ?? fromTz;
       toTz = v.toTz ?? toTz;
+      detailTz = v.detailTz ?? detailTz;
     },
   });
 </script>
@@ -211,13 +220,22 @@
       </div>
     {:else}
       <input class="dbx-input mono" bind:value={inputTs} placeholder={u.placeholder} />
+      <p class="dbx-hint">{u.tsHint}</p>
     {/if}
     {#if error}<p class="err">{error}</p>{/if}
   </div>
 
   {#if rows.length}
     <div class="dbx-card">
-      <h2 class="dbx-section-title">{u.details}</h2>
+      <div class="card-head">
+        <h2 class="dbx-section-title">{u.details}</h2>
+        {#if mode === "timestamp"}
+          <label class="tzpick">
+            <span class="dbx-label">{u.tzDetail}</span>
+            <TzPicker bind:value={detailTz} />
+          </label>
+        {/if}
+      </div>
       <table class="dbx-table">
         <tbody>
           {#each rows as [name, value]}
@@ -250,6 +268,8 @@
     cursor: pointer;
   }
   .tzlocal:hover { text-decoration: underline; }
+  .card-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .tzpick { display: flex; flex-direction: column; gap: 4px; width: 240px; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
   .k { white-space: nowrap; font-weight: 600; width: 160px; }
   .v code { overflow-wrap: anywhere; }

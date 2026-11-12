@@ -8,14 +8,39 @@
   let open = $state(false);
   let active = $state(0);
   let wrapEl;
+  // Only filter by the input's text once the user actually edits it in this
+  // open session — an existing selection must not hide the other options.
+  let edited = $state(false);
 
   const MAX = 14;
   const LOCAL = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const NOW = Date.now();
+  // Bare-offset candidates like "UTC+08:00" are their own offset label.
+  function offsetOf(z) {
+    if (/^UTC[+-]/i.test(z)) return "";
+    try {
+      return tzOffsetLabelAt(NOW, z);
+    } catch {
+      return "";
+    }
+  }
   // Offset queries ("+8", "utc-5") reverse-lookup every zone currently at that
   // offset — the bare offset itself is offered first and is a valid value.
   const offsetMatch = $derived(value.trim().match(/^(?:(?:utc|gmt)\s*)?([+-])(\d{1,2})$/i));
   const filtered = $derived.by(() => {
+    if (!edited) return [LOCAL, ...COMMON_TIMEZONES.filter((z) => z !== LOCAL), ...TIMEZONES.filter((z) => z !== LOCAL && !COMMON_TIMEZONES.includes(z))].slice(0, MAX);
     const q = value.trim().toLowerCase();
+    // Bare digits ("8", "08") mean "zones at ±N hours" — signless, so both
+    // directions match and the two fixed-offset values lead the list.
+    const bareNum = q.match(/^\d{1,2}$/);
+    if (bareNum) {
+      const h = +bareNum[0];
+      if (h > 14) return [];
+      const label = (sign) => `UTC${sign}${String(h).padStart(2, "0")}:00`;
+      const at = (sign) => TIMEZONES.filter((z) => tzOffsetLabelAt(NOW, z) === label(sign));
+      if (h === 0) return ["UTC", ...at("+")].slice(0, MAX);
+      return [label("+"), label("-"), ...at("+"), ...at("-")].slice(0, MAX);
+    }
     if (offsetMatch) {
       const h = +offsetMatch[2];
       if (h <= 14) {
@@ -40,6 +65,7 @@
   function pick(z) {
     value = z;
     open = false;
+    edited = false;
   }
 
   function onKeydown(e) {
@@ -65,14 +91,15 @@
   }
 </script>
 
-<div class="tzpicker" bind:this={wrapEl} onfocusin={() => { open = true; active = 0; }} onfocusout={onFocusOut}>
-  <input class="dbx-input mono" bind:value={value} {placeholder} onkeydown={onKeydown} oninput={() => { open = true; active = 0; }} role="combobox" aria-expanded={open} aria-autocomplete="list" />
+<div class="tzpicker" bind:this={wrapEl} onfocusin={(e) => { open = true; active = 0; edited = false; const el = e.target; requestAnimationFrame(() => el.select?.()); }} onfocusout={onFocusOut}>
+  <input class="dbx-input mono" bind:value={value} {placeholder} onkeydown={onKeydown} oninput={() => { open = true; active = 0; edited = true; }} role="combobox" aria-expanded={open} aria-autocomplete="list" />
   {#if open && filtered.length}
     <ul class="tzlist" role="listbox">
       {#each filtered as z, i}
         <li>
           <button type="button" class="tzopt" class:active={i === active} onmousedown={() => pick(z)} onmouseenter={() => (active = i)} role="option" aria-selected={i === active}>
-            {z}
+            <span class="name">{z}</span>
+            {#if offsetOf(z)}<span class="off">{offsetOf(z)}</span>{/if}
           </button>
         </li>
       {/each}
@@ -100,7 +127,10 @@
     z-index: 50;
   }
   .tzopt {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
     width: 100%;
     text-align: left;
     padding: 6px 10px;
@@ -112,5 +142,7 @@
     color: inherit;
     cursor: pointer;
   }
+  .tzopt .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tzopt .off { flex-shrink: 0; color: var(--color-text-secondary, #64748b); font-size: 11px; }
   .tzopt.active { background: var(--color-muted, #f4f4f5); }
 </style>

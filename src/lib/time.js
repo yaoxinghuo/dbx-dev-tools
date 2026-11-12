@@ -103,7 +103,7 @@ function zoneFormatter(tz) {
   return f;
 }
 
-function zoneParts(ms, tz) {
+export function zoneParts(ms, tz) {
   const p = {};
   for (const part of zoneFormatter(tz).formatToParts(new Date(ms))) {
     if (part.type !== "literal") p[part.type] = part.value;
