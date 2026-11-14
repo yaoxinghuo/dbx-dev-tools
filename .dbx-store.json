@@ -21,7 +21,7 @@
   "source": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "homepage": "https://github.com/yaoxinghuo/dbx-dev-tools",
   "license": "MIT",
-  "releaseNotes": "新增：图像工具一键复制图片到剪贴板（需 DBX ≥ 0.7.0）——二维码、条码生成器、占位图、图片转 Base64（解码侧）新增「复制图片」按钮，非 PNG 格式自动转码；旧版宿主自动隐藏按钮。 | New: one-click copy-to-clipboard in image tools (requires DBX ≥ 0.7.0) — QR code, barcode generator, placeholder image and Base64-to-image gain a Copy Image button, with automatic PNG re-encoding for other formats; the button is hidden on older hosts.",
+  "releaseNotes": "新增：时间工具的「时间详情」卡片支持选择显示时区，墙钟时间、星期、年积日、ISO 周等全部跟随所选时区；时区选择器优化——聚焦展开完整列表、选项标注当前偏移、支持直接输入数字（如 8）匹配 ±N 小时时区、聚焦自动全选便于替换；「时间戳」模式更名「日期时间」并补充输入格式提示。 | New: the time tool's details card now has a display-timezone picker — wall clock, weekday, day-of-year and ISO week all follow the chosen zone; the timezone picker got a usability pass — full list on focus, per-option current offsets, bare-digit queries like 8 matching ±N-hour zones, and select-all on focus for quick replacement; the Timestamp mode is renamed Date & time with an input-format hint.",
   "localizations": {
     "zh-CN": {
       "name": "Dev 工具集",
